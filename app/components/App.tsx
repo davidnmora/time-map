@@ -16,6 +16,8 @@ function App() {
     mapboxgl.accessToken = accessToken;
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current as HTMLElement,
+      center: [-68.137343, 45.137451],
+      zoom: 3,
     });
     mapRef.current.setStyle(
       "mapbox://styles/davidnmora/cmikmelfl004601sqcjoe98co"
