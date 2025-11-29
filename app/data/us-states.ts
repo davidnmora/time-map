@@ -2,7 +2,7 @@ import type {
   TimeBoundGeographicRegion,
   TimeBoundGeographicRegionGroup,
   TimeRange,
-} from "../types/data";
+} from "./types";
 import type { GeoJSON } from "geojson";
 import statesData from "./us-states.json";
 import statesFoundedData from "./date-us-states-were-founded.json";

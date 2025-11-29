@@ -2,7 +2,7 @@ import type {
   TimeBoundGeographicRegion,
   TimeBoundGeographicRegionGroup,
   TimeRange,
-} from "../types/data";
+} from "../data/types";
 import type { GeographicRegion } from "../components/Map";
 
 function timeRangeOverlapsYear(

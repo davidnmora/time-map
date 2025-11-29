@@ -1,4 +1,4 @@
-import type { TimeBoundGeographicRegionGroup } from "../types/data";
+import type { TimeBoundGeographicRegionGroup } from "./types";
 import { generateUSStatesData } from "./us-states";
 
 export function getAllData(): TimeBoundGeographicRegionGroup {

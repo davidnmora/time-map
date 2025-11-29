@@ -22,4 +22,3 @@ export type TimeBoundGeographicRegionGroup = {
   metadata: Metadata;
 };
 
-
