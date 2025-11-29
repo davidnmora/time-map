@@ -11,8 +11,8 @@ It should take in the following props:
 - zoom: number
 - style: string
 - accessToken: string
-- onPositionUpdated which should be called when the user pans or zooms the map
-- polygons: an array of GeoJSON.FeatureCollection objects or something that enables us to add a polygon like:
+- onPositionUpdated which should be called when the user pans or zooms the map and passes the new center and zoom as arguments
+- geographicRegions: an array of GeoJSON.FeatureCollection objects or something (we'll have to design it to work smoothly with our data structure as defined below) that enables us to add a polygon like:
 
 ```js
 mapRef.current.addSource('maine', {
@@ -67,7 +67,13 @@ For now, it should hold
 
 We should keep the URL up to date. 
 
-We also want a nice set of hooks / functions that makes it easy to both read and update the URL. eg `const { zoom, center, year } = useURLState()` and `setURLState({ zoom: 10, center: [0, 0], year: 2020 })` where the setting properties are optional and will only update the URL if they are provided.
+We also want a nice set of hooks / functions that makes it easy to both read and update the URL. eg
+
+ `const { zoom, center, year } = useURLState()` and 
+ 
+ `setURLState({ zoom: 10, center: [0, 0], year: 2020 })` 
+ 
+ where the setting properties are optional and will only update the URL if they are provided.
 
 
 
@@ -75,7 +81,7 @@ We also want a nice set of hooks / functions that makes it easy to both read and
 
 The big picture aim of this app is to let you explore geographic data over time. The map displays a moment in time, there will eventually be a timeline to show things over time.
 
-Practically speaking, we will want to be able to compose time periods and geographies.
+Generally speaking, we will want to be able to show geographies that correspond to a specific moment in time (or region in time, eventually). The data structure should be designed to make this easy to specify and to compose.
 
 ## General data structure (proposal)
 
@@ -106,7 +112,9 @@ type TimeBoundGeographicRegion = {
 }
 ```
 
-We then can group those `TimeBoundGeographicRegion`s into `TimeBoundGeographicRegionGroup`s, which themselves can be used as a child of another `TimeBoundGeographicRegionGroup`.
+We then can group those `TimeBoundGeographicRegion`s into `TimeBoundGeographicRegionGroup`s, both of which can be further grouped into even more `TimeBoundGeographicRegionGroup`. 
+
+For a pratcical example, imagine the Roman Empire: individual regions, eg Britain, might have been under their control for specific periods, but we want to group them all into the larger entity of the Roman Empire.
 
 ```ts
 type TimeBoundGeographicRegionGroup = {
@@ -121,16 +129,107 @@ type TimeBoundGeographicRegionGroup = {
 
 ## Hardcode some actual data into the app
 
-Maybe we just try doing a 2 US states as `TimeBoundGeographicRegion`s and then a group of those two as a `TimeBoundGeographicRegionGroup` titled "United States".
+We can programtically generate `TimeBoundGeographicRegion`s from `app/data/us-states.json` and `app/data/date-us-states-were-founded.json` and then a group of those two as a `TimeBoundGeographicRegionGroup` titled "United States".
 
 ## Update the map to display the data
 
 ### a. create an input that lets you chose the current year and update the URL with it
 
-A basic range slider between the min and max years of the data, at the top of the page (make its own compoent, instantiate in the parent, NOT in the map component).
+A basic range slider between the min and max years of the data, at the top of the page (make its own component, instantiate in the parent, NOT in the map component).
 
 ### b. update the map to handle the geography data
 
 Basically, in the parent component, filter the data to only include geographies whose time region overlaps with the current year.
 
-Mapbox needs to add and remove the polygons as the data changes.
+Mapbox needs to add and remove the polygons as the data changes, as in this generic example:
+
+```js
+import React, { useEffect, useRef } from 'react';
+import mapboxgl from 'mapbox-gl';
+
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+const MapboxExample = () => {
+  const mapContainerRef = useRef();
+  const mapRef = useRef();
+
+  useEffect(() => {
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZGF2aWRubW9yYSIsImEiOiJjanQ2NGt2eXYwOTd3NDlzMnF4NnBscWZjIn0.acsLJCvFw9LAVbhFVIm7yQ';
+
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: 'mapbox://styles/mapbox/standard',
+      config: {
+        basemap: {
+          theme: 'monochrome'
+        }
+      },
+      center: [-68.137343, 45.137451],
+      zoom: 5
+    });
+
+    mapRef.current.on('load', () => {
+      mapRef.current.addSource('maine', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: {
+            type: 'Polygon',
+            // These coordinates outline Maine.
+            coordinates: [
+              [
+                [-67.13734, 45.13745],
+                [-66.96466, 44.8097],
+                [-68.03252, 44.3252],
+                [-69.06, 43.98],
+                [-70.11617, 43.68405],
+                [-70.64573, 43.09008],
+                [-70.75102, 43.08003],
+                [-70.79761, 43.21973],
+                [-70.98176, 43.36789],
+                [-70.94416, 43.46633],
+                [-71.08482, 45.30524],
+                [-70.66002, 45.46022],
+                [-70.30495, 45.91479],
+                [-70.00014, 46.69317],
+                [-69.23708, 47.44777],
+                [-68.90478, 47.18479],
+                [-68.2343, 47.35462],
+                [-67.79035, 47.06624],
+                [-67.79141, 45.70258],
+                [-67.13734, 45.13745]
+              ]
+            ]
+          }
+        }
+      });
+
+      mapRef.current.addLayer({
+        id: 'maine',
+        type: 'fill',
+        source: 'maine',
+        layout: {},
+        paint: {
+          'fill-color': '#0080ff',
+          'fill-opacity': 0.5
+        }
+      });
+
+      mapRef.current.addLayer({
+        id: 'outline',
+        type: 'line',
+        source: 'maine',
+        layout: {},
+        paint: {
+          'line-color': '#000',
+          'line-width': 3
+        }
+      });
+    });
+  }, []);
+
+  return <div id="map" ref={mapContainerRef} style={{ height: '100%' }} />;
+};
+
+export default MapboxExample;
+```
