@@ -21,6 +21,14 @@ Given the nested nature of data (e.g. a region in Britain is part of the larger 
 
 See `app/data/types.ts` for the precise definitions of the data structures.
 
+
+# Data resources and inspiration
+
+- Pinterest board for design [inspiration](https://www.pinterest.com/itsdavidmora/time-map/)
+- Open Source QGIS can [help](https://docs.qgis.org/3.40/en/docs/training_manual/forestry/map_georeferencing.html) you "georeference" a map image onto a digital map, so you can export it, say, as a [GeoJSON file](https://stackoverflow.com/questions/70455885/how-to-create-a-geojson-file-from-an-image-overlay)
+- [OmniAtlas](https://omniatlas.com/) made a series of static images (with overlay annotations) for an incredible swath of history and geography, I think it may be the most comprehensive set of static map images on the web.
+
+
 # Development
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
