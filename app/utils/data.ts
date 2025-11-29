@@ -16,53 +16,53 @@ function timeRangeOverlapsYear(
   return year >= startYear && year <= endYear;
 }
 
-export function getMinMaxYears(
-  group: TimeBoundGeographicRegionGroup
+function traverseMinMaxYears(
+  item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup
 ): { min: number; max: number } {
-  let min = Infinity;
-  let max = -Infinity;
-
-  function traverse(
-    item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup
-  ) {
-    if ("children" in item) {
-      item.children.forEach(traverse);
-    } else {
-      const [startYear, endYear] = item.timeRange;
-      min = Math.min(min, startYear);
-      if (endYear !== null) {
-        max = Math.max(max, endYear);
-      } else {
-        max = Math.max(max, new Date().getFullYear());
-      }
-    }
+  if ("children" in item) {
+    return item.children.map(traverseMinMaxYears).reduce(
+      (acc, curr) => ({
+        min: Math.min(acc.min, curr.min),
+        max: Math.max(acc.max, curr.max),
+      }),
+      { min: Infinity, max: -Infinity }
+    );
+  } else {
+    const [startYear, endYear] = item.timeRange;
+    const currentYear = new Date().getFullYear();
+    return {
+      min: startYear,
+      max: endYear !== null ? endYear : currentYear,
+    };
   }
+}
 
-  traverse(group);
+export function getMinMaxYears(group: TimeBoundGeographicRegionGroup): {
+  min: number;
+  max: number;
+} {
+  return traverseMinMaxYears(group);
+}
 
-  return { min, max };
+function traverseRegionsByYear(
+  item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup,
+  year: number
+): TimeBoundGeographicRegion[] {
+  if ("children" in item) {
+    return item.children.flatMap((child) => traverseRegionsByYear(child, year));
+  } else {
+    if (timeRangeOverlapsYear(item.timeRange, year)) {
+      return [item];
+    }
+    return [];
+  }
 }
 
 export function filterRegionsByYear(
   group: TimeBoundGeographicRegionGroup,
   year: number
 ): TimeBoundGeographicRegion[] {
-  const regions: TimeBoundGeographicRegion[] = [];
-
-  function traverse(
-    item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup
-  ) {
-    if ("children" in item) {
-      item.children.forEach(traverse);
-    } else {
-      if (timeRangeOverlapsYear(item.timeRange, year)) {
-        regions.push(item);
-      }
-    }
-  }
-
-  traverse(group);
-  return regions;
+  return traverseRegionsByYear(group, year);
 }
 
 export function convertToMapRegions(
