@@ -1,15 +1,44 @@
 "use client";
 
 import Map from "./components/Map";
+import YearSlider from "./components/YearSlider";
 import { useURLState } from "./hooks/useURLState";
+import { getAllData } from "./data/all-data";
+import {
+  getMinMaxYears,
+  filterRegionsByYear,
+  convertToMapRegions,
+} from "./utils/data";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 import { useMemo, Suspense } from "react";
 
 function MapContent() {
-  const { zoom, center, setURLState } = useURLState();
+  const { zoom, center, year, setURLState } = useURLState();
 
-  // Default values if not in URL
+  const allData = useMemo(() => getAllData(), []);
+  const { min: minYear, max: maxYear } = useMemo(
+    () => getMinMaxYears(allData),
+    [allData]
+  );
+
+  const currentYear =
+    year ?? (isFinite(minYear) ? minYear : new Date().getFullYear());
+
+  const filteredRegions = useMemo(
+    () => filterRegionsByYear(allData, currentYear),
+    [allData, currentYear]
+  );
+
+  const geographicRegions = useMemo(
+    () => convertToMapRegions(filteredRegions),
+    [filteredRegions]
+  );
+
+  const handleYearChange = (newYear: number) => {
+    setURLState({ year: newYear });
+  };
+
   const mapZoom = zoom ?? 3;
   const mapCenter: [number, number] = center ?? [-68.137343, 45.137451];
   const mapStyle = "mapbox://styles/davidnmora/cmikmelfl004601sqcjoe98co";
@@ -25,9 +54,6 @@ function MapContent() {
     });
   };
 
-  // For now, no geographic regions - will be added in part 3
-  const geographicRegions = useMemo(() => [], []);
-
   if (!accessToken) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
@@ -40,7 +66,15 @@ function MapContent() {
   }
 
   return (
-    <div className="h-screen w-screen">
+    <div className="h-screen w-screen relative">
+      {isFinite(minYear) && isFinite(maxYear) && (
+        <YearSlider
+          minYear={minYear}
+          maxYear={maxYear}
+          currentYear={currentYear}
+          onYearChange={handleYearChange}
+        />
+      )}
       <Map
         center={mapCenter}
         zoom={mapZoom}
