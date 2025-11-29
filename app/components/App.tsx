@@ -8,11 +8,18 @@ function App() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    mapboxgl.accessToken =
-      "pk.eyJ1IjoiZGF2aWRubW9yYSIsImEiOiJjanQ2NGt2eXYwOTd3NDlzMnF4NnBscWZjIn0.acsLJCvFw9LAVbhFVIm7yQ";
+    const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+    if (!accessToken) {
+      console.error("Mapbox access token is not configured");
+      return;
+    }
+    mapboxgl.accessToken = accessToken;
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current as HTMLElement,
     });
+    mapRef.current.setStyle(
+      "mapbox://styles/davidnmora/cmikmelfl004601sqcjoe98co"
+    );
 
     return () => {
       mapRef.current?.remove();
