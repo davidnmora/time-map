@@ -1,9 +1,5 @@
 Main sequences of work
 
-1. Get basic map component features / infra in
-2. Plan data structures for composing time periods & geographies
-3. Create some actual data using all this
-
 # 1. Get basic map component features / infra in
 
 ## Map component
@@ -93,12 +89,14 @@ type Metadata = {
     color?: string,
 }
 
-type TimeRange = [number, number]; // I imagine we can use negative numbers to represent BC
+ // I imagine we can use negative numbers to represent BC
+ // null means "to present" (ie not bounded by a year)
+type TimeRange = [number, number | null];
 
 type GeographicRegion = GeoJSON.FeatureCollection; // or something similar
 ```
 
-Next, the base unite used to describe a greograph region that existed in some period of time:
+Here's the base unit used to describe a geographic region that existed in some period of time:
 
 ```ts
 type TimeBoundGeographicRegion = {
@@ -108,7 +106,7 @@ type TimeBoundGeographicRegion = {
 }
 ```
 
-We then can compose those `TimeBoundGeographicRegion`s into `TimeBoundGeographicRegionGroup`s, which themselves can be grouped into even more `TimeBoundGeographicRegionGroup`s, and so on.
+We then can group those `TimeBoundGeographicRegion`s into `TimeBoundGeographicRegionGroup`s, which themselves can be used as a child of another `TimeBoundGeographicRegionGroup`.
 
 ```ts
 type TimeBoundGeographicRegionGroup = {
@@ -117,3 +115,22 @@ type TimeBoundGeographicRegionGroup = {
 }
 ```
 
+
+
+# 3. Create some actual data using all this
+
+## Hardcode some actual data into the app
+
+Maybe we just try doing a 2 US states as `TimeBoundGeographicRegion`s and then a group of those two as a `TimeBoundGeographicRegionGroup` titled "United States".
+
+## Update the map to display the data
+
+### a. create an input that lets you chose the current year and update the URL with it
+
+A basic range slider between the min and max years of the data, at the top of the page (make its own compoent, instantiate in the parent, NOT in the map component).
+
+### b. update the map to handle the geography data
+
+Basically, in the parent component, filter the data to only include geographies whose time region overlaps with the current year.
+
+Mapbox needs to add and remove the polygons as the data changes.
