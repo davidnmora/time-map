@@ -1,6 +1,39 @@
 import type React from "react";
 import mapboxgl from "mapbox-gl";
 import type { GeographicRegion } from "./Map";
+import type { TimeRange } from "../../data/types";
+
+export type TooltipData = {
+  hierarchy: string[];
+  title: string;
+  description?: string;
+  timeRange: TimeRange;
+};
+
+export const formatTimeRange = (timeRange: TimeRange): string => {
+  const [start, end] = timeRange;
+  if (end === null) {
+    return `${start} - present`;
+  }
+  return `${start} - ${end}`;
+};
+
+export const renderTooltip = (data: TooltipData): string => {
+  const hierarchyText =
+    data.hierarchy.length > 0 ? data.hierarchy.join(" > ") : "";
+  const timeRangeText = formatTimeRange(data.timeRange);
+
+  let html = "";
+  if (hierarchyText) {
+    html += `<div style="font-weight: 600; margin-bottom: 4px;">${hierarchyText}</div>`;
+  }
+  html += `<div style="font-weight: 600; margin-bottom: 4px;">${data.title}</div>`;
+  if (data.description) {
+    html += `<div style="margin-bottom: 4px; color: #666;">${data.description}</div>`;
+  }
+  html += `<div style="color: #666;">${timeRangeText}</div>`;
+  return html;
+};
 
 export function updateGeographicRegions(
   map: mapboxgl.Map,

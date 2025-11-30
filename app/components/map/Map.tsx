@@ -3,7 +3,7 @@
 import { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import type { GeoJSON } from "geojson";
-import { updateGeographicRegions } from "./map-utils";
+import { updateGeographicRegions, type TooltipData } from "./map-utils";
 import type { Metadata, TimeRange } from "../../data/types";
 
 export type GeographicRegion = {
@@ -16,13 +16,6 @@ export type GeographicRegion = {
   metadata?: Metadata;
   timeRange?: TimeRange;
   hierarchy?: string[];
-};
-
-export type TooltipData = {
-  hierarchy: string[];
-  title: string;
-  description?: string;
-  timeRange: TimeRange;
 };
 
 type MapProps = {

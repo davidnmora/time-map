@@ -5,6 +5,7 @@ import YearSlider from "./components/YearSlider";
 import { useURLState } from "./hooks/useURLState";
 import { getAllData } from "./data/all-data";
 import { getMinMaxYears, convertToMapRegions } from "./utils/data";
+import { renderTooltip } from "./components/map/map-utils";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 import { useMemo, Suspense } from "react";
@@ -43,36 +44,6 @@ function MapContent() {
       center: newCenter,
       zoom: newZoom,
     });
-  };
-
-  const formatTimeRange = (timeRange: [number, number | null]): string => {
-    const [start, end] = timeRange;
-    if (end === null) {
-      return `${start} - present`;
-    }
-    return `${start} - ${end}`;
-  };
-
-  const renderTooltip = (data: {
-    hierarchy: string[];
-    title: string;
-    description?: string;
-    timeRange: [number, number | null];
-  }): string => {
-    const hierarchyText =
-      data.hierarchy.length > 0 ? data.hierarchy.join(" > ") : "";
-    const timeRangeText = formatTimeRange(data.timeRange);
-
-    let html = "";
-    if (hierarchyText) {
-      html += `<div style="font-weight: 600; margin-bottom: 4px;">${hierarchyText}</div>`;
-    }
-    html += `<div style="font-weight: 600; margin-bottom: 4px;">${data.title}</div>`;
-    if (data.description) {
-      html += `<div style="margin-bottom: 4px; color: #666;">${data.description}</div>`;
-    }
-    html += `<div style="color: #666;">${timeRangeText}</div>`;
-    return html;
   };
 
   if (!accessToken) {
