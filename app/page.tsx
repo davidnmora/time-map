@@ -4,11 +4,7 @@ import Map from "./components/map/Map";
 import YearSlider from "./components/YearSlider";
 import { useURLState } from "./hooks/useURLState";
 import { getAllData } from "./data/all-data";
-import {
-  getMinMaxYears,
-  filterRegionsByYear,
-  convertToMapRegions,
-} from "./utils/data";
+import { getMinMaxYears, convertToMapRegions } from "./utils/data";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 import { useMemo, Suspense } from "react";
@@ -25,14 +21,9 @@ function MapContent() {
   const currentYear =
     year ?? (isFinite(minYear) ? minYear : new Date().getFullYear());
 
-  const filteredRegions = useMemo(
-    () => filterRegionsByYear(allData, currentYear),
-    [allData, currentYear]
-  );
-
   const geographicRegions = useMemo(
-    () => convertToMapRegions(filteredRegions),
-    [filteredRegions]
+    () => convertToMapRegions(allData, currentYear),
+    [allData, currentYear]
   );
 
   const handleYearChange = (newYear: number) => {
@@ -52,6 +43,36 @@ function MapContent() {
       center: newCenter,
       zoom: newZoom,
     });
+  };
+
+  const formatTimeRange = (timeRange: [number, number | null]): string => {
+    const [start, end] = timeRange;
+    if (end === null) {
+      return `${start} - present`;
+    }
+    return `${start} - ${end}`;
+  };
+
+  const renderTooltip = (data: {
+    hierarchy: string[];
+    title: string;
+    description?: string;
+    timeRange: [number, number | null];
+  }): string => {
+    const hierarchyText =
+      data.hierarchy.length > 0 ? data.hierarchy.join(" > ") : "";
+    const timeRangeText = formatTimeRange(data.timeRange);
+
+    let html = "";
+    if (hierarchyText) {
+      html += `<div style="font-weight: 600; margin-bottom: 4px;">${hierarchyText}</div>`;
+    }
+    html += `<div style="font-weight: 600; margin-bottom: 4px;">${data.title}</div>`;
+    if (data.description) {
+      html += `<div style="margin-bottom: 4px; color: #666;">${data.description}</div>`;
+    }
+    html += `<div style="color: #666;">${timeRangeText}</div>`;
+    return html;
   };
 
   if (!accessToken) {
@@ -82,6 +103,7 @@ function MapContent() {
         accessToken={accessToken}
         onPositionUpdated={handlePositionUpdated}
         geographicRegions={geographicRegions}
+        renderTooltip={renderTooltip}
       />
     </div>
   );

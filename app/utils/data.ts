@@ -44,15 +44,24 @@ export function getMinMaxYears(group: TimeBoundGeographicRegionGroup): {
   return traverseMinMaxYears(group);
 }
 
+type RegionWithHierarchy = {
+  region: TimeBoundGeographicRegion;
+  hierarchy: string[];
+};
+
 function traverseRegionsByYear(
   item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup,
-  year: number
-): TimeBoundGeographicRegion[] {
+  year: number,
+  hierarchy: string[] = []
+): RegionWithHierarchy[] {
   if ("children" in item) {
-    return item.children.flatMap((child) => traverseRegionsByYear(child, year));
+    const currentHierarchy = [...hierarchy, item.metadata.title];
+    return item.children.flatMap((child) =>
+      traverseRegionsByYear(child, year, currentHierarchy)
+    );
   } else {
     if (timeRangeOverlapsYear(item.timeRange, year)) {
-      return [item];
+      return [{ region: item, hierarchy }];
     }
     return [];
   }
@@ -62,13 +71,15 @@ export function filterRegionsByYear(
   group: TimeBoundGeographicRegionGroup,
   year: number
 ): TimeBoundGeographicRegion[] {
-  return traverseRegionsByYear(group, year);
+  return traverseRegionsByYear(group, year).map((item) => item.region);
 }
 
 export function convertToMapRegions(
-  timeBoundRegions: TimeBoundGeographicRegion[]
+  group: TimeBoundGeographicRegionGroup,
+  year: number
 ): GeographicRegion[] {
-  return timeBoundRegions.flatMap((region) =>
+  const regionsWithHierarchy = traverseRegionsByYear(group, year);
+  return regionsWithHierarchy.flatMap(({ region, hierarchy }) =>
     region.geographicRegions.map((geoRegion, index) => ({
       id: `${region.metadata.id}-${index}`,
       data: geoRegion,
@@ -76,6 +87,9 @@ export function convertToMapRegions(
       fillOpacity: 0.5,
       lineColor: "#000",
       lineWidth: 2,
+      metadata: region.metadata,
+      timeRange: region.timeRange,
+      hierarchy: [...hierarchy, region.metadata.title],
     }))
   );
 }

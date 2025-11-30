@@ -55,7 +55,12 @@ export function updateGeographicRegions(
         source: sourceId,
         paint: {
           "fill-color": region.fillColor || "#0080ff",
-          "fill-opacity": region.fillOpacity ?? 0.5,
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hover"], false],
+            1,
+            region.fillOpacity ?? 0.5,
+          ],
         },
       });
     } else {
@@ -64,11 +69,12 @@ export function updateGeographicRegions(
         "fill-color",
         region.fillColor || "#0080ff"
       );
-      map.setPaintProperty(
-        fillLayerId,
-        "fill-opacity",
-        region.fillOpacity ?? 0.5
-      );
+      map.setPaintProperty(fillLayerId, "fill-opacity", [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        1,
+        region.fillOpacity ?? 0.5,
+      ]);
     }
 
     if (!map.getLayer(lineLayerId)) {
