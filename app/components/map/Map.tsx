@@ -3,7 +3,7 @@
 import { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import type { GeoJSON } from "geojson";
-import { updateGeographicRegions } from "./map/map-utils";
+import { updateGeographicRegions } from "./map-utils";
 
 export type GeographicRegion = {
   id: string;
@@ -133,7 +133,11 @@ export default function Map({
   }, [geographicRegions]);
 
   return (
-    <div id="map-container" ref={mapContainerRef} className="h-full w-full" />
+    <div
+      id="map-container"
+      ref={mapContainerRef}
+      className="h-full w-full"
+    />
   );
 }
 
