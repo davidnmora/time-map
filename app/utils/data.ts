@@ -76,10 +76,21 @@ export function filterRegionsByYear(
 
 export function convertToMapRegions(
   group: TimeBoundGeographicRegionGroup,
-  year: number
+  year: number,
+  minYear?: number,
+  maxYear?: number
 ): GeographicRegion[] {
   const regionsWithHierarchy = traverseRegionsByYear(group, year);
-  return regionsWithHierarchy.flatMap(({ region, hierarchy }) =>
+  const filtered = regionsWithHierarchy.filter(({ region }) => {
+    if (minYear === undefined && maxYear === undefined) return true;
+    const [startYear, endYear] = region.timeRange;
+    const currentYear = new Date().getFullYear();
+    const effectiveEndYear = endYear !== null ? endYear : currentYear;
+    if (minYear !== undefined && effectiveEndYear < minYear) return false;
+    if (maxYear !== undefined && startYear > maxYear) return false;
+    return true;
+  });
+  return filtered.flatMap(({ region, hierarchy }) =>
     region.geographicRegions.map((geoRegion, index) => ({
       id: `${region.metadata.id}-${index}`,
       data: geoRegion,
@@ -91,6 +102,47 @@ export function convertToMapRegions(
       timeRange: region.timeRange,
       hierarchy: [...hierarchy, region.metadata.title],
     }))
+  );
+}
+
+function traverseAllRegions(
+  item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup,
+  hierarchy: string[] = []
+): RegionWithHierarchy[] {
+  if ("children" in item) {
+    const currentHierarchy = [...hierarchy, item.metadata.title];
+    return item.children.flatMap((child) =>
+      traverseAllRegions(child, currentHierarchy)
+    );
+  } else {
+    return [{ region: item, hierarchy }];
+  }
+}
+
+export function getAllRegions(
+  group: TimeBoundGeographicRegionGroup
+): RegionWithHierarchy[] {
+  return traverseAllRegions(group);
+}
+
+function timeRangeOverlapsRange(
+  timeRange: TimeRange,
+  minYear: number,
+  maxYear: number
+): boolean {
+  const [startYear, endYear] = timeRange;
+  const currentYear = new Date().getFullYear();
+  const effectiveEndYear = endYear !== null ? endYear : currentYear;
+  return startYear <= maxYear && effectiveEndYear >= minYear;
+}
+
+export function filterRegionsByYearRange(
+  regions: RegionWithHierarchy[],
+  minYear: number,
+  maxYear: number
+): RegionWithHierarchy[] {
+  return regions.filter(({ region }) =>
+    timeRangeOverlapsRange(region.timeRange, minYear, maxYear)
   );
 }
 

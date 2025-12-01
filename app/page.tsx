@@ -4,31 +4,75 @@ import Map from "./components/map/Map";
 import YearSlider from "./components/YearSlider";
 import { useURLState } from "./hooks/useURLState";
 import { getAllData } from "./data/all-data";
-import { getMinMaxYears, convertToMapRegions } from "./utils/data";
+import {
+  getMinMaxYears,
+  convertToMapRegions,
+  getAllRegions,
+  filterRegionsByYearRange,
+} from "./utils/data";
 import { renderTooltip } from "./components/map/map-utils";
+import { TimelineAndTimelineRegions } from "./components/timeline/TimelineAndTimelineRegions";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
-import { useMemo, Suspense } from "react";
+import { useMemo, Suspense, useState, useEffect } from "react";
 
 function MapContent() {
-  const { zoom, center, year, setURLState } = useURLState();
+  const {
+    zoom,
+    center,
+    year,
+    minYear: urlMinYear,
+    maxYear: urlMaxYear,
+    setURLState,
+  } = useURLState();
+  const [windowHeight, setWindowHeight] = useState(800);
+
+  useEffect(() => {
+    const updateHeight = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
 
   const allData = useMemo(() => getAllData(), []);
-  const { min: minYear, max: maxYear } = useMemo(
+  const { min: dataMinYear, max: dataMaxYear } = useMemo(
     () => getMinMaxYears(allData),
     [allData]
   );
 
+  const visibleMinYear = urlMinYear ?? dataMinYear;
+  const visibleMaxYear = urlMaxYear ?? dataMaxYear;
   const currentYear =
-    year ?? (isFinite(minYear) ? minYear : new Date().getFullYear());
+    year ?? (isFinite(dataMinYear) ? dataMinYear : new Date().getFullYear());
+
+  const timelineRegions = useMemo(() => {
+    const allRegionsWithHierarchy = getAllRegions(allData);
+    const filteredRegions = filterRegionsByYearRange(
+      allRegionsWithHierarchy,
+      visibleMinYear,
+      visibleMaxYear
+    );
+    return filteredRegions.map(({ region, hierarchy }) => ({
+      id: region.metadata.id,
+      timeRange: region.timeRange,
+      color: region.metadata.color,
+    }));
+  }, [allData, visibleMinYear, visibleMaxYear]);
 
   const geographicRegions = useMemo(
-    () => convertToMapRegions(allData, currentYear),
-    [allData, currentYear]
+    () =>
+      convertToMapRegions(allData, currentYear, visibleMinYear, visibleMaxYear),
+    [allData, currentYear, visibleMinYear, visibleMaxYear]
   );
 
   const handleYearChange = (newYear: number) => {
     setURLState({ year: newYear });
+  };
+
+  const handleZoomChange = (newMinYear: number, newMaxYear: number) => {
+    setURLState({ minYear: newMinYear, maxYear: newMaxYear });
   };
 
   const mapZoom = zoom ?? 3;
@@ -59,10 +103,10 @@ function MapContent() {
 
   return (
     <div className="h-screen w-screen relative">
-      {isFinite(minYear) && isFinite(maxYear) && (
+      {isFinite(dataMinYear) && isFinite(dataMaxYear) && (
         <YearSlider
-          minYear={minYear}
-          maxYear={maxYear}
+          minYear={dataMinYear}
+          maxYear={dataMaxYear}
           currentYear={currentYear}
           onYearChange={handleYearChange}
         />
@@ -76,6 +120,29 @@ function MapContent() {
         geographicRegions={geographicRegions}
         renderTooltip={renderTooltip}
       />
+      {isFinite(visibleMinYear) && isFinite(visibleMaxYear) && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            bottom: 0,
+            zIndex: 1000,
+            pointerEvents: "auto",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+          }}
+        >
+          <TimelineAndTimelineRegions
+            height={windowHeight}
+            minYear={visibleMinYear}
+            maxYear={visibleMaxYear}
+            selectedYear={currentYear}
+            regions={timelineRegions}
+            onYearChange={handleYearChange}
+            onZoomChange={handleZoomChange}
+          />
+        </div>
+      )}
     </div>
   );
 }

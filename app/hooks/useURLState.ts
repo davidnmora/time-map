@@ -7,12 +7,16 @@ type URLState = {
   zoom?: number;
   center?: [number, number];
   year?: number;
+  minYear?: number;
+  maxYear?: number;
 };
 
 type PartialURLState = {
   zoom?: number;
   center?: [number, number];
   year?: number;
+  minYear?: number;
+  maxYear?: number;
 };
 
 export function useURLState(): URLState & {
@@ -44,6 +48,16 @@ export function useURLState(): URLState & {
     return yearParam ? parseInt(yearParam, 10) : undefined;
   }, [searchParams]);
 
+  const minYear = useMemo(() => {
+    const minYearParam = searchParams.get("minYear");
+    return minYearParam ? parseInt(minYearParam, 10) : undefined;
+  }, [searchParams]);
+
+  const maxYear = useMemo(() => {
+    const maxYearParam = searchParams.get("maxYear");
+    return maxYearParam ? parseInt(maxYearParam, 10) : undefined;
+  }, [searchParams]);
+
   const setURLState = useCallback(
     (updates: PartialURLState) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -57,6 +71,12 @@ export function useURLState(): URLState & {
       if (updates.year !== undefined) {
         params.set("year", updates.year.toString());
       }
+      if (updates.minYear !== undefined) {
+        params.set("minYear", updates.minYear.toString());
+      }
+      if (updates.maxYear !== undefined) {
+        params.set("maxYear", updates.maxYear.toString());
+      }
 
       router.push(`${pathname}?${params.toString()}`);
     },
@@ -67,6 +87,8 @@ export function useURLState(): URLState & {
     zoom,
     center,
     year,
+    minYear,
+    maxYear,
     setURLState,
   };
 }
