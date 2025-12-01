@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { TimelineRegionColumn } from "./TimelineRegionColumn";
 import type { TimeRange } from "../../data/types";
 
@@ -69,12 +68,10 @@ export const TimelineRegions = ({
   maxYear,
   regions,
 }: TimelineRegionsProps) => {
-  const columns = useMemo(() => {
-    return computeRegionColumns(regions);
-  }, [regions]);
+  const columns = computeRegionColumns(regions);
 
   return (
-    <div style={{ display: "flex", height: height }}>
+    <div className="flex" style={{ height: height }}>
       {columns.map((columnRegions, index) => (
         <TimelineRegionColumn
           key={index}

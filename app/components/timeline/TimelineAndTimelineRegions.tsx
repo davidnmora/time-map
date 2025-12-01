@@ -30,7 +30,7 @@ export const TimelineAndTimelineRegions = ({
   onZoomChange,
 }: TimelineAndTimelineRegionsProps) => {
   return (
-    <div style={{ display: "flex", height: height }}>
+    <div className="flex" style={{ height: height }}>
       <Timeline
         height={height}
         minYear={minYear}

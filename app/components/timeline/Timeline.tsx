@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
 const MARGIN = { top: 30, right: 0, bottom: 30, left: 50 };
@@ -29,15 +29,13 @@ export const Timeline = ({
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
   const centerY = boundsHeight / 2;
 
-  const yScale = useMemo(() => {
-    return d3
+  useEffect(() => {
+    if (!axisRef.current) return;
+
+    const yScale = d3
       .scaleLinear()
       .domain([minYear, maxYear])
       .range([boundsHeight, 0]);
-  }, [minYear, maxYear, boundsHeight]);
-
-  useEffect(() => {
-    if (!axisRef.current) return;
 
     const svgElement = d3.select(axisRef.current);
     svgElement.selectAll("*").remove();
@@ -60,7 +58,7 @@ export const Timeline = ({
       .attr("y2", centerY)
       .attr("stroke", "#000")
       .attr("stroke-width", 2);
-  }, [yScale, boundsHeight, centerY]);
+  }, [minYear, maxYear, boundsHeight, centerY]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -83,13 +81,14 @@ export const Timeline = ({
         const deltaY = e.deltaY;
         const range = maxYear - minYear;
         const scrollSpeed = range / 100;
-        const newYear = selectedYear + (deltaY > 0 ? scrollSpeed : -scrollSpeed);
+        const newYear =
+          selectedYear + (deltaY > 0 ? scrollSpeed : -scrollSpeed);
         const roundedYear = Math.round(newYear);
-        
+
         const halfRange = range / 2;
         const newMinYear = roundedYear - halfRange;
         const newMaxYear = roundedYear + halfRange;
-        
+
         onYearChange(roundedYear);
         onZoomChange(newMinYear, newMaxYear);
       }
@@ -105,14 +104,10 @@ export const Timeline = ({
   return (
     <div
       ref={containerRef}
-      style={{
-        width: TIMELINE_WIDTH,
-        height: height,
-        position: "relative",
-        overflow: "hidden",
-      }}
+      className="relative overflow-hidden"
+      style={{ width: TIMELINE_WIDTH, height: height }}
     >
-      <svg width={TIMELINE_WIDTH} height={height} style={{ display: "block" }}>
+      <svg width={TIMELINE_WIDTH} height={height} className="block">
         <g
           ref={axisRef}
           transform={`translate(${MARGIN.left},${MARGIN.top})`}

@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import * as d3 from "d3";
 import type { TimeRange } from "../../data/types";
 
@@ -28,33 +27,29 @@ export const TimelineRegionColumn = ({
 }: TimelineRegionColumnProps) => {
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
-  const yScale = useMemo(() => {
-    return d3
-      .scaleLinear()
-      .domain([minYear, maxYear])
-      .range([boundsHeight, 0]);
-  }, [minYear, maxYear, boundsHeight]);
+  const yScale = d3
+    .scaleLinear()
+    .domain([minYear, maxYear])
+    .range([boundsHeight, 0]);
 
-  const strips = useMemo(() => {
-    return regions.map((region) => {
-      const [startYear, endYear] = region.timeRange;
-      const currentYear = new Date().getFullYear();
-      const effectiveEndYear = endYear !== null ? endYear : currentYear;
-      
-      const startY = yScale(effectiveEndYear);
-      const endY = yScale(startYear);
-      const stripHeight = Math.abs(endY - startY);
+  const strips = regions.map((region) => {
+    const [startYear, endYear] = region.timeRange;
+    const currentYear = new Date().getFullYear();
+    const effectiveEndYear = endYear !== null ? endYear : currentYear;
 
-      return {
-        ...region,
-        y: Math.min(startY, endY),
-        height: Math.max(stripHeight, 1),
-      };
-    });
-  }, [regions, yScale]);
+    const startY = yScale(effectiveEndYear);
+    const endY = yScale(startYear);
+    const stripHeight = Math.abs(endY - startY);
+
+    return {
+      ...region,
+      y: Math.min(startY, endY),
+      height: Math.max(stripHeight, 1),
+    };
+  });
 
   return (
-    <svg width={REGION_STRIP_WIDTH} height={height} style={{ display: "block" }}>
+    <svg width={REGION_STRIP_WIDTH} height={height} className="block">
       <g transform={`translate(0,${MARGIN.top})`}>
         {strips.map((strip) => (
           <rect
