@@ -5,6 +5,7 @@ import mapboxgl from "mapbox-gl";
 import type { GeoJSON } from "geojson";
 import { updateGeographicRegions, type TooltipData } from "./map-utils";
 import type { Metadata, TimeRange } from "../../data/types";
+import { useHoveredElement } from "../../contexts/HoveredElementContext";
 
 export type GeographicRegion = {
   id: string;
@@ -56,6 +57,7 @@ export default function Map(props: MapProps) {
   const hoverHandlersRef = useRef<
     globalThis.Map<string, { mousemove: () => void; mouseleave: () => void }>
   >(new globalThis.Map());
+  const { hoveredRegionId: contextHoveredRegionId } = useHoveredElement();
 
   // Keep the callback ref up to date
   useEffect(() => {
@@ -174,6 +176,48 @@ export default function Map(props: MapProps) {
       cleanupHoverHandlers();
     };
   }, [geographicRegions, renderTooltip]);
+
+  useEffect(() => {
+    if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;
+
+    const map = mapRef.current;
+    const matchingRegionIds = contextHoveredRegionId
+      ? geographicRegions
+          .filter(
+            (region) =>
+              region.id === contextHoveredRegionId ||
+              region.id.startsWith(`${contextHoveredRegionId}-`)
+          )
+          .map((region) => region.id)
+      : [];
+
+    const allRegionIds = geographicRegions.map((region) => region.id);
+
+    allRegionIds.forEach((regionId) => {
+      const source = map.getSource(regionId);
+      if (!source || source.type !== "geojson") return;
+
+      const isMatchingRegion = matchingRegionIds.includes(regionId);
+
+      try {
+        const features = map.querySourceFeatures(regionId);
+        features.forEach((feature) => {
+          if (feature.id !== undefined && feature.id !== null) {
+            try {
+              map.setFeatureState(
+                { source: regionId, id: feature.id },
+                { hover: isMatchingRegion }
+              );
+            } catch (e) {
+              // Feature might not exist, ignore
+            }
+          }
+        });
+      } catch (e) {
+        // Source might not be ready, ignore
+      }
+    });
+  }, [contextHoveredRegionId, geographicRegions]);
 
   const setupHoverHandlers = (
     map: mapboxgl.Map,
