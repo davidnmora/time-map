@@ -6,11 +6,10 @@ import { useURLState } from "./hooks/useURLState";
 import { getAllData } from "./data/all-data";
 import {
   getMinMaxYears,
-  convertToMapRegions,
   getAllRegions,
   filterRegionsByYearRange,
 } from "./utils/data";
-import { renderTooltip } from "./components/map/map-utils";
+import { renderTooltip, convertToMapRegions } from "./components/map/map-utils";
 import { TimelineAndTimelineRegions } from "./components/timeline/TimelineAndTimelineRegions";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import "mapbox-gl/dist/mapbox-gl.css";

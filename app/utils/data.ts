@@ -49,7 +49,7 @@ type RegionWithHierarchy = {
   hierarchy: string[];
 };
 
-function traverseRegionsByYear(
+export function traverseRegionsByYear(
   item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup,
   year: number,
   hierarchy: string[] = []
@@ -72,37 +72,6 @@ export function filterRegionsByYear(
   year: number
 ): TimeBoundGeographicRegion[] {
   return traverseRegionsByYear(group, year).map((item) => item.region);
-}
-
-export function convertToMapRegions(
-  group: TimeBoundGeographicRegionGroup,
-  year: number,
-  minYear?: number,
-  maxYear?: number
-): GeographicRegion[] {
-  const regionsWithHierarchy = traverseRegionsByYear(group, year);
-  const filtered = regionsWithHierarchy.filter(({ region }) => {
-    if (minYear === undefined && maxYear === undefined) return true;
-    const [startYear, endYear] = region.timeRange;
-    const currentYear = new Date().getFullYear();
-    const effectiveEndYear = endYear !== null ? endYear : currentYear;
-    if (minYear !== undefined && effectiveEndYear < minYear) return false;
-    if (maxYear !== undefined && startYear > maxYear) return false;
-    return true;
-  });
-  return filtered.flatMap(({ region, hierarchy }) =>
-    region.geographicRegions.map((geoRegion, index) => ({
-      id: `${region.metadata.id}-${index}`,
-      data: geoRegion,
-      fillColor: region.metadata.color,
-      fillOpacity: 0.5,
-      lineColor: "#000",
-      lineWidth: 2,
-      metadata: region.metadata,
-      timeRange: region.timeRange,
-      hierarchy: [...hierarchy, region.metadata.title],
-    }))
-  );
 }
 
 function traverseAllRegions(

@@ -1,7 +1,11 @@
 import type React from "react";
 import mapboxgl from "mapbox-gl";
 import type { GeographicRegion } from "./Map";
-import type { TimeRange } from "../../data/types";
+import type {
+  TimeRange,
+  TimeBoundGeographicRegionGroup,
+} from "../../data/types";
+import { traverseRegionsByYear } from "../../utils/data";
 
 const DEFAULT_FILL_OPACITY = 0.2;
 const DEFAULT_LINE_WIDTH = 1;
@@ -37,6 +41,37 @@ export const renderTooltip = (data: TooltipData): string => {
   html += `<div style="color: #666;">${timeRangeText}</div>`;
   return html;
 };
+
+export function convertToMapRegions(
+  group: TimeBoundGeographicRegionGroup,
+  year: number,
+  minYear?: number,
+  maxYear?: number
+): GeographicRegion[] {
+  const regionsWithHierarchy = traverseRegionsByYear(group, year);
+  const filtered = regionsWithHierarchy.filter(({ region }) => {
+    if (minYear === undefined && maxYear === undefined) return true;
+    const [startYear, endYear] = region.timeRange;
+    const currentYear = new Date().getFullYear();
+    const effectiveEndYear = endYear !== null ? endYear : currentYear;
+    if (minYear !== undefined && effectiveEndYear < minYear) return false;
+    if (maxYear !== undefined && startYear > maxYear) return false;
+    return true;
+  });
+  return filtered.flatMap(({ region, hierarchy }) =>
+    region.geographicRegions.map((geoRegion, index) => ({
+      id: `${region.metadata.id}-${index}`,
+      data: geoRegion,
+      fillColor: region.metadata.color,
+      fillOpacity: 0.5,
+      lineColor: "#000",
+      lineWidth: 2,
+      metadata: region.metadata,
+      timeRange: region.timeRange,
+      hierarchy: [...hierarchy, region.metadata.title],
+    }))
+  );
+}
 
 export function updateGeographicRegions(
   map: mapboxgl.Map,
