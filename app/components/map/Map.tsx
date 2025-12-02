@@ -57,7 +57,8 @@ export default function Map(props: MapProps) {
   const hoverHandlersRef = useRef<
     globalThis.Map<string, { mousemove: () => void; mouseleave: () => void }>
   >(new globalThis.Map());
-  const { hoveredRegionId: contextHoveredRegionId } = useHoveredElement();
+  const { hoveredRegionId: contextHoveredRegionId, setHoveredRegionId } =
+    useHoveredElement();
 
   // Keep the callback ref up to date
   useEffect(() => {
@@ -239,6 +240,7 @@ export default function Map(props: MapProps) {
         hoveredFeatureRef.current = null;
       }
       hoveredRegionIdRef.current = null;
+      setHoveredRegionId(null);
       if (renderTooltip) {
         popupRef.current?.remove();
       }
@@ -257,6 +259,11 @@ export default function Map(props: MapProps) {
         }
 
         hoveredRegionIdRef.current = region.id;
+
+        const baseRegionId = region.metadata?.id;
+        if (baseRegionId) {
+          setHoveredRegionId(baseRegionId);
+        }
 
         const feature = e.features[0];
         const featureId = feature.id;
