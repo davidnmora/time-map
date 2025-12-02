@@ -179,8 +179,6 @@ export default function Map(props: MapProps) {
     map: mapboxgl.Map,
     regions: GeographicRegion[]
   ) => {
-    if (!renderTooltip) return;
-
     const removeHoverState = () => {
       if (hoveredFeatureRef.current) {
         try {
@@ -197,7 +195,9 @@ export default function Map(props: MapProps) {
         hoveredFeatureRef.current = null;
       }
       hoveredRegionIdRef.current = null;
-      popupRef.current?.remove();
+      if (renderTooltip) {
+        popupRef.current?.remove();
+      }
     };
 
     regions.forEach((region) => {
@@ -206,7 +206,7 @@ export default function Map(props: MapProps) {
       if (!map.getLayer(fillLayerId)) return;
 
       const handleMouseMove = (e: mapboxgl.MapLayerMouseEvent) => {
-        if (!renderTooltip || !e.features || e.features.length === 0) return;
+        if (!e.features || e.features.length === 0) return;
 
         if (hoveredRegionIdRef.current !== region.id) {
           removeHoverState();
@@ -215,7 +215,11 @@ export default function Map(props: MapProps) {
         hoveredRegionIdRef.current = region.id;
 
         const feature = e.features[0];
-        const featureId = feature.id ?? 0;
+        const featureId = feature.id;
+
+        if (featureId === undefined || featureId === null) {
+          return;
+        }
 
         try {
           map.setFeatureState(
@@ -230,19 +234,21 @@ export default function Map(props: MapProps) {
           // Feature might not exist, ignore
         }
 
-        const hierarchy = region.hierarchy || [];
-        const title = region.metadata?.title || "";
-        const description = region.metadata?.description;
-        const timeRange = region.timeRange || [0, null];
+        if (renderTooltip) {
+          const hierarchy = region.hierarchy || [];
+          const title = region.metadata?.title || "";
+          const description = region.metadata?.description;
+          const timeRange = region.timeRange || [0, null];
 
-        const tooltipHtml = renderTooltip({
-          hierarchy,
-          title,
-          description,
-          timeRange,
-        });
+          const tooltipHtml = renderTooltip({
+            hierarchy,
+            title,
+            description,
+            timeRange,
+          });
 
-        popupRef.current?.setLngLat(e.lngLat).setHTML(tooltipHtml).addTo(map);
+          popupRef.current?.setLngLat(e.lngLat).setHTML(tooltipHtml).addTo(map);
+        }
       };
 
       const handleMouseLeave = () => {

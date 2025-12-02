@@ -70,13 +70,12 @@ export function updateGeographicRegions(
     const lineLayerId = `${sourceId}-line`;
 
     if (map.getSource(sourceId)) {
-      (map.getSource(sourceId) as mapboxgl.GeoJSONSource).setData(
-        region.data
-      );
+      (map.getSource(sourceId) as mapboxgl.GeoJSONSource).setData(region.data);
     } else {
       map.addSource(sourceId, {
         type: "geojson",
         data: region.data,
+        generateId: true,
       });
       sourcesRef.current.add(sourceId);
     }
@@ -107,7 +106,7 @@ export function updateGeographicRegions(
         ["boolean", ["feature-state", "hover"], false],
         1,
         region.fillOpacity ?? 0.5,
-      ]);
+      ] as any);
     }
 
     if (!map.getLayer(lineLayerId)) {
@@ -126,11 +125,7 @@ export function updateGeographicRegions(
         "line-color",
         region.lineColor || "#000"
       );
-      map.setPaintProperty(
-        lineLayerId,
-        "line-width",
-        region.lineWidth ?? 2
-      );
+      map.setPaintProperty(lineLayerId, "line-width", region.lineWidth ?? 2);
     }
   });
 }
