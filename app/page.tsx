@@ -12,6 +12,7 @@ import {
 } from "./utils/data";
 import { renderTooltip } from "./components/map/map-utils";
 import { TimelineAndTimelineRegions } from "./components/timeline/TimelineAndTimelineRegions";
+import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 import { useMemo, Suspense, useState, useEffect } from "react";
@@ -58,6 +59,8 @@ function MapContent() {
       id: region.metadata.id,
       timeRange: region.timeRange,
       color: region.metadata.color,
+      metadata: region.metadata,
+      hierarchy,
     }));
   }, [allData, visibleMinYear, visibleMaxYear]);
 
@@ -102,48 +105,50 @@ function MapContent() {
   }
 
   return (
-    <div className="h-screen w-screen relative">
-      {isFinite(dataMinYear) && isFinite(dataMaxYear) && (
-        <YearSlider
-          minYear={dataMinYear}
-          maxYear={dataMaxYear}
-          currentYear={currentYear}
-          onYearChange={handleYearChange}
-        />
-      )}
-      <Map
-        center={mapCenter}
-        zoom={mapZoom}
-        style={mapStyle}
-        accessToken={accessToken}
-        onPositionUpdated={handlePositionUpdated}
-        geographicRegions={geographicRegions}
-        renderTooltip={renderTooltip}
-      />
-      {isFinite(visibleMinYear) && isFinite(visibleMaxYear) && (
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 0,
-            bottom: 0,
-            zIndex: 1000,
-            pointerEvents: "auto",
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
-          }}
-        >
-          <TimelineAndTimelineRegions
-            height={windowHeight}
-            minYear={visibleMinYear}
-            maxYear={visibleMaxYear}
-            selectedYear={currentYear}
-            regions={timelineRegions}
+    <HoveredElementProvider>
+      <div className="h-screen w-screen relative">
+        {isFinite(dataMinYear) && isFinite(dataMaxYear) && (
+          <YearSlider
+            minYear={dataMinYear}
+            maxYear={dataMaxYear}
+            currentYear={currentYear}
             onYearChange={handleYearChange}
-            onZoomChange={handleZoomChange}
           />
-        </div>
-      )}
-    </div>
+        )}
+        <Map
+          center={mapCenter}
+          zoom={mapZoom}
+          style={mapStyle}
+          accessToken={accessToken}
+          onPositionUpdated={handlePositionUpdated}
+          geographicRegions={geographicRegions}
+          renderTooltip={renderTooltip}
+        />
+        {isFinite(visibleMinYear) && isFinite(visibleMaxYear) && (
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              zIndex: 1000,
+              pointerEvents: "auto",
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+            }}
+          >
+            <TimelineAndTimelineRegions
+              height={windowHeight}
+              minYear={visibleMinYear}
+              maxYear={visibleMaxYear}
+              selectedYear={currentYear}
+              regions={timelineRegions}
+              onYearChange={handleYearChange}
+              onZoomChange={handleZoomChange}
+            />
+          </div>
+        )}
+      </div>
+    </HoveredElementProvider>
   );
 }
 

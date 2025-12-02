@@ -1,12 +1,14 @@
 "use client";
 
 import { TimelineRegionColumn } from "./TimelineRegionColumn";
-import type { TimeRange } from "../../data/types";
+import type { TimeRange, Metadata } from "../../data/types";
 
 type RegionStrip = {
   id: string;
   timeRange: TimeRange;
   color?: string;
+  metadata?: Metadata;
+  hierarchy?: string[];
 };
 
 type TimelineRegionsProps = {

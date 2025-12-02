@@ -2,12 +2,14 @@
 
 import { Timeline } from "./Timeline";
 import { TimelineRegions } from "./TimelineRegions";
-import type { TimeRange } from "../../data/types";
+import type { TimeRange, Metadata } from "../../data/types";
 
 type RegionData = {
   id: string;
   timeRange: TimeRange;
   color?: string;
+  metadata?: Metadata;
+  hierarchy?: string[];
 };
 
 type TimelineAndTimelineRegionsProps = {
