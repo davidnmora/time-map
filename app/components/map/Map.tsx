@@ -53,9 +53,6 @@ export default function Map(props: MapProps) {
     sourceId: string;
     featureId: string | number;
   } | null>(null);
-  const regionDataMapRef = useRef<globalThis.Map<string, GeographicRegion>>(
-    new globalThis.Map()
-  );
   const hoverHandlersRef = useRef<
     globalThis.Map<string, { mousemove: () => void; mouseleave: () => void }>
   >(new globalThis.Map());
@@ -139,14 +136,6 @@ export default function Map(props: MapProps) {
     }
   }, [center, zoom]);
 
-  // Build region data map for tooltip lookups
-  useEffect(() => {
-    regionDataMapRef.current.clear();
-    geographicRegions.forEach((region) => {
-      regionDataMapRef.current.set(region.id, region);
-    });
-  }, [geographicRegions]);
-
   // Handle geographic regions - add/remove sources and layers
   useEffect(() => {
     if (!mapRef.current) return;
@@ -219,9 +208,6 @@ export default function Map(props: MapProps) {
       const handleMouseMove = (e: mapboxgl.MapLayerMouseEvent) => {
         if (!renderTooltip || !e.features || e.features.length === 0) return;
 
-        const regionData = regionDataMapRef.current.get(region.id);
-        if (!regionData) return;
-
         if (hoveredRegionIdRef.current !== region.id) {
           removeHoverState();
         }
@@ -244,10 +230,10 @@ export default function Map(props: MapProps) {
           // Feature might not exist, ignore
         }
 
-        const hierarchy = regionData.hierarchy || [];
-        const title = regionData.metadata?.title || "";
-        const description = regionData.metadata?.description;
-        const timeRange = regionData.timeRange || [0, null];
+        const hierarchy = region.hierarchy || [];
+        const title = region.metadata?.title || "";
+        const description = region.metadata?.description;
+        const timeRange = region.timeRange || [0, null];
 
         const tooltipHtml = renderTooltip({
           hierarchy,
