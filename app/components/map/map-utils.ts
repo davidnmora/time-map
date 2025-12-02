@@ -3,6 +3,9 @@ import mapboxgl from "mapbox-gl";
 import type { GeographicRegion } from "./Map";
 import type { TimeRange } from "../../data/types";
 
+const DEFAULT_FILL_OPACITY = 0.2;
+const DEFAULT_LINE_WIDTH = 1;
+
 export type TooltipData = {
   hierarchy: string[];
   title: string;
@@ -91,7 +94,7 @@ export function updateGeographicRegions(
             "case",
             ["boolean", ["feature-state", "hover"], false],
             1,
-            region.fillOpacity ?? 0.5,
+            region.fillOpacity ?? DEFAULT_FILL_OPACITY,
           ],
         },
       });
@@ -105,7 +108,7 @@ export function updateGeographicRegions(
         "case",
         ["boolean", ["feature-state", "hover"], false],
         1,
-        region.fillOpacity ?? 0.5,
+        region.fillOpacity ?? DEFAULT_FILL_OPACITY,
       ] as any);
     }
 
@@ -116,7 +119,7 @@ export function updateGeographicRegions(
         source: sourceId,
         paint: {
           "line-color": region.lineColor || "#000",
-          "line-width": region.lineWidth ?? 2,
+          "line-width": region.lineWidth ?? DEFAULT_LINE_WIDTH,
         },
       });
     } else {
@@ -125,7 +128,7 @@ export function updateGeographicRegions(
         "line-color",
         region.lineColor || "#000"
       );
-      map.setPaintProperty(lineLayerId, "line-width", region.lineWidth ?? 2);
+      map.setPaintProperty(lineLayerId, "line-width", region.lineWidth ?? DEFAULT_LINE_WIDTH);
     }
   });
 }
