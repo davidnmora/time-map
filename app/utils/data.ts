@@ -2,13 +2,10 @@ import type {
   TimeBoundGeographicRegion,
   TimeBoundGeographicRegionGroup,
   TimeRange,
+  GeographicRegion,
 } from "../data/types";
-import type { GeographicRegion } from "../components/map/Map";
 
-function timeRangeOverlapsYear(
-  timeRange: TimeRange,
-  year: number
-): boolean {
+function timeRangeOverlapsYear(timeRange: TimeRange, year: number): boolean {
   const [startYear, endYear] = timeRange;
   if (endYear === null) {
     return year >= startYear;
@@ -113,5 +110,22 @@ export function filterRegionsByYearRange(
   return regions.filter(({ region }) =>
     timeRangeOverlapsRange(region.timeRange, minYear, maxYear)
   );
+}
+
+// TODO: I'd like to ideally have one main data structure, that's consistent, and is used by all the components (you don't have to think "What version is there" or duplicate code deriving the same things)
+export function prepareTimelineRegions(
+  group: TimeBoundGeographicRegionGroup,
+  calculateTotalArea: (geographicRegions?: GeographicRegion[]) => number
+) {
+  const allRegionsWithHierarchy = getAllRegions(group);
+  return allRegionsWithHierarchy.map(({ region, hierarchy }) => ({
+    id: region.metadata.id,
+    timeRange: region.timeRange,
+    color: region.metadata.color,
+    metadata: region.metadata,
+    hierarchy,
+    geographicRegions: region.geographicRegions,
+    area: calculateTotalArea(region.geographicRegions),
+  }));
 }
 

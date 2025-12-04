@@ -10,6 +10,7 @@ type RegionData = {
   color?: string;
   metadata?: Metadata;
   hierarchy?: string[];
+  area: number;
 };
 
 type TimelineAndTimelineRegionsProps = {

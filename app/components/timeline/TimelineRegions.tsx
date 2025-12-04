@@ -9,6 +9,7 @@ type RegionStrip = {
   color?: string;
   metadata?: Metadata;
   hierarchy?: string[];
+  area: number;
 };
 
 type TimelineRegionsProps = {
@@ -19,6 +20,30 @@ type TimelineRegionsProps = {
 };
 
 type Column = RegionStrip[];
+
+const MIN_STRIP_WIDTH = 2;
+const MAX_STRIP_WIDTH = 30;
+const DEFAULT_STRIP_WIDTH = 3;
+
+function createGetWidthEncodingValue(
+  areas: number[]
+): (area: number) => number {
+  if (areas.length === 0) {
+    return () => DEFAULT_STRIP_WIDTH;
+  }
+  const minArea = Math.min(...areas.filter((a) => a > 0));
+  const maxArea = Math.max(...areas);
+  if (minArea === maxArea || maxArea === 0) {
+    return () => DEFAULT_STRIP_WIDTH;
+  }
+  return (area: number) => {
+    if (area === 0) return MIN_STRIP_WIDTH;
+    const normalized = (area - minArea) / (maxArea - minArea);
+    const width =
+      MIN_STRIP_WIDTH + normalized * (MAX_STRIP_WIDTH - MIN_STRIP_WIDTH);
+    return Math.round(width * 100) / 100;
+  };
+}
 
 function timeRangesOverlap(
   timeRange1: TimeRange,
@@ -71,16 +96,30 @@ export const TimelineRegions = ({
   regions,
 }: TimelineRegionsProps) => {
   const columns = computeRegionColumns(regions);
+  // TODO: the specific encoded variable (eg here "area") should be configurable, and be set in page.tsx (not in here)
+  const allAreas = regions.map((region) => region.area);
+  const getWidthEncodingValue = createGetWidthEncodingValue(allAreas);
+
+  const columnsWithWidths = columns.map((columnRegions) => {
+    const stripWidths = columnRegions.map((region) =>
+      getWidthEncodingValue(region.area)
+    );
+    const columnWidth =
+      Math.round(Math.max(...stripWidths, DEFAULT_STRIP_WIDTH) * 100) / 100;
+    return { columnRegions, columnWidth };
+  });
 
   return (
     <div className="flex" style={{ height: height }}>
-      {columns.map((columnRegions, index) => (
+      {columnsWithWidths.map(({ columnRegions, columnWidth }, index) => (
         <TimelineRegionColumn
           key={index}
           height={height}
           minYear={minYear}
           maxYear={maxYear}
           regions={columnRegions}
+          columnWidth={columnWidth}
+          getWidthEncodingValue={getWidthEncodingValue}
         />
       ))}
     </div>

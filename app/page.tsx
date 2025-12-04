@@ -4,17 +4,14 @@ import Map from "./components/map/Map";
 import YearSlider from "./components/YearSlider";
 import { useURLState } from "./hooks/useURLState";
 import { getAllData } from "./data/all-data";
-import {
-  getMinMaxYears,
-  getAllRegions,
-  filterRegionsByYearRange,
-} from "./utils/data";
+import { getMinMaxYears, prepareTimelineRegions } from "./utils/data";
 import { renderTooltip, convertToMapRegions } from "./components/map/map-utils";
 import { TimelineAndTimelineRegions } from "./components/timeline/TimelineAndTimelineRegions";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
+import { calculateTotalArea } from "./components/timeline/timeline-utils";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
-import { useMemo, Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 
 function MapContent() {
   const {
@@ -36,37 +33,21 @@ function MapContent() {
     return () => window.removeEventListener("resize", updateHeight);
   }, []);
 
-  const allData = useMemo(() => getAllData(), []);
-  const { min: dataMinYear, max: dataMaxYear } = useMemo(
-    () => getMinMaxYears(allData),
-    [allData]
-  );
+  const allData = getAllData();
+  const { min: dataMinYear, max: dataMaxYear } = getMinMaxYears(allData);
 
   const visibleMinYear = urlMinYear ?? dataMinYear;
   const visibleMaxYear = urlMaxYear ?? dataMaxYear;
   const currentYear =
     year ?? (isFinite(dataMinYear) ? dataMinYear : new Date().getFullYear());
 
-  const timelineRegions = useMemo(() => {
-    const allRegionsWithHierarchy = getAllRegions(allData);
-    const filteredRegions = filterRegionsByYearRange(
-      allRegionsWithHierarchy,
-      visibleMinYear,
-      visibleMaxYear
-    );
-    return filteredRegions.map(({ region, hierarchy }) => ({
-      id: region.metadata.id,
-      timeRange: region.timeRange,
-      color: region.metadata.color,
-      metadata: region.metadata,
-      hierarchy,
-    }));
-  }, [allData, visibleMinYear, visibleMaxYear]);
+  const timelineRegions = prepareTimelineRegions(allData, calculateTotalArea);
 
-  const geographicRegions = useMemo(
-    () =>
-      convertToMapRegions(allData, currentYear, visibleMinYear, visibleMaxYear),
-    [allData, currentYear, visibleMinYear, visibleMaxYear]
+  const geographicRegions = convertToMapRegions(
+    allData,
+    currentYear,
+    visibleMinYear,
+    visibleMaxYear
   );
 
   const handleYearChange = (newYear: number) => {

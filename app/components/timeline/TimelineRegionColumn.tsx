@@ -6,7 +6,6 @@ import type { TimeRange, Metadata } from "../../data/types";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { renderTooltip } from "../map/map-utils";
 
-const REGION_STRIP_WIDTH = 3;
 const MARGIN = { top: 30, bottom: 30 };
 const DEFAULT_OPACITY = 0.3;
 const HOVERED_OPACITY = 1;
@@ -17,6 +16,7 @@ type RegionStrip = {
   color?: string;
   metadata?: Metadata;
   hierarchy?: string[];
+  area: number;
 };
 
 type TimelineRegionColumnProps = {
@@ -24,6 +24,8 @@ type TimelineRegionColumnProps = {
   minYear: number;
   maxYear: number;
   regions: RegionStrip[];
+  columnWidth: number;
+  getWidthEncodingValue: (area: number) => number;
 };
 
 export const TimelineRegionColumn = ({
@@ -31,6 +33,8 @@ export const TimelineRegionColumn = ({
   minYear,
   maxYear,
   regions,
+  columnWidth,
+  getWidthEncodingValue,
 }: TimelineRegionColumnProps) => {
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
@@ -53,11 +57,13 @@ export const TimelineRegionColumn = ({
     const startY = yScale(effectiveEndYear);
     const endY = yScale(startYear);
     const stripHeight = Math.abs(endY - startY);
+    const width = getWidthEncodingValue(region.area);
 
     return {
       ...region,
       y: Math.min(startY, endY),
       height: Math.max(stripHeight, 1),
+      width,
     };
   });
 
@@ -104,7 +110,7 @@ export const TimelineRegionColumn = ({
 
   return (
     <>
-      <svg width={REGION_STRIP_WIDTH} height={height} className="block">
+      <svg width={columnWidth} height={height} className="block">
         <g transform={`translate(0,${MARGIN.top})`}>
           {strips.map((strip) => {
             const isHovered = hoveredRegionId === strip.id;
@@ -113,7 +119,7 @@ export const TimelineRegionColumn = ({
                 key={strip.id}
                 x={0}
                 y={strip.y}
-                width={REGION_STRIP_WIDTH}
+                width={strip.width}
                 height={strip.height}
                 fill={strip.color || "#0080ff"}
                 opacity={isHovered ? HOVERED_OPACITY : DEFAULT_OPACITY}
