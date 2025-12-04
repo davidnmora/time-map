@@ -10,6 +10,7 @@ const MARGIN = { top: 30, bottom: 30 };
 const DEFAULT_OPACITY = 0.3;
 const HOVERED_OPACITY = 1;
 
+// TODO: de-duplicate definition (and ideally the definition is for a global type, not a local type)
 type RegionStrip = {
   id: string;
   timeRange: TimeRange;
@@ -25,7 +26,7 @@ type TimelineRegionColumnProps = {
   maxYear: number;
   regions: RegionStrip[];
   columnWidth: number;
-  getWidthEncodingValue: (area: number) => number;
+  getWidthEncodingValue: (region: RegionStrip) => number;
 };
 
 export const TimelineRegionColumn = ({
@@ -57,7 +58,7 @@ export const TimelineRegionColumn = ({
     const startY = yScale(effectiveEndYear);
     const endY = yScale(startYear);
     const stripHeight = Math.abs(endY - startY);
-    const width = getWidthEncodingValue(region.area);
+    const width = getWidthEncodingValue(region);
 
     return {
       ...region,

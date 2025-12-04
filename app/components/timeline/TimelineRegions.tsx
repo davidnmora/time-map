@@ -17,6 +17,7 @@ type TimelineRegionsProps = {
   minYear: number;
   maxYear: number;
   regions: RegionStrip[];
+  widthEncodingKey?: keyof RegionStrip;
 };
 
 type Column = RegionStrip[];
@@ -26,19 +27,21 @@ const MAX_STRIP_WIDTH = 30;
 const DEFAULT_STRIP_WIDTH = 3;
 
 function createGetWidthEncodingValue(
-  areas: number[]
-): (area: number) => number {
-  if (areas.length === 0) {
+  domain: number[],
+  domainKey: keyof RegionStrip
+): (region: RegionStrip) => number {
+  if (domain.length === 0) {
     return () => DEFAULT_STRIP_WIDTH;
   }
-  const minArea = Math.min(...areas.filter((a) => a > 0));
-  const maxArea = Math.max(...areas);
-  if (minArea === maxArea || maxArea === 0) {
+  const domainMin = Math.min(...domain.filter((a) => a > 0));
+  const domainMax = Math.max(...domain);
+  if (domainMin === domainMax || domainMax === 0) {
     return () => DEFAULT_STRIP_WIDTH;
   }
-  return (area: number) => {
-    if (area === 0) return MIN_STRIP_WIDTH;
-    const normalized = (area - minArea) / (maxArea - minArea);
+  return (region: RegionStrip) => {
+    const domainValue = Number(region[domainKey]);
+    if (domainValue === 0) return MIN_STRIP_WIDTH;
+    const normalized = (domainValue - domainMin) / (domainMax - domainMin);
     const width =
       MIN_STRIP_WIDTH + normalized * (MAX_STRIP_WIDTH - MIN_STRIP_WIDTH);
     return Math.round(width * 100) / 100;
@@ -94,15 +97,18 @@ export const TimelineRegions = ({
   minYear,
   maxYear,
   regions,
+  widthEncodingKey = "area",
 }: TimelineRegionsProps) => {
   const columns = computeRegionColumns(regions);
-  // TODO: the specific encoded variable (eg here "area") should be configurable, and be set in page.tsx (not in here)
-  const allAreas = regions.map((region) => region.area);
-  const getWidthEncodingValue = createGetWidthEncodingValue(allAreas);
+  const domain = regions.map((region) => Number(region[widthEncodingKey]));
+  const getWidthEncodingValue = createGetWidthEncodingValue(
+    domain,
+    widthEncodingKey
+  );
 
   const columnsWithWidths = columns.map((columnRegions) => {
     const stripWidths = columnRegions.map((region) =>
-      getWidthEncodingValue(region.area)
+      getWidthEncodingValue(region)
     );
     const columnWidth =
       Math.round(Math.max(...stripWidths, DEFAULT_STRIP_WIDTH) * 100) / 100;
