@@ -19,6 +19,7 @@ type TimelineAndTimelineRegionsProps = {
   maxYear: number;
   selectedYear: number;
   regions: RegionData[];
+  widthEncodingKey?: keyof RegionData;
   onYearChange: (year: number) => void;
   onZoomChange: (minYear: number, maxYear: number) => void;
 };
@@ -29,6 +30,7 @@ export const TimelineAndTimelineRegions = ({
   maxYear,
   selectedYear,
   regions,
+  widthEncodingKey,
   onYearChange,
   onZoomChange,
 }: TimelineAndTimelineRegionsProps) => {
@@ -47,6 +49,7 @@ export const TimelineAndTimelineRegions = ({
         minYear={minYear}
         maxYear={maxYear}
         regions={regions}
+        widthEncodingKey={widthEncodingKey}
       />
     </div>
   );

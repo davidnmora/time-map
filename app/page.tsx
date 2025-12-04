@@ -122,6 +122,7 @@ function MapContent() {
               maxYear={visibleMaxYear}
               selectedYear={currentYear}
               regions={timelineRegions}
+              widthEncodingKey="area"
               onYearChange={handleYearChange}
               onZoomChange={handleZoomChange}
             />

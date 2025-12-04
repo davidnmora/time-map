@@ -2,23 +2,13 @@
 
 import * as d3 from "d3";
 import { useState } from "react";
-import type { TimeRange, Metadata } from "../../data/types";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { renderTooltip } from "../map/map-utils";
+import type { RegionStrip } from "./timeline-utils";
 
 const MARGIN = { top: 30, bottom: 30 };
 const DEFAULT_OPACITY = 0.3;
 const HOVERED_OPACITY = 1;
-
-// TODO: de-duplicate definition (and ideally the definition is for a global type, not a local type)
-type RegionStrip = {
-  id: string;
-  timeRange: TimeRange;
-  color?: string;
-  metadata?: Metadata;
-  hierarchy?: string[];
-  area: number;
-};
 
 type TimelineRegionColumnProps = {
   height: number;
