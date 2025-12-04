@@ -60,46 +60,6 @@ export const Timeline = ({
       .attr("stroke-width", 2);
   }, [minYear, maxYear, boundsHeight, centerY]);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-
-      const isZoom = e.ctrlKey || e.metaKey;
-
-      if (isZoom) {
-        const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9;
-        const range = maxYear - minYear;
-        const halfRange = range / 2;
-        const newHalfRange = halfRange * zoomFactor;
-        const newMinYear = selectedYear - newHalfRange;
-        const newMaxYear = selectedYear + newHalfRange;
-        onZoomChange(newMinYear, newMaxYear);
-      } else {
-        const deltaY = e.deltaY;
-        const range = maxYear - minYear;
-        const scrollSpeed = range / 100;
-        const newYear =
-          selectedYear + (deltaY > 0 ? scrollSpeed : -scrollSpeed);
-        const roundedYear = Math.round(newYear);
-
-        const halfRange = range / 2;
-        const newMinYear = roundedYear - halfRange;
-        const newMaxYear = roundedYear + halfRange;
-
-        onYearChange(roundedYear);
-        onZoomChange(newMinYear, newMaxYear);
-      }
-    };
-
-    container.addEventListener("wheel", handleWheel, { passive: false });
-
-    return () => {
-      container.removeEventListener("wheel", handleWheel);
-    };
-  }, [selectedYear, minYear, maxYear, onYearChange, onZoomChange]);
 
   return (
     <div

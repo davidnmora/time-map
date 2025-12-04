@@ -86,7 +86,7 @@ function MapContent() {
 
   return (
     <HoveredElementProvider>
-      <div className="h-screen w-screen relative">
+      <div className="h-screen w-screen flex">
         {isFinite(dataMinYear) && isFinite(dataMaxYear) && (
           <YearSlider
             minYear={dataMinYear}
@@ -95,27 +95,19 @@ function MapContent() {
             onYearChange={handleYearChange}
           />
         )}
-        <Map
-          center={mapCenter}
-          zoom={mapZoom}
-          style={mapStyle}
-          accessToken={accessToken}
-          onPositionUpdated={handlePositionUpdated}
-          geographicRegions={geographicRegions}
-          renderTooltip={renderTooltip}
-        />
+        <div className="flex-1 relative">
+          <Map
+            center={mapCenter}
+            zoom={mapZoom}
+            style={mapStyle}
+            accessToken={accessToken}
+            onPositionUpdated={handlePositionUpdated}
+            geographicRegions={geographicRegions}
+            renderTooltip={renderTooltip}
+          />
+        </div>
         {isFinite(visibleMinYear) && isFinite(visibleMaxYear) && (
-          <div
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              zIndex: 1000,
-              pointerEvents: "auto",
-              backgroundColor: "rgba(255, 255, 255, 0.9)",
-            }}
-          >
+          <div className="bg-white overflow-hidden">
             <TimelineAndTimelineRegions
               height={windowHeight}
               minYear={visibleMinYear}
