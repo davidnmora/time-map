@@ -69,11 +69,12 @@ export const TimelineAndTimelineRegions = ({
       };
     };
 
+    const MINIMUM_DRAG_DISTANCE = 0.5;
     const handleMouseMove = (e: MouseEvent) => {
       if (!dragStartRef.current) return;
 
       const deltaY = Math.abs(e.clientY - dragStartRef.current.y);
-      if (deltaY > 3) {
+      if (deltaY > MINIMUM_DRAG_DISTANCE) {
         hasMovedRef.current = true;
         if (!isDraggingRef.current) {
           isDraggingRef.current = true;
