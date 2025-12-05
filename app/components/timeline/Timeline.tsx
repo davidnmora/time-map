@@ -21,7 +21,6 @@ export const Timeline = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
-  const centerY = boundsHeight / 2;
 
   useEffect(() => {
     if (!axisRef.current) return;
@@ -43,16 +42,7 @@ export const Timeline = ({
 
     axisG.selectAll(".tick line").attr("x2", -6);
     axisG.selectAll(".tick text").attr("x", -10);
-
-    svgElement
-      .append("line")
-      .attr("x1", 0)
-      .attr("x2", -6)
-      .attr("y1", centerY)
-      .attr("y2", centerY)
-      .attr("stroke", "#000")
-      .attr("stroke-width", 2);
-  }, [minYear, maxYear, boundsHeight, centerY]);
+  }, [minYear, maxYear, boundsHeight]);
 
   return (
     <div

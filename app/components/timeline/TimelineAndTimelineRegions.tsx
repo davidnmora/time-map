@@ -143,15 +143,12 @@ export const TimelineAndTimelineRegions = ({
       className="flex overflow-hidden"
       style={{ height: height, cursor: "grab" }}
     >
-      <Timeline
-        height={height}
-        minYear={minYear}
-        maxYear={maxYear}
-      />
+      <Timeline height={height} minYear={minYear} maxYear={maxYear} />
       <TimelineRegions
         height={height}
         minYear={minYear}
         maxYear={maxYear}
+        currentYear={currentYear}
         regions={regions}
         widthEncodingKey={widthEncodingKey}
       />
