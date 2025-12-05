@@ -1,94 +1,14 @@
-Build it in two stages
-
-# 1. Basic timeline with interaction
-
-General attributes:
-- Vertical timeline on the right side of the screen, overlaying the map, about 100 pixels wide.
-- Year should be the smallest resolution, and the year labels should be on the left of the timeline line
-- User interaction:
-    - The selected year is marked with a horizontal line, and always sits at the dead center of the timeline
-    - the user can scroll up and down, which shifts the timeline forward and backward in time (this updates the selected year)
-    - the user can do the "zoom in/out" gesture, which zooms in or out on the timeline (we'll need to create two new URL params called `minYear` and `maxYear`, which should also filter what regions are passed into the Map.tsx component)
-- Use d3-axis to render the timeline (as a separate sub component), maybe something vaguely like:
-```js
-import { useEffect, useMemo, useRef } from "react";
-import * as d3 from "d3";
-
-const MARGIN = { top: 30, right: 30, bottom: 50, left: 50 };
-
-type AxisBasicD3Props = {
-  width: number;
-  height: number;
-};
-
-export const AxisBasicD3 = ({ width, height }: AxisBasicD3Props) => {
-  // Layout. The div size is set by the given props.
-  // The bounds (=area inside the axis) is calculated by substracting the margins
-  const axesRef = useRef(null);
-  const boundsWidth = width - MARGIN.right - MARGIN.left;
-  const boundsHeight = height - MARGIN.top - MARGIN.bottom;
-
-  // X axis
-  const xScale = useMemo(() => {
-    return d3.scaleLinear().domain([0, 10]).range([0, boundsWidth]);
-  }, [width]);
-
-  // Y axis
-  const yScale = useMemo(() => {
-    return d3.scaleLinear().domain([0, 10]).range([boundsHeight, 0]);
-  }, [height]);
-
-  // Render the X and Y axis using d3.js, not react
-  useEffect(() => {
-    const svgElement = d3.select(axesRef.current);
-    svgElement.selectAll("*").remove();
-    const xAxisGenerator = d3.axisBottom(xScale);
-    svgElement
-      .append("g")
-      .attr("transform", "translate(0," + boundsHeight + ")")
-      .call(xAxisGenerator);
-
-    const yAxisGenerator = d3.axisLeft(yScale);
-    svgElement.append("g").call(yAxisGenerator);
-  }, [xScale, yScale, boundsHeight]);
-
-  return (
-    <div>
-      <svg width={width} height={height} style={{ display: "inline-block" }}>
-        {/* Second is for the axes */}
-        <g
-          width={boundsWidth}
-          height={boundsHeight}
-          ref={axesRef}
-          transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
-        />
-      </svg>
-    </div>
-  );
-};
-```
-
-
-# 2. Add visualization of the regions over time
-
-### component structure
-
-Next, we want to add a thin, vertical strip for each region, corresponding to the timeRange of the region. About 3 pixels wide.
-
-They should be their own sub component that's rendered alongside the timeline sub-component, within a parent. Both are equal height, and sit in columns next to each other.
-
-I imagine component something like:
-- `TimelineAndTimelineRegions.tsx`
-- `Timeline.tsx`
-- `TimelineRegions.tsx`
-  - For each column we compute (call them `regionColumns`), `TimelineRegionColumn.tsx`
-
-
-### Layout algorithm to produce the `regionColumns`
+# Layout algorithm to produce the `regionColumns` [ORIGINAL PLAN]
 
 Generally speaking, we will place these vertical strips in non-overlapping columns just to the right of the timeline line. Our aim is to place the strips as close to the timeline line as possible, while avoiding overlap. When there's overlap, we look for the nearest (earliest/leftmost) column without an overlap, or add another column to the right if needed.
 
-#### Examples
+## Added complexity: width of region strips
+
+Currently we're encoding things like geographic region area as the width of the vertical strip. This creates a more complex potential algorithm than the one below, because we need to consider the width of the strip when deciding where to place the regions.
+
+Perhaps the the way forward is to move away from geometric, box-y strips and into a more flow-y stream graph approach (curved stacked area charts). Could be more aesthetically beautiful, and also move away from the rectilinear precision of rectangles, and be more suggestive of the approximate/simplifying nature of the chart.
+
+## Examples
 
 For example, imagine we have three regions:
 - Region 1: [1900, 1950]
@@ -119,7 +39,7 @@ Results in:
 ```
 The above table "stacks" the regions in columns where overlap won't happen. Then we can safely just render out each column as a separate sub-component, and we'll have a nice, non-overlapping layout.
 
-#### Layout algorithm more formally
+## Layout algorithm more formally
 
 The layout algorithm should be:
 1. Prep: Sort the regions by their timeRange start year, and begin rendering the earliest region first
