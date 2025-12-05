@@ -21,8 +21,7 @@ type TimelineAndTimelineRegionsProps = {
   currentYear: number;
   regions: RegionData[];
   widthEncodingKey?: keyof RegionData;
-  onYearChange: (year: number) => void;
-  onZoomChange: (minYear: number, maxYear: number) => void;
+  onTimelineShift: (minYear: number, maxYear: number) => void;
 };
 
 export const TimelineAndTimelineRegions = ({
@@ -32,8 +31,7 @@ export const TimelineAndTimelineRegions = ({
   currentYear,
   regions,
   widthEncodingKey,
-  onYearChange,
-  onZoomChange,
+  onTimelineShift,
 }: TimelineAndTimelineRegionsProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const dragStartRef = useRef<{
@@ -58,7 +56,7 @@ export const TimelineAndTimelineRegions = ({
       const newHalfRange = halfRange * zoomFactor;
       const newMinYear = currentYear - newHalfRange;
       const newMaxYear = currentYear + newHalfRange;
-      onZoomChange(newMinYear, newMaxYear);
+      onTimelineShift(newMinYear, newMaxYear);
     };
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -94,7 +92,7 @@ export const TimelineAndTimelineRegions = ({
         const newMinYear = dragStartRef.current.minYear + yearDelta;
         const newMaxYear = dragStartRef.current.maxYear + yearDelta;
 
-        onZoomChange(newMinYear, newMaxYear);
+        onTimelineShift(newMinYear, newMaxYear);
       }
     };
 
@@ -135,7 +133,7 @@ export const TimelineAndTimelineRegions = ({
       window.removeEventListener("mouseup", handleMouseUp);
       container.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [height, minYear, maxYear, currentYear, onZoomChange]);
+  }, [height, minYear, maxYear, currentYear, onTimelineShift]);
 
   return (
     <div

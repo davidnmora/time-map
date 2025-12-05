@@ -54,12 +54,19 @@ function MapContent() {
     setURLState({ year: newYear });
   };
 
-  const handleZoomChange = (newMinYear: number, newMaxYear: number) => {
-    setURLState({ minYear: newMinYear, maxYear: newMaxYear });
+  const handleTimelineShift = (newMinYear: number, newMaxYear: number) => {
+    setURLState({
+      minYear: newMinYear,
+      maxYear: newMaxYear,
+      // keep the year in the middle of the timeline
+      year: newMaxYear - (newMaxYear - newMinYear) / 2,
+    });
   };
 
+  // TODO: fallback values should be abstracted away into the hook (applies to this whole file)
   const mapZoom = zoom ?? 3;
   const mapCenter: [number, number] = center ?? [-68.137343, 45.137451];
+  // TODO: move this to a config file
   const mapStyle = "mapbox://styles/davidnmora/cmikmelfl004601sqcjoe98co";
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 
@@ -115,8 +122,7 @@ function MapContent() {
               currentYear={currentYear}
               regions={timelineRegions}
               widthEncodingKey="area"
-              onYearChange={handleYearChange}
-              onZoomChange={handleZoomChange}
+              onTimelineShift={handleTimelineShift}
             />
           </div>
         )}
