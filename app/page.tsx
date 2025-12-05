@@ -49,10 +49,6 @@ function MapContent() {
     visibleMaxYear
   );
 
-  const handleYearChange = (newYear: number) => {
-    setURLState({ year: newYear });
-  };
-
   const handleTimelineShift = (newMinYear: number, newMaxYear: number) => {
     setURLState({
       minYear: newMinYear,
