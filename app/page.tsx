@@ -96,15 +96,15 @@ function MapContent() {
           />
         )}
         <div className="flex-1 relative">
-          <Map
-            center={mapCenter}
-            zoom={mapZoom}
-            style={mapStyle}
-            accessToken={accessToken}
-            onPositionUpdated={handlePositionUpdated}
-            geographicRegions={geographicRegions}
-            renderTooltip={renderTooltip}
-          />
+        <Map
+          center={mapCenter}
+          zoom={mapZoom}
+          style={mapStyle}
+          accessToken={accessToken}
+          onPositionUpdated={handlePositionUpdated}
+          geographicRegions={geographicRegions}
+          renderTooltip={renderTooltip}
+        />
         </div>
         {isFinite(visibleMinYear) && isFinite(visibleMaxYear) && (
           <div className="bg-white overflow-hidden">

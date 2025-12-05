@@ -89,7 +89,7 @@ export const TimelineAndTimelineRegions = ({
         const range =
           dragStartRef.current.maxYear - dragStartRef.current.minYear;
         const yearPerPixel = range / height;
-        const yearDelta = -deltaY * yearPerPixel;
+        const yearDelta = deltaY * yearPerPixel;
 
         const newMinYear = dragStartRef.current.minYear + yearDelta;
         const newMaxYear = dragStartRef.current.maxYear + yearDelta;
