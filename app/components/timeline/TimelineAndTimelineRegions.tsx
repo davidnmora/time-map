@@ -18,7 +18,7 @@ type TimelineAndTimelineRegionsProps = {
   height: number;
   minYear: number;
   maxYear: number;
-  selectedYear: number;
+  currentYear: number;
   regions: RegionData[];
   widthEncodingKey?: keyof RegionData;
   onYearChange: (year: number) => void;
@@ -29,7 +29,7 @@ export const TimelineAndTimelineRegions = ({
   height,
   minYear,
   maxYear,
-  selectedYear,
+  currentYear,
   regions,
   widthEncodingKey,
   onYearChange,
@@ -56,8 +56,8 @@ export const TimelineAndTimelineRegions = ({
       const range = maxYear - minYear;
       const halfRange = range / 2;
       const newHalfRange = halfRange * zoomFactor;
-      const newMinYear = selectedYear - newHalfRange;
-      const newMaxYear = selectedYear + newHalfRange;
+      const newMinYear = currentYear - newHalfRange;
+      const newMaxYear = currentYear + newHalfRange;
       onZoomChange(newMinYear, newMaxYear);
     };
 
@@ -135,7 +135,7 @@ export const TimelineAndTimelineRegions = ({
       window.removeEventListener("mouseup", handleMouseUp);
       container.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [height, minYear, maxYear, selectedYear, onZoomChange]);
+  }, [height, minYear, maxYear, currentYear, onZoomChange]);
 
   return (
     <div
@@ -147,9 +147,6 @@ export const TimelineAndTimelineRegions = ({
         height={height}
         minYear={minYear}
         maxYear={maxYear}
-        selectedYear={selectedYear}
-        onYearChange={onYearChange}
-        onZoomChange={onZoomChange}
       />
       <TimelineRegions
         height={height}

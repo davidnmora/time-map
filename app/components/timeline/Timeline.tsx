@@ -10,18 +10,12 @@ type TimelineProps = {
   height: number;
   minYear: number;
   maxYear: number;
-  selectedYear: number;
-  onYearChange: (year: number) => void;
-  onZoomChange: (minYear: number, maxYear: number) => void;
 };
 
 export const Timeline = ({
   height,
   minYear,
   maxYear,
-  selectedYear,
-  onYearChange,
-  onZoomChange,
 }: TimelineProps) => {
   const axisRef = useRef<SVGGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -59,7 +53,6 @@ export const Timeline = ({
       .attr("stroke", "#000")
       .attr("stroke-width", 2);
   }, [minYear, maxYear, boundsHeight, centerY]);
-
 
   return (
     <div
