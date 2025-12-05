@@ -1,7 +1,6 @@
 "use client";
 
 import Map from "./components/map/Map";
-import YearSlider from "./components/YearSlider";
 import { useURLState } from "./hooks/useURLState";
 import { getAllData } from "./data/all-data";
 import { getMinMaxYears, prepareTimelineRegions } from "./utils/data";
