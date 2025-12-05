@@ -6,7 +6,6 @@ import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { renderTooltip } from "../map/map-utils";
 import type { RegionStrip } from "./timeline-utils";
 
-const MARGIN = { top: 30, bottom: 30 };
 const DEFAULT_OPACITY = 0.3;
 const HOVERED_OPACITY = 1;
 
@@ -27,7 +26,7 @@ export const TimelineRegionColumn = ({
   columnWidth,
   getWidthEncodingValue,
 }: TimelineRegionColumnProps) => {
-  const boundsHeight = height - MARGIN.top - MARGIN.bottom;
+  const boundsHeight = height;
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
   const [tooltipData, setTooltipData] = useState<{
     x: number;
@@ -102,7 +101,7 @@ export const TimelineRegionColumn = ({
   return (
     <>
       <svg width={columnWidth} height={height} className="block">
-        <g transform={`translate(0,${MARGIN.top})`}>
+        <g>
           {strips.map((strip) => {
             const isHovered = hoveredRegionId === strip.id;
             return (

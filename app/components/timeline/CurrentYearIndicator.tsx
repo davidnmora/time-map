@@ -3,9 +3,6 @@
 import { useRef, useEffect } from "react";
 import * as d3 from "d3";
 
-// TODO: remove margin in timeline everywhere
-const MARGIN = { top: 30, bottom: 30 };
-
 type CurrentYearIndicatorProps = {
   height: number;
   minYear: number;
@@ -23,7 +20,7 @@ export const CurrentYearIndicator = ({
 }: CurrentYearIndicatorProps) => {
   const overlayRef = useRef<SVGSVGElement | null>(null);
 
-  const boundsHeight = height - MARGIN.top - MARGIN.bottom;
+  const boundsHeight = height;
 
   useEffect(() => {
     if (!overlayRef.current) return;
@@ -33,7 +30,7 @@ export const CurrentYearIndicator = ({
       .domain([minYear, maxYear])
       .range([boundsHeight, 0]);
 
-    const currentYearY = yScale(currentYear) + MARGIN.top;
+    const currentYearY = yScale(currentYear);
 
     const svgElement = d3.select(overlayRef.current);
     svgElement.selectAll("*").remove();

@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const MARGIN = { top: 30, right: 0, bottom: 30, left: 50 };
 const TIMELINE_WIDTH = 50;
 
 type TimelineProps = {
@@ -12,15 +11,11 @@ type TimelineProps = {
   maxYear: number;
 };
 
-export const Timeline = ({
-  height,
-  minYear,
-  maxYear,
-}: TimelineProps) => {
+export const Timeline = ({ height, minYear, maxYear }: TimelineProps) => {
   const axisRef = useRef<SVGGElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const boundsHeight = height - MARGIN.top - MARGIN.bottom;
+  const boundsHeight = height;
 
   useEffect(() => {
     if (!axisRef.current) return;
@@ -51,10 +46,7 @@ export const Timeline = ({
       style={{ width: TIMELINE_WIDTH, height: height }}
     >
       <svg width={TIMELINE_WIDTH} height={height} className="block">
-        <g
-          ref={axisRef}
-          transform={`translate(${MARGIN.left},${MARGIN.top})`}
-        />
+        <g ref={axisRef} transform={`translate(${TIMELINE_WIDTH}, 0)`} />
       </svg>
     </div>
   );
