@@ -1,26 +1,19 @@
 "use client";
 
 import Map from "./components/map/Map";
-import { useURLState } from "./hooks/useURLState";
 import { getAllData } from "./data/all-data";
-import { getMinMaxYears, prepareTimelineRegions } from "./utils/data";
+import { prepareTimelineRegions } from "./utils/data";
 import { renderTooltip, convertToMapRegions } from "./components/map/map-utils";
 import { TimelineAndTimelineRegions } from "./components/timeline/TimelineAndTimelineRegions";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
+import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import { calculateTotalArea } from "./components/timeline/timeline-utils";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 import { Suspense, useState, useEffect } from "react";
 
 function MapContent() {
-  const {
-    zoom,
-    center,
-    year,
-    minYear: urlMinYear,
-    maxYear: urlMaxYear,
-    setURLState,
-  } = useURLState();
+  const { zoom, center, year, minYear, maxYear } = useAppState();
   const [windowHeight, setWindowHeight] = useState(800);
 
   useEffect(() => {
@@ -33,47 +26,17 @@ function MapContent() {
   }, []);
 
   const allData = getAllData();
-  const { min: dataMinYear, max: dataMaxYear } = getMinMaxYears(allData);
-
-  const visibleMinYear = urlMinYear ?? dataMinYear;
-  const visibleMaxYear = urlMaxYear ?? dataMaxYear;
-  const currentYear =
-    year ?? (isFinite(dataMinYear) ? dataMinYear : new Date().getFullYear());
-
   const timelineRegions = prepareTimelineRegions(allData, calculateTotalArea);
 
   const geographicRegions = convertToMapRegions(
     allData,
-    currentYear,
-    visibleMinYear,
-    visibleMaxYear
+    year,
+    minYear,
+    maxYear
   );
 
-  const handleTimelineShift = (newMinYear: number, newMaxYear: number) => {
-    setURLState({
-      minYear: newMinYear,
-      maxYear: newMaxYear,
-      // keep the year in the middle of the timeline
-      year: newMaxYear - (newMaxYear - newMinYear) / 2,
-    });
-  };
-
-  // TODO: fallback values should be abstracted away into the hook (applies to this whole file)
-  const mapZoom = zoom ?? 3;
-  const mapCenter: [number, number] = center ?? [-68.137343, 45.137451];
-  // TODO: move this to a config file
   const mapStyle = "mapbox://styles/davidnmora/cmikmelfl004601sqcjoe98co";
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
-
-  const handlePositionUpdated = (
-    newCenter: [number, number],
-    newZoom: number
-  ) => {
-    setURLState({
-      center: newCenter,
-      zoom: newZoom,
-    });
-  };
 
   if (!accessToken) {
     return (
@@ -91,25 +54,21 @@ function MapContent() {
       <div className="h-screen w-screen flex">
         <div className="flex-1 relative">
           <Map
-            center={mapCenter}
-            zoom={mapZoom}
+            center={center}
+            zoom={zoom}
             style={mapStyle}
             accessToken={accessToken}
-            onPositionUpdated={handlePositionUpdated}
             geographicRegions={geographicRegions}
             renderTooltip={renderTooltip}
           />
         </div>
-        {isFinite(visibleMinYear) && isFinite(visibleMaxYear) && (
+        {isFinite(minYear) && isFinite(maxYear) && (
           <div className="bg-white overflow-hidden">
             <TimelineAndTimelineRegions
               height={windowHeight}
-              minYear={visibleMinYear}
-              maxYear={visibleMaxYear}
-              currentYear={currentYear}
+              currentYear={year}
               regions={timelineRegions}
               widthEncodingKey="area"
-              onTimelineShift={handleTimelineShift}
             />
           </div>
         )}
@@ -120,14 +79,16 @@ function MapContent() {
 
 export default function Home() {
   return (
-    <Suspense
-      fallback={
-        <div className="h-screen w-screen flex items-center justify-center">
-          <p>Loading map...</p>
-        </div>
-      }
-    >
-      <MapContent />
-    </Suspense>
+    <AppStateProvider>
+      <Suspense
+        fallback={
+          <div className="h-screen w-screen flex items-center justify-center">
+            <p>Loading map...</p>
+          </div>
+        }
+      >
+        <MapContent />
+      </Suspense>
+    </AppStateProvider>
   );
 }

@@ -6,6 +6,7 @@ import type { GeoJSON } from "geojson";
 import { updateGeographicRegions, type TooltipData } from "./map-utils";
 import type { Metadata, TimeRange } from "../../data/types";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
+import { useAppState } from "../../contexts/AppStateContext";
 
 export type GeographicRegion = {
   id: string;
@@ -24,7 +25,6 @@ type MapProps = {
   zoom: number;
   style: string;
   accessToken: string;
-  onPositionUpdated: (center: [number, number], zoom: number) => void;
   geographicRegions?: GeographicRegion[];
   renderTooltip?: (data: TooltipData) => string;
 };
@@ -39,15 +39,15 @@ export default function Map(props: MapProps) {
     zoom,
     style,
     accessToken,
-    onPositionUpdated,
     geographicRegions = [],
     renderTooltip,
   } = props;
+  const { updateState } = useAppState();
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const sourcesRef = useRef<Set<string>>(new Set());
   const isUserInteractionRef = useRef(false);
-  const onPositionUpdatedRef = useRef(onPositionUpdated);
+  const updateStateRef = useRef(updateState);
   const popupRef = useRef<mapboxgl.Popup | null>(null);
   const hoveredRegionIdRef = useRef<string | null>(null);
   const hoveredFeatureRef = useRef<{
@@ -60,10 +60,9 @@ export default function Map(props: MapProps) {
   const { hoveredRegionId: contextHoveredRegionId, setHoveredRegionId } =
     useHoveredElement();
 
-  // Keep the callback ref up to date
   useEffect(() => {
-    onPositionUpdatedRef.current = onPositionUpdated;
-  }, [onPositionUpdated]);
+    updateStateRef.current = updateState;
+  }, [updateState]);
 
   // Initialize map
   useEffect(() => {
@@ -91,7 +90,10 @@ export default function Map(props: MapProps) {
       if (!mapRef.current || !isUserInteractionRef.current) return;
       const newCenter = mapRef.current.getCenter();
       const newZoom = mapRef.current.getZoom();
-      onPositionUpdatedRef.current([newCenter.lng, newCenter.lat], newZoom);
+      updateStateRef.current({
+        center: [newCenter.lng, newCenter.lat],
+        zoom: newZoom,
+      });
       isUserInteractionRef.current = false;
     };
 

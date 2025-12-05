@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { Timeline } from "./Timeline";
 import { TimelineRegions } from "./TimelineRegions";
+import { useAppState } from "../../contexts/AppStateContext";
 import type { TimeRange, Metadata } from "../../data/types";
 
 type RegionData = {
@@ -16,23 +17,18 @@ type RegionData = {
 
 type TimelineAndTimelineRegionsProps = {
   height: number;
-  minYear: number;
-  maxYear: number;
   currentYear: number;
   regions: RegionData[];
   widthEncodingKey?: keyof RegionData;
-  onTimelineShift: (minYear: number, maxYear: number) => void;
 };
 
 export const TimelineAndTimelineRegions = ({
   height,
-  minYear,
-  maxYear,
   currentYear,
   regions,
   widthEncodingKey,
-  onTimelineShift,
 }: TimelineAndTimelineRegionsProps) => {
+  const { minYear, maxYear, updateTimelineRange } = useAppState();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const dragStartRef = useRef<{
     y: number;
@@ -56,7 +52,7 @@ export const TimelineAndTimelineRegions = ({
       const newHalfRange = halfRange * zoomFactor;
       const newMinYear = currentYear - newHalfRange;
       const newMaxYear = currentYear + newHalfRange;
-      onTimelineShift(newMinYear, newMaxYear);
+      updateTimelineRange(newMinYear, newMaxYear, { autoCalculateYear: true });
     };
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -93,7 +89,9 @@ export const TimelineAndTimelineRegions = ({
         const newMinYear = dragStartRef.current.minYear + yearDelta;
         const newMaxYear = dragStartRef.current.maxYear + yearDelta;
 
-        onTimelineShift(newMinYear, newMaxYear);
+        updateTimelineRange(newMinYear, newMaxYear, {
+          autoCalculateYear: true,
+        });
       }
     };
 
@@ -134,7 +132,7 @@ export const TimelineAndTimelineRegions = ({
       window.removeEventListener("mouseup", handleMouseUp);
       container.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [height, minYear, maxYear, currentYear, onTimelineShift]);
+  }, [height, minYear, maxYear, currentYear, updateTimelineRange]);
 
   return (
     <div
