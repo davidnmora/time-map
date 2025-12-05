@@ -94,14 +94,6 @@ function MapContent() {
   return (
     <HoveredElementProvider>
       <div className="h-screen w-screen flex">
-        {isFinite(dataMinYear) && isFinite(dataMaxYear) && (
-          <YearSlider
-            minYear={dataMinYear}
-            maxYear={dataMaxYear}
-            currentYear={currentYear}
-            onYearChange={handleYearChange}
-          />
-        )}
         <div className="flex-1 relative">
           <Map
             center={mapCenter}
