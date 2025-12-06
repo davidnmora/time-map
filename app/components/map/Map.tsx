@@ -3,7 +3,14 @@
 import { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import type { GeoJSON } from "geojson";
-import { initializeGeographicRegions, type TooltipData } from "./map-utils";
+import {
+  initializeMapRegions,
+  updateRegionVisibility,
+  updateHoverStateFromContext,
+  setupHoverHandlers,
+  type TooltipData,
+  type HoverHandlers,
+} from "./map-utils";
 import type { Metadata, TimeRange } from "../../data/types";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { useAppState } from "../../contexts/AppStateContext";
@@ -155,50 +162,24 @@ export default function Map(props: MapProps) {
 
     const initialize = () => {
       if (!mapRef.current) return;
-      initializeGeographicRegions(
+
+      const hoverHandlers: HoverHandlers = {
+        hoveredFeatureRef,
+        hoveredRegionIdRef,
+        setHoveredRegionId,
+        popupRef,
+        renderTooltip,
+        hoverHandlersRef,
+      };
+
+      initializeMapRegions(
         mapRef.current,
         sourcesRef,
-        geographicRegions
+        geographicRegions,
+        (map, regions) => setupHoverHandlers(map, regions, hoverHandlers),
+        isRegionVisible
       );
-      setupHoverHandlers(mapRef.current, geographicRegions);
       initializedRef.current = true;
-
-      const updateVisibility = () => {
-        if (!mapRef.current) return;
-        geographicRegions.forEach((region) => {
-          const sourceId = region.id;
-          const source = mapRef.current?.getSource(sourceId);
-          if (!source || source.type !== "geojson") return;
-
-          const visible = isRegionVisible(region);
-
-          try {
-            const features = mapRef.current?.querySourceFeatures(sourceId);
-            if (!features) return;
-            features.forEach((feature) => {
-              if (feature.id !== undefined && feature.id !== null) {
-                try {
-                  mapRef.current?.setFeatureState(
-                    { source: sourceId, id: feature.id },
-                    { visible }
-                  );
-                } catch (e) {
-                  // Feature might not exist, ignore
-                }
-              }
-            });
-          } catch (e) {
-            // Source might not be ready, ignore
-          }
-        });
-      };
-
-      const handleIdle = () => {
-        updateVisibility();
-        map.off("idle", handleIdle);
-      };
-
-      map.once("idle", handleIdle);
     };
 
     if (!map.isStyleLoaded()) {
@@ -219,40 +200,10 @@ export default function Map(props: MapProps) {
 
     const map = mapRef.current;
 
-    const updateVisibility = () => {
-      if (!mapRef.current) return;
-      geographicRegions.forEach((region) => {
-        const sourceId = region.id;
-        const source = mapRef.current?.getSource(sourceId);
-        if (!source || source.type !== "geojson") return;
-
-        const visible = isRegionVisible(region);
-
-        try {
-          const features = mapRef.current?.querySourceFeatures(sourceId);
-          if (!features || features.length === 0) return;
-          features.forEach((feature) => {
-            if (feature.id !== undefined && feature.id !== null) {
-              try {
-                mapRef.current?.setFeatureState(
-                  { source: sourceId, id: feature.id },
-                  { visible }
-                );
-              } catch (e) {
-                // Feature might not exist, ignore
-              }
-            }
-          });
-        } catch (e) {
-          // Source might not be ready, ignore
-        }
-      });
-    };
-
-    updateVisibility();
+    updateRegionVisibility(map, geographicRegions, isRegionVisible);
 
     const handleIdle = () => {
-      updateVisibility();
+      updateRegionVisibility(map, geographicRegions, isRegionVisible);
       map.off("idle", handleIdle);
     };
 
@@ -262,140 +213,12 @@ export default function Map(props: MapProps) {
   useEffect(() => {
     if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;
 
-    const map = mapRef.current;
-    const matchingRegionIds = contextHoveredRegionId
-      ? geographicRegions
-          .filter(
-            (region) =>
-              region.id === contextHoveredRegionId ||
-              region.id.startsWith(`${contextHoveredRegionId}-`)
-          )
-          .map((region) => region.id)
-      : [];
-
-    const allRegionIds = geographicRegions.map((region) => region.id);
-
-    allRegionIds.forEach((regionId) => {
-      const source = map.getSource(regionId);
-      if (!source || source.type !== "geojson") return;
-
-      const isMatchingRegion = matchingRegionIds.includes(regionId);
-
-      try {
-        const features = map.querySourceFeatures(regionId);
-        features.forEach((feature) => {
-          if (feature.id !== undefined && feature.id !== null) {
-            try {
-              map.setFeatureState(
-                { source: regionId, id: feature.id },
-                { hover: isMatchingRegion }
-              );
-            } catch (e) {
-              // Feature might not exist, ignore
-            }
-          }
-        });
-      } catch (e) {
-        // Source might not be ready, ignore
-      }
-    });
+    updateHoverStateFromContext(
+      mapRef.current,
+      geographicRegions,
+      contextHoveredRegionId
+    );
   }, [contextHoveredRegionId, geographicRegions]);
-
-  const setupHoverHandlers = (
-    map: mapboxgl.Map,
-    regions: GeographicRegion[]
-  ) => {
-    const removeHoverState = () => {
-      if (hoveredFeatureRef.current) {
-        try {
-          map.setFeatureState(
-            {
-              source: hoveredFeatureRef.current.sourceId,
-              id: hoveredFeatureRef.current.featureId,
-            },
-            { hover: false }
-          );
-        } catch (e) {
-          // Feature might not exist, ignore
-        }
-        hoveredFeatureRef.current = null;
-      }
-      hoveredRegionIdRef.current = null;
-      setHoveredRegionId(null);
-      if (renderTooltip) {
-        popupRef.current?.remove();
-      }
-    };
-
-    regions.forEach((region) => {
-      const fillLayerId = `${region.id}-fill`;
-
-      if (!map.getLayer(fillLayerId)) return;
-
-      const handleMouseMove = (e: mapboxgl.MapLayerMouseEvent) => {
-        if (!e.features || e.features.length === 0) return;
-
-        if (hoveredRegionIdRef.current !== region.id) {
-          removeHoverState();
-        }
-
-        hoveredRegionIdRef.current = region.id;
-
-        const baseRegionId = region.metadata?.id;
-        if (baseRegionId) {
-          setHoveredRegionId(baseRegionId);
-        }
-
-        const feature = e.features[0];
-        const featureId = feature.id;
-
-        if (featureId === undefined || featureId === null) {
-          return;
-        }
-
-        try {
-          map.setFeatureState(
-            { source: region.id, id: featureId },
-            { hover: true }
-          );
-          hoveredFeatureRef.current = {
-            sourceId: region.id,
-            featureId: featureId,
-          };
-        } catch (e) {
-          // Feature might not exist, ignore
-        }
-
-        if (renderTooltip) {
-          const hierarchy = region.hierarchy || [];
-          const title = region.metadata?.title || "";
-          const description = region.metadata?.description;
-          const timeRange = region.timeRange || [0, null];
-
-          const tooltipHtml = renderTooltip({
-            hierarchy,
-            title,
-            description,
-            timeRange,
-          });
-
-          popupRef.current?.setLngLat(e.lngLat).setHTML(tooltipHtml).addTo(map);
-        }
-      };
-
-      const handleMouseLeave = () => {
-        removeHoverState();
-      };
-
-      map.on("mousemove", fillLayerId, handleMouseMove);
-      map.on("mouseleave", fillLayerId, handleMouseLeave);
-
-      hoverHandlersRef.current.set(fillLayerId, {
-        mousemove: handleMouseMove as () => void,
-        mouseleave: handleMouseLeave,
-      });
-    });
-  };
 
   return (
     <div id="map-container" ref={mapContainerRef} className="h-full w-full" />
