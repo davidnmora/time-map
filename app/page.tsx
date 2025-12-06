@@ -77,16 +77,16 @@ function MapContent() {
 
 export default function Home() {
   return (
-    <AppStateProvider>
-      <Suspense
-        fallback={
-          <div className="h-screen w-screen flex items-center justify-center">
-            <p>Loading map...</p>
-          </div>
-        }
-      >
+    <Suspense
+      fallback={
+        <div className="h-screen w-screen flex items-center justify-center">
+          <p>Loading map...</p>
+        </div>
+      }
+    >
+      <AppStateProvider>
         <MapContent />
-      </Suspense>
-    </AppStateProvider>
+      </AppStateProvider>
+    </Suspense>
   );
 }
