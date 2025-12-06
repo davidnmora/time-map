@@ -1,3 +1,4 @@
+import * as turf from "@turf/turf";
 import type {
   TimeBoundGeographicRegion,
   TimeBoundGeographicRegionGroup,
@@ -91,11 +92,17 @@ export function getAllRegions(
   return traverseAllRegions(group);
 }
 
+export function calculateTotalArea(
+  geographicRegions?: GeographicRegion[]
+): number {
+  return (geographicRegions || []).reduce(
+    (total, geoRegion) => total + turf.area(geoRegion),
+    0
+  );
+}
+
 // TODO: I'd like to ideally have one main data structure, that's consistent, and is used by all the components (you don't have to think "What version is there" or duplicate code deriving the same things)
-export function prepareTimelineRegions(
-  group: TimeBoundGeographicRegionGroup,
-  calculateTotalArea: (geographicRegions?: GeographicRegion[]) => number
-) {
+export function prepareTimelineRegions(group: TimeBoundGeographicRegionGroup) {
   const allRegionsWithHierarchy = getAllRegions(group);
   return allRegionsWithHierarchy.map(({ region, hierarchy }) => ({
     id: region.metadata.id,

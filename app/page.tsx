@@ -10,7 +10,6 @@ import {
 import { Timeline } from "./components/timeline/Timeline";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
-import { calculateTotalArea } from "./components/timeline/timeline-utils";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 import { Suspense, useState, useEffect } from "react";
@@ -29,7 +28,7 @@ function MapContent() {
   }, []);
 
   const allData = getAllData();
-  const timelineRegions = prepareTimelineRegions(allData, calculateTotalArea);
+  const timelineRegions = prepareTimelineRegions(allData);
 
   const geographicRegions = convertAllToMapRegions(allData);
 

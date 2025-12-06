@@ -1,16 +1,4 @@
-import * as turf from "@turf/turf";
-import type { GeographicRegion, TimeRange, Metadata } from "../../data/types";
-
-export function calculateTotalArea(
-  geographicRegions?: GeographicRegion[]
-): number {
-  if (!geographicRegions || geographicRegions.length === 0) {
-    return 0;
-  }
-  return geographicRegions.reduce((total, geoRegion) => {
-    return total + turf.area(geoRegion);
-  }, 0);
-}
+import type { TimeRange, Metadata } from "../../data/types";
 
 export type RegionStrip = {
   id: string;
@@ -92,4 +80,3 @@ export function computeRegionColumns(regions: RegionStrip[]): Column[] {
 
   return columns;
 }
-
