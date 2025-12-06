@@ -43,7 +43,10 @@ export const CurrentYearIndicator = ({
         fontSize="14px"
         fill="#000"
       >
-        Current Year: <tspan fontSize="48px">{currentYear}</tspan>
+        Current Year:{" "}
+        <tspan fontFamily="monospace" fontSize="48px">
+          {Math.round(currentYear)}
+        </tspan>
       </text>
     </svg>
   );

@@ -90,17 +90,17 @@ function readStateFromURL(searchParams: URLSearchParams): AppState {
 
   const year = (() => {
     const yearParam = searchParams.get("year");
-    return yearParam ? parseInt(yearParam, 10) : undefined;
+    return yearParam ? parseFloat(yearParam) : undefined;
   })();
 
   const minYear = (() => {
     const minYearParam = searchParams.get("minYear");
-    return minYearParam ? parseInt(minYearParam, 10) : undefined;
+    return minYearParam ? parseFloat(minYearParam) : undefined;
   })();
 
   const maxYear = (() => {
     const maxYearParam = searchParams.get("maxYear");
-    return maxYearParam ? parseInt(maxYearParam, 10) : undefined;
+    return maxYearParam ? parseFloat(maxYearParam) : undefined;
   })();
 
   return { zoom, center, year, minYear, maxYear };
@@ -242,11 +242,11 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
 
   const defaults = getDefaultState();
   const contextValue: AppStateContextType = {
-    zoom: state.zoom ?? defaults.zoom,
-    center: state.center ?? defaults.center,
-    year: state.year ?? defaults.year,
-    minYear: state.minYear ?? defaults.minYear,
-    maxYear: state.maxYear ?? defaults.maxYear,
+    zoom: state.zoom ?? defaults.zoom!,
+    center: state.center ?? defaults.center!,
+    year: state.year ?? defaults.year!,
+    minYear: state.minYear ?? defaults.minYear!,
+    maxYear: state.maxYear ?? defaults.maxYear!,
     updateState,
     updateTimelineRange,
   };
