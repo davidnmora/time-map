@@ -22,33 +22,37 @@ export const CurrentYearIndicator = ({
   const currentYearY = yScale(currentYear);
 
   return (
-    <svg
-      width={totalWidth}
-      height={height}
+    <div
       className="absolute top-0 left-0 pointer-events-none"
+      style={{ width: totalWidth, height: height }}
     >
-      <line
-        x1={0}
-        x2={totalWidth}
-        y1={currentYearY}
-        y2={currentYearY}
-        stroke="#000"
-        strokeWidth={4}
+      <div
+        className="absolute"
+        style={{
+          left: 0,
+          top: currentYearY,
+          width: totalWidth,
+          height: 4,
+          backgroundColor: "#000",
+        }}
       />
-      <text
-        x={totalWidth / 2}
-        y={currentYearY - 8}
-        textAnchor="middle"
-        fontWeight="bold"
-        fontSize="14px"
-        fill="#000"
+      <div
+        className="absolute"
+        style={{
+          left: "50%",
+          top: currentYearY - 8,
+          transform: "translateX(-50%)",
+          fontWeight: "bold",
+          fontSize: "14px",
+          color: "#000",
+        }}
       >
         Current Year:{" "}
-        <tspan fontFamily="monospace" fontSize="48px">
+        <span style={{ fontFamily: "monospace", fontSize: "48px" }}>
           {Math.round(currentYear)}
-        </tspan>
-      </text>
-    </svg>
+        </span>
+      </div>
+    </div>
   );
 };
 

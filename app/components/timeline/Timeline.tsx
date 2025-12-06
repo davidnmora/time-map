@@ -1,9 +1,26 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
 const TIMELINE_WIDTH = 50;
+const TICK_LENGTH = 6;
+const TICK_OFFSET = 10;
+
+const generateDecadeTicks = (minYear: number, maxYear: number): number[] => {
+  const startDecade = Math.floor(minYear / 10) * 10;
+  const endDecade = Math.ceil(maxYear / 10) * 10;
+  const ticks: number[] = [];
+  
+  for (let year = startDecade; year <= endDecade; year += 10) {
+    ticks.push(year);
+  }
+  
+  return ticks;
+};
+
+const isCentury = (year: number): boolean => {
+  return year % 100 === 0;
+};
 
 type TimelineProps = {
   height: number;
@@ -12,42 +29,58 @@ type TimelineProps = {
 };
 
 export const Timeline = ({ height, minYear, maxYear }: TimelineProps) => {
-  const axisRef = useRef<SVGGElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const yScale = d3
+    .scaleLinear()
+    .domain([minYear, maxYear])
+    .range([height, 0]);
 
-  const boundsHeight = height;
-
-  useEffect(() => {
-    if (!axisRef.current) return;
-
-    const yScale = d3
-      .scaleLinear()
-      .domain([minYear, maxYear])
-      .range([boundsHeight, 0]);
-
-    const svgElement = d3.select(axisRef.current);
-    svgElement.selectAll("*").remove();
-
-    const yAxisGenerator = d3
-      .axisLeft(yScale)
-      .tickFormat((d) => d.toString())
-      .ticks(Math.floor(boundsHeight / 30));
-
-    const axisG = svgElement.append("g").call(yAxisGenerator);
-
-    axisG.selectAll(".tick line").attr("x2", -6);
-    axisG.selectAll(".tick text").attr("x", -10);
-  }, [minYear, maxYear, boundsHeight]);
+  const decadeTicks = generateDecadeTicks(minYear, maxYear);
 
   return (
     <div
-      ref={containerRef}
       className="relative overflow-hidden"
       style={{ width: TIMELINE_WIDTH, height: height }}
     >
-      <svg width={TIMELINE_WIDTH} height={height} className="block">
-        <g ref={axisRef} transform={`translate(${TIMELINE_WIDTH}, 0)`} />
-      </svg>
+      <div className="relative w-full h-full">
+        {decadeTicks.map((year) => {
+          const y = yScale(year);
+          const isCenturyYear = isCentury(year);
+          
+          return (
+            <div
+              key={year}
+              className="absolute"
+              style={{
+                left: TIMELINE_WIDTH - TICK_LENGTH,
+                top: y,
+                width: TICK_LENGTH,
+                height: 1,
+                backgroundColor: "#000",
+              }}
+            />
+          );
+        })}
+        {decadeTicks.map((year) => {
+          const y = yScale(year);
+          const isCenturyYear = isCentury(year);
+          
+          return (
+            <div
+              key={`label-${year}`}
+              className="absolute"
+              style={{
+                left: TIMELINE_WIDTH - TICK_OFFSET,
+                top: y - 8,
+                transform: "translateX(-100%)",
+                fontSize: isCenturyYear ? "16px" : "12px",
+                fontWeight: isCenturyYear ? "bold" : "normal",
+              }}
+            >
+              {year}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

@@ -58,7 +58,7 @@ export const TimelineRegionColumn = ({
   });
 
   const handleMouseEnter = (
-    e: React.MouseEvent<SVGRectElement>,
+    e: React.MouseEvent<HTMLDivElement>,
     strip: (typeof strips)[0]
   ) => {
     setHoveredRegionId(strip.id);
@@ -83,7 +83,7 @@ export const TimelineRegionColumn = ({
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<SVGRectElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (tooltipData) {
       setTooltipData({
         ...tooltipData,
@@ -100,28 +100,32 @@ export const TimelineRegionColumn = ({
 
   return (
     <>
-      <svg width={columnWidth} height={height} className="block">
-        <g>
-          {strips.map((strip) => {
-            const isHovered = hoveredRegionId === strip.id;
-            return (
-              <rect
-                key={strip.id}
-                x={0}
-                y={strip.y}
-                width={strip.width}
-                height={strip.height}
-                fill={strip.color || "#0080ff"}
-                opacity={isHovered ? HOVERED_OPACITY : DEFAULT_OPACITY}
-                onMouseEnter={(e) => handleMouseEnter(e, strip)}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                style={{ cursor: "pointer" }}
-              />
-            );
-          })}
-        </g>
-      </svg>
+      <div
+        className="relative block"
+        style={{ width: columnWidth, height: height }}
+      >
+        {strips.map((strip) => {
+          const isHovered = hoveredRegionId === strip.id;
+          return (
+            <div
+              key={strip.id}
+              className="absolute"
+              style={{
+                left: 0,
+                top: strip.y,
+                width: strip.width,
+                height: strip.height,
+                backgroundColor: strip.color || "#0080ff",
+                opacity: isHovered ? HOVERED_OPACITY : DEFAULT_OPACITY,
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => handleMouseEnter(e, strip)}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            />
+          );
+        })}
+      </div>
       {tooltipData && (
         <div
           style={{
