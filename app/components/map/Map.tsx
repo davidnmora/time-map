@@ -3,7 +3,7 @@
 import { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import type { GeoJSON } from "geojson";
-import { updateGeographicRegions, type TooltipData } from "./map-utils";
+import { initializeGeographicRegions, type TooltipData } from "./map-utils";
 import type { Metadata, TimeRange } from "../../data/types";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { useAppState } from "../../contexts/AppStateContext";
@@ -42,7 +42,7 @@ export default function Map(props: MapProps) {
     geographicRegions = [],
     renderTooltip,
   } = props;
-  const { updateState } = useAppState();
+  const { updateState, year, minYear, maxYear } = useAppState();
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const sourcesRef = useRef<Set<string>>(new Set());
@@ -141,44 +141,135 @@ export default function Map(props: MapProps) {
     }
   }, [center, zoom]);
 
-  // Handle geographic regions - add/remove sources and layers
+  const initializedRef = useRef(false);
+
+  const isRegionVisible = (region: GeographicRegion): boolean => {
+    if (!region.timeRange) return true;
+
+    const [startYear, endYear] = region.timeRange;
+    const currentYear = new Date().getFullYear();
+    const effectiveEndYear = endYear !== null ? endYear : currentYear;
+
+    const overlapsYear = effectiveEndYear >= year && startYear <= year;
+    if (!overlapsYear) return false;
+
+    if (minYear === undefined && maxYear === undefined) return true;
+
+    if (minYear !== undefined && effectiveEndYear < minYear) return false;
+    if (maxYear !== undefined && startYear > maxYear) return false;
+    return true;
+  };
+
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || initializedRef.current) return;
 
     const map = mapRef.current;
 
-    const cleanupHoverHandlers = () => {
-      hoverHandlersRef.current.forEach((handlers, layerId) => {
-        map.off("mousemove", layerId, handlers.mousemove);
-        map.off("mouseleave", layerId, handlers.mouseleave);
-      });
-      hoverHandlersRef.current.clear();
+    const initialize = () => {
+      if (!mapRef.current) return;
+      initializeGeographicRegions(
+        mapRef.current,
+        sourcesRef,
+        geographicRegions
+      );
+      setupHoverHandlers(mapRef.current, geographicRegions);
+      initializedRef.current = true;
+
+      const updateVisibility = () => {
+        if (!mapRef.current) return;
+        geographicRegions.forEach((region) => {
+          const sourceId = region.id;
+          const source = mapRef.current?.getSource(sourceId);
+          if (!source || source.type !== "geojson") return;
+
+          const visible = isRegionVisible(region);
+
+          try {
+            const features = mapRef.current?.querySourceFeatures(sourceId);
+            if (!features) return;
+            features.forEach((feature) => {
+              if (feature.id !== undefined && feature.id !== null) {
+                try {
+                  mapRef.current?.setFeatureState(
+                    { source: sourceId, id: feature.id },
+                    { visible }
+                  );
+                } catch (e) {
+                  // Feature might not exist, ignore
+                }
+              }
+            });
+          } catch (e) {
+            // Source might not be ready, ignore
+          }
+        });
+      };
+
+      const handleIdle = () => {
+        updateVisibility();
+        map.off("idle", handleIdle);
+      };
+
+      map.once("idle", handleIdle);
     };
 
-    // Wait for map to be ready
     if (!map.isStyleLoaded()) {
-      map.once("styledata", () => {
-        if (mapRef.current) {
-          cleanupHoverHandlers();
-          updateGeographicRegions(
-            mapRef.current,
-            sourcesRef,
-            geographicRegions
-          );
-          setupHoverHandlers(mapRef.current, geographicRegions);
-        }
-      });
+      map.once("styledata", initialize);
       return;
     }
 
-    cleanupHoverHandlers();
-    updateGeographicRegions(map, sourcesRef, geographicRegions);
-    setupHoverHandlers(map, geographicRegions);
+    initialize();
+  }, [geographicRegions, renderTooltip, year, minYear, maxYear]);
 
-    return () => {
-      cleanupHoverHandlers();
+  useEffect(() => {
+    if (
+      !mapRef.current ||
+      !mapRef.current.isStyleLoaded() ||
+      !initializedRef.current
+    )
+      return;
+
+    const map = mapRef.current;
+
+    const updateVisibility = () => {
+      if (!mapRef.current) return;
+      geographicRegions.forEach((region) => {
+        const sourceId = region.id;
+        const source = mapRef.current?.getSource(sourceId);
+        if (!source || source.type !== "geojson") return;
+
+        const visible = isRegionVisible(region);
+
+        try {
+          const features = mapRef.current?.querySourceFeatures(sourceId);
+          if (!features || features.length === 0) return;
+          features.forEach((feature) => {
+            if (feature.id !== undefined && feature.id !== null) {
+              try {
+                mapRef.current?.setFeatureState(
+                  { source: sourceId, id: feature.id },
+                  { visible }
+                );
+              } catch (e) {
+                // Feature might not exist, ignore
+              }
+            }
+          });
+        } catch (e) {
+          // Source might not be ready, ignore
+        }
+      });
     };
-  }, [geographicRegions, renderTooltip]);
+
+    updateVisibility();
+
+    const handleIdle = () => {
+      updateVisibility();
+      map.off("idle", handleIdle);
+    };
+
+    map.once("idle", handleIdle);
+  }, [year, minYear, maxYear, geographicRegions]);
 
   useEffect(() => {
     if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;

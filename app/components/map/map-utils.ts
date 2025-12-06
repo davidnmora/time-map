@@ -5,7 +5,7 @@ import type {
   TimeRange,
   TimeBoundGeographicRegionGroup,
 } from "../../data/types";
-import { traverseRegionsByYear } from "../../utils/data";
+import { getAllRegions } from "../../utils/data";
 
 const DEFAULT_FILL_OPACITY = 0.2;
 const DEFAULT_LINE_WIDTH = 1;
@@ -42,23 +42,11 @@ export const renderTooltip = (data: TooltipData): string => {
   return html;
 };
 
-export function convertToMapRegions(
-  group: TimeBoundGeographicRegionGroup,
-  year: number,
-  minYear?: number,
-  maxYear?: number
+export function convertAllToMapRegions(
+  group: TimeBoundGeographicRegionGroup
 ): GeographicRegion[] {
-  const regionsWithHierarchy = traverseRegionsByYear(group, year);
-  const filtered = regionsWithHierarchy.filter(({ region }) => {
-    if (minYear === undefined && maxYear === undefined) return true;
-    const [startYear, endYear] = region.timeRange;
-    const currentYear = new Date().getFullYear();
-    const effectiveEndYear = endYear !== null ? endYear : currentYear;
-    if (minYear !== undefined && effectiveEndYear < minYear) return false;
-    if (maxYear !== undefined && startYear > maxYear) return false;
-    return true;
-  });
-  return filtered.flatMap(({ region, hierarchy }) =>
+  const regionsWithHierarchy = getAllRegions(group);
+  return regionsWithHierarchy.flatMap(({ region, hierarchy }) =>
     region.geographicRegions.map((geoRegion, index) => ({
       id: `${region.metadata.id}-${index}`,
       data: geoRegion,
@@ -73,34 +61,12 @@ export function convertToMapRegions(
   );
 }
 
-export function updateGeographicRegions(
+export function initializeGeographicRegions(
   map: mapboxgl.Map,
   sourcesRef: React.MutableRefObject<Set<string>>,
   geographicRegions: GeographicRegion[]
 ) {
   if (!map) return;
-
-  const currentRegionIds = new Set(geographicRegions.map((r) => r.id));
-
-  sourcesRef.current.forEach((sourceId) => {
-    if (!currentRegionIds.has(sourceId)) {
-      const fillLayerId = `${sourceId}-fill`;
-      const lineLayerId = `${sourceId}-line`;
-
-      if (map.getLayer(fillLayerId)) {
-        map.removeLayer(fillLayerId);
-      }
-      if (map.getLayer(lineLayerId)) {
-        map.removeLayer(lineLayerId);
-      }
-
-      if (map.getSource(sourceId)) {
-        map.removeSource(sourceId);
-      }
-
-      sourcesRef.current.delete(sourceId);
-    }
-  });
 
   geographicRegions.forEach((region) => {
     const sourceId = region.id;
@@ -108,63 +74,53 @@ export function updateGeographicRegions(
     const lineLayerId = `${sourceId}-line`;
 
     if (map.getSource(sourceId)) {
-      (map.getSource(sourceId) as mapboxgl.GeoJSONSource).setData(region.data);
-    } else {
-      map.addSource(sourceId, {
-        type: "geojson",
-        data: region.data,
-        generateId: true,
-      });
-      sourcesRef.current.add(sourceId);
+      return;
     }
 
-    if (!map.getLayer(fillLayerId)) {
-      map.addLayer({
-        id: fillLayerId,
-        type: "fill",
-        source: sourceId,
-        paint: {
-          "fill-color": region.fillColor || "#0080ff",
-          "fill-opacity": [
+    map.addSource(sourceId, {
+      type: "geojson",
+      data: region.data,
+      generateId: true,
+    });
+    sourcesRef.current.add(sourceId);
+
+    map.addLayer({
+      id: fillLayerId,
+      type: "fill",
+      source: sourceId,
+      paint: {
+        "fill-color": region.fillColor || "#0080ff",
+        "fill-opacity": [
+          "case",
+          ["boolean", ["feature-state", "hover"], false],
+          1,
+          [
             "case",
-            ["boolean", ["feature-state", "hover"], false],
-            1,
+            ["boolean", ["feature-state", "visible"], false],
             region.fillOpacity ?? DEFAULT_FILL_OPACITY,
+            0,
           ],
-        },
-      });
-    } else {
-      map.setPaintProperty(
-        fillLayerId,
-        "fill-color",
-        region.fillColor || "#0080ff"
-      );
-      map.setPaintProperty(fillLayerId, "fill-opacity", [
-        "case",
-        ["boolean", ["feature-state", "hover"], false],
-        1,
-        region.fillOpacity ?? DEFAULT_FILL_OPACITY,
-      ] as any);
-    }
+        ],
+      },
+      layout: {},
+    });
 
-    if (!map.getLayer(lineLayerId)) {
-      map.addLayer({
-        id: lineLayerId,
-        type: "line",
-        source: sourceId,
-        paint: {
-          "line-color": region.lineColor || "#000",
-          "line-width": region.lineWidth ?? DEFAULT_LINE_WIDTH,
-        },
-      });
-    } else {
-      map.setPaintProperty(
-        lineLayerId,
-        "line-color",
-        region.lineColor || "#000"
-      );
-      map.setPaintProperty(lineLayerId, "line-width", region.lineWidth ?? DEFAULT_LINE_WIDTH);
-    }
+    map.addLayer({
+      id: lineLayerId,
+      type: "line",
+      source: sourceId,
+      paint: {
+        "line-color": region.lineColor || "#000",
+        "line-width": region.lineWidth ?? DEFAULT_LINE_WIDTH,
+        "line-opacity": [
+          "case",
+          ["boolean", ["feature-state", "visible"], false],
+          1,
+          0,
+        ],
+      },
+      layout: {},
+    });
   });
 }
 

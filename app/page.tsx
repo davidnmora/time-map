@@ -3,7 +3,10 @@
 import Map from "./components/map/Map";
 import { getAllData } from "./data/all-data";
 import { prepareTimelineRegions } from "./utils/data";
-import { renderTooltip, convertToMapRegions } from "./components/map/map-utils";
+import {
+  renderTooltip,
+  convertAllToMapRegions,
+} from "./components/map/map-utils";
 import { TimelineAndTimelineRegions } from "./components/timeline/TimelineAndTimelineRegions";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
@@ -28,12 +31,7 @@ function MapContent() {
   const allData = getAllData();
   const timelineRegions = prepareTimelineRegions(allData, calculateTotalArea);
 
-  const geographicRegions = convertToMapRegions(
-    allData,
-    year,
-    minYear,
-    maxYear
-  );
+  const geographicRegions = convertAllToMapRegions(allData);
 
   const mapStyle = "mapbox://styles/davidnmora/cmikmelfl004601sqcjoe98co";
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
