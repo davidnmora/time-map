@@ -91,27 +91,6 @@ export function getAllRegions(
   return traverseAllRegions(group);
 }
 
-function timeRangeOverlapsRange(
-  timeRange: TimeRange,
-  minYear: number,
-  maxYear: number
-): boolean {
-  const [startYear, endYear] = timeRange;
-  const currentYear = new Date().getFullYear();
-  const effectiveEndYear = endYear !== null ? endYear : currentYear;
-  return startYear <= maxYear && effectiveEndYear >= minYear;
-}
-
-export function filterRegionsByYearRange(
-  regions: RegionWithHierarchy[],
-  minYear: number,
-  maxYear: number
-): RegionWithHierarchy[] {
-  return regions.filter(({ region }) =>
-    timeRangeOverlapsRange(region.timeRange, minYear, maxYear)
-  );
-}
-
 // TODO: I'd like to ideally have one main data structure, that's consistent, and is used by all the components (you don't have to think "What version is there" or duplicate code deriving the same things)
 export function prepareTimelineRegions(
   group: TimeBoundGeographicRegionGroup,
@@ -129,3 +108,24 @@ export function prepareTimelineRegions(
   }));
 }
 
+export function isTimeRangeActive(
+  timeRange: TimeRange | undefined,
+  year: number,
+  minYear?: number,
+  maxYear?: number
+): boolean {
+  if (!timeRange) return true;
+
+  const [startYear, endYear] = timeRange;
+  const currentYear = new Date().getFullYear();
+  const effectiveEndYear = endYear !== null ? endYear : currentYear;
+
+  const overlapsYear = effectiveEndYear >= year && startYear <= year;
+  if (!overlapsYear) return false;
+
+  if (minYear === undefined && maxYear === undefined) return true;
+
+  if (minYear !== undefined && effectiveEndYear < minYear) return false;
+  if (maxYear !== undefined && startYear > maxYear) return false;
+  return true;
+}

@@ -7,6 +7,7 @@ import { initializeGeographicRegions, type TooltipData } from "./map-utils";
 import type { Metadata, TimeRange } from "../../data/types";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { useAppState } from "../../contexts/AppStateContext";
+import { isTimeRangeActive } from "../../utils/data";
 
 export type GeographicRegion = {
   id: string;
@@ -144,20 +145,7 @@ export default function Map(props: MapProps) {
   const initializedRef = useRef(false);
 
   const isRegionVisible = (region: GeographicRegion): boolean => {
-    if (!region.timeRange) return true;
-
-    const [startYear, endYear] = region.timeRange;
-    const currentYear = new Date().getFullYear();
-    const effectiveEndYear = endYear !== null ? endYear : currentYear;
-
-    const overlapsYear = effectiveEndYear >= year && startYear <= year;
-    if (!overlapsYear) return false;
-
-    if (minYear === undefined && maxYear === undefined) return true;
-
-    if (minYear !== undefined && effectiveEndYear < minYear) return false;
-    if (maxYear !== undefined && startYear > maxYear) return false;
-    return true;
+    return isTimeRangeActive(region.timeRange, year, minYear, maxYear);
   };
 
   useEffect(() => {
