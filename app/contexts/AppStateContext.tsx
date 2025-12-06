@@ -106,34 +106,42 @@ function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
   return { zoom, center, year, minYear, maxYear };
 }
 
+const APP_STATE_KEYS: Array<keyof AppState> = ["zoom", "center", "year", "minYear", "maxYear"];
+
 function isCompleteAppState(state: PartialAppState): state is AppState {
-  return (
-    state.zoom !== undefined &&
-    state.center !== undefined &&
-    state.year !== undefined &&
-    state.minYear !== undefined &&
-    state.maxYear !== undefined
-  );
+  return APP_STATE_KEYS.every((key) => state[key] !== undefined);
+}
+
+function mergeAppState(
+  partial: PartialAppState,
+  complete: AppState
+): AppState {
+  const result = {} as AppState;
+  for (const key of APP_STATE_KEYS) {
+    const value = partial[key];
+    if (value !== undefined) {
+      (result as any)[key] = value;
+    } else {
+      (result as any)[key] = complete[key];
+    }
+  }
+  return result;
 }
 
 function writeStateToURL(state: PartialAppState, currentParams: URLSearchParams): string {
   const params = new URLSearchParams(currentParams.toString());
 
-  if (state.zoom !== undefined) {
-    params.set("zoom", state.zoom.toString());
-  }
-  if (state.center !== undefined) {
-    params.set("center", `${state.center[0]},${state.center[1]}`);
-  }
-  if (state.year !== undefined) {
-    params.set("year", state.year.toString());
-  }
-  if (state.minYear !== undefined) {
-    params.set("minYear", state.minYear.toString());
-  }
-  if (state.maxYear !== undefined) {
-    params.set("maxYear", state.maxYear.toString());
-  }
+  APP_STATE_KEYS.forEach((key) => {
+    const value = state[key];
+    if (value !== undefined) {
+      if (key === "center") {
+        const center = value as [number, number];
+        params.set(key, `${center[0]},${center[1]}`);
+      } else {
+        params.set(key, (value as number).toString());
+      }
+    }
+  });
 
   return params.toString();
 }
@@ -145,13 +153,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<AppState>(() => {
     const urlState = readStateFromURL(searchParams);
     const defaults = getDefaultState();
-    return {
-      zoom: urlState.zoom ?? defaults.zoom,
-      center: urlState.center ?? defaults.center,
-      year: urlState.year ?? defaults.year,
-      minYear: urlState.minYear ?? defaults.minYear,
-      maxYear: urlState.maxYear ?? defaults.maxYear,
-    };
+    return mergeAppState(urlState, defaults);
   });
   const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingUpdatesRef = useRef<PartialAppState>({});
@@ -163,13 +165,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     const defaults = getDefaultState();
     
     if (hasInitializedRef.current) {
-      setState((prevState) => ({
-        zoom: urlState.zoom ?? prevState.zoom,
-        center: urlState.center ?? prevState.center,
-        year: urlState.year ?? prevState.year,
-        minYear: urlState.minYear ?? prevState.minYear,
-        maxYear: urlState.maxYear ?? prevState.maxYear,
-      }));
+      setState((prevState) => mergeAppState(urlState, prevState));
       return;
     }
 
@@ -177,14 +173,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     const needsInitialization = !hasURLParams || !isCompleteAppState(urlState);
 
     if (needsInitialization) {
-      const initialState = {
-        minYear: urlState.minYear ?? defaults.minYear,
-        maxYear: urlState.maxYear ?? defaults.maxYear,
-        year: urlState.year ?? defaults.year,
-        zoom: urlState.zoom ?? defaults.zoom,
-        center: urlState.center ?? defaults.center,
-      };
-
+      const initialState = mergeAppState(urlState, defaults);
       setState(initialState);
       const newParams = writeStateToURL(initialState, new URLSearchParams());
       router.replace(`${pathname}?${newParams}`);
@@ -260,11 +249,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
   }, [flushURLUpdate]);
 
   const contextValue: AppStateContextType = {
-    zoom: state.zoom,
-    center: state.center,
-    year: state.year,
-    minYear: state.minYear,
-    maxYear: state.maxYear,
+    ...state,
     updateState,
     updateTimelineRange,
   };
