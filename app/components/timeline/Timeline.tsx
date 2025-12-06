@@ -9,11 +9,6 @@ const TICK_OFFSET = 10;
 
 const DECADE_FONT_SIZE = 12;
 const CENTURY_FONT_SIZE = 16;
-const BASELINE_OFFSET_RATIO = 0.67;
-
-const calculateLabelTopOffset = (fontSize: number): number => {
-  return -fontSize * BASELINE_OFFSET_RATIO;
-};
 
 const generateDecadeTicks = (minYear: number, maxYear: number): number[] => {
   const startDecade = Math.floor(minYear / 10) * 10;
@@ -92,7 +87,6 @@ export const Timeline = ({ height, minYear, maxYear, currentYear, totalWidth }: 
             const y = yScale(year);
             const isCenturyYear = isCentury(year);
             const fontSize = isCenturyYear ? CENTURY_FONT_SIZE : DECADE_FONT_SIZE;
-            const topOffset = calculateLabelTopOffset(fontSize);
             
             return (
               <div
