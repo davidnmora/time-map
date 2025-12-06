@@ -1,7 +1,6 @@
 "use client";
 
 import { TimelineRegionColumn } from "./TimelineRegionColumn";
-import { CurrentYearIndicator } from "./CurrentYearIndicator";
 import {
   type RegionStrip,
   computeRegionColumns,
@@ -13,7 +12,6 @@ type TimelineRegionsProps = {
   height: number;
   minYear: number;
   maxYear: number;
-  currentYear: number;
   regions: RegionStrip[];
   widthEncodingKey?: keyof RegionStrip;
 };
@@ -22,7 +20,6 @@ export const TimelineRegions = ({
   height,
   minYear,
   maxYear,
-  currentYear,
   regions,
   widthEncodingKey = "area",
 }: TimelineRegionsProps) => {
@@ -42,11 +39,6 @@ export const TimelineRegions = ({
     return { columnRegions, columnWidth };
   });
 
-  const totalWidth = columnsWithWidths.reduce(
-    (sum, { columnWidth }) => sum + columnWidth,
-    0
-  );
-
   return (
     <div className="relative flex" style={{ height: height }}>
       {columnsWithWidths.map(({ columnRegions, columnWidth }, index) => (
@@ -60,13 +52,6 @@ export const TimelineRegions = ({
           getWidthEncodingValue={getWidthEncodingValue}
         />
       ))}
-      <CurrentYearIndicator
-        height={height}
-        minYear={minYear}
-        maxYear={maxYear}
-        currentYear={currentYear}
-        totalWidth={totalWidth}
-      />
     </div>
   );
 };

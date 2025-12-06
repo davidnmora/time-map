@@ -5,6 +5,11 @@ import { Timeline } from "./Timeline";
 import { TimelineRegions } from "./TimelineRegions";
 import { useAppState } from "../../contexts/AppStateContext";
 import type { TimeRange, Metadata } from "../../data/types";
+import {
+  computeRegionColumns,
+  createGetWidthEncodingValue,
+  DEFAULT_STRIP_WIDTH,
+} from "./timeline-utils";
 
 type RegionData = {
   id: string;
@@ -134,20 +139,50 @@ export const TimelineAndTimelineRegions = ({
     };
   }, [height, minYear, maxYear, currentYear, updateTimelineRange]);
 
+  const widthEncodingKeyValue = widthEncodingKey || "area";
+  const columns = computeRegionColumns(regions);
+  const domain = regions.map((region) => Number(region[widthEncodingKeyValue]));
+  const getWidthEncodingValue = createGetWidthEncodingValue(
+    domain,
+    widthEncodingKeyValue
+  );
+
+  const columnsWithWidths = columns.map((columnRegions) => {
+    const stripWidths = columnRegions.map((region) =>
+      getWidthEncodingValue(region)
+    );
+    const columnWidth =
+      Math.round(Math.max(...stripWidths, DEFAULT_STRIP_WIDTH) * 100) / 100;
+    return { columnRegions, columnWidth };
+  });
+
+  const totalWidth = columnsWithWidths.reduce(
+    (sum, { columnWidth }) => sum + columnWidth,
+    0
+  );
+
   return (
     <div
       ref={containerRef}
-      className="flex overflow-hidden"
+      className="relative overflow-hidden"
       style={{ height: height, cursor: "grab" }}
     >
-      <Timeline height={height} minYear={minYear} maxYear={maxYear} />
-      <TimelineRegions
+      <div className="flex">
+        <div style={{ width: 50 }} />
+        <TimelineRegions
+          height={height}
+          minYear={minYear}
+          maxYear={maxYear}
+          regions={regions}
+          widthEncodingKey={widthEncodingKey}
+        />
+      </div>
+      <Timeline
         height={height}
         minYear={minYear}
         maxYear={maxYear}
         currentYear={currentYear}
-        regions={regions}
-        widthEncodingKey={widthEncodingKey}
+        totalWidth={totalWidth}
       />
     </div>
   );
