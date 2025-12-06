@@ -5,7 +5,7 @@ import type {
   TimeRange,
   TimeBoundGeographicRegionGroup,
 } from "../../data/types";
-import { getAllRegions } from "../../utils/data";
+import { getAFlagListOfAllRegions } from "../../utils/data";
 
 const DEFAULT_FILL_OPACITY = 0.2;
 const DEFAULT_LINE_WIDTH = 1;
@@ -45,8 +45,8 @@ export const renderTooltip = (data: TooltipData): string => {
 export function convertAllToMapRegions(
   group: TimeBoundGeographicRegionGroup
 ): GeographicRegion[] {
-  const regionsWithHierarchy = getAllRegions(group);
-  return regionsWithHierarchy.flatMap(({ region, hierarchy }) =>
+  const regions = getAFlagListOfAllRegions(group);
+  return regions.flatMap((region) =>
     region.geographicRegions.map((geoRegion, index) => ({
       id: `${region.metadata.id}-${index}`,
       data: geoRegion,
@@ -56,7 +56,7 @@ export function convertAllToMapRegions(
       lineWidth: 2,
       metadata: region.metadata,
       timeRange: region.timeRange,
-      hierarchy: [...hierarchy, region.metadata.title],
+      hierarchy: [...region.hierarchy, region.metadata.title],
     }))
   );
 }

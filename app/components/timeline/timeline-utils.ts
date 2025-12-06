@@ -1,15 +1,6 @@
-import type { TimeRange, Metadata } from "../../data/types";
+import type { TimeRange, TimeBoundGeographicRegion } from "../../data/types";
 
-export type RegionStrip = {
-  id: string;
-  timeRange: TimeRange;
-  color?: string;
-  metadata?: Metadata;
-  hierarchy?: string[];
-  area: number;
-};
-
-export type Column = RegionStrip[];
+export type Column = TimeBoundGeographicRegion[];
 
 export const MIN_STRIP_WIDTH = 2;
 export const MAX_STRIP_WIDTH = 30;
@@ -17,8 +8,8 @@ export const DEFAULT_STRIP_WIDTH = 3;
 
 export function createGetWidthEncodingValue(
   domain: number[],
-  domainKey: keyof RegionStrip
-): (region: RegionStrip) => number {
+  domainKey: keyof TimeBoundGeographicRegion
+): (region: TimeBoundGeographicRegion) => number {
   if (domain.length === 0) {
     return () => DEFAULT_STRIP_WIDTH;
   }
@@ -27,7 +18,7 @@ export function createGetWidthEncodingValue(
   if (domainMin === domainMax || domainMax === 0) {
     return () => DEFAULT_STRIP_WIDTH;
   }
-  return (region: RegionStrip) => {
+  return (region: TimeBoundGeographicRegion) => {
     const domainValue = Number(region[domainKey]);
     if (domainValue === 0) return MIN_STRIP_WIDTH;
     const normalized = (domainValue - domainMin) / (domainMax - domainMin);
@@ -49,7 +40,9 @@ export function timeRangesOverlap(
   return start1 <= effectiveEnd2 && start2 <= effectiveEnd1;
 }
 
-export function computeRegionColumns(regions: RegionStrip[]): Column[] {
+export function computeRegionColumns(
+  regions: TimeBoundGeographicRegion[]
+): Column[] {
   const sortedRegions = [...regions].sort((a, b) => {
     const [startA] = a.timeRange;
     const [startB] = b.timeRange;

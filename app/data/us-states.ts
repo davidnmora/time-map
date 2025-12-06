@@ -1,6 +1,6 @@
 import type {
-  TimeBoundGeographicRegion,
-  TimeBoundGeographicRegionGroup,
+  PartialTimeBoundGeographicRegion,
+  PartialTimeBoundGeographicRegionGroup,
   TimeRange,
 } from "./types";
 import type { GeoJSON } from "geojson";
@@ -28,7 +28,7 @@ function createTimeBoundRegionForState(
   stateName: string,
   foundedYear: number,
   feature: GeoJSON.Feature
-): TimeBoundGeographicRegion {
+): PartialTimeBoundGeographicRegion {
   const featureCollection: GeoJSON.FeatureCollection = {
     type: "FeatureCollection",
     features: [feature],
@@ -48,11 +48,11 @@ function createTimeBoundRegionForState(
   };
 }
 
-export function generateUSStatesData(): TimeBoundGeographicRegionGroup {
+export function generateUSStatesData(): PartialTimeBoundGeographicRegionGroup {
   const statesFounded = statesFoundedData as StateFounded[];
   const geojson = statesData as GeoJSON.FeatureCollection;
 
-  const timeBoundRegions: TimeBoundGeographicRegion[] = statesFounded
+  const timeBoundRegions: PartialTimeBoundGeographicRegion[] = statesFounded
     .map((state) => {
       const feature = findStateFeature(state.name, geojson);
       if (!feature) {
@@ -62,7 +62,7 @@ export function generateUSStatesData(): TimeBoundGeographicRegionGroup {
       return createTimeBoundRegionForState(state.name, state.founded, feature);
     })
     .filter(
-      (region): region is TimeBoundGeographicRegion => region !== null
+      (region): region is PartialTimeBoundGeographicRegion => region !== null
     );
 
   return {
@@ -70,7 +70,7 @@ export function generateUSStatesData(): TimeBoundGeographicRegionGroup {
     metadata: {
       id: "united-states",
       title: "United States",
-      description: "US states by founding year",
+      description: "'MERICA! F**K YEAH!'",
     },
   };
 }

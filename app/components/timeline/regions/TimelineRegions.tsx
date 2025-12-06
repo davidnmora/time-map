@@ -2,18 +2,18 @@
 
 import { TimelineRegionColumn } from "./TimelineRegionColumn";
 import {
-  type RegionStrip,
   computeRegionColumns,
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
 } from "../timeline-utils";
+import { TimeBoundGeographicRegion } from "@/app/data/types";
 
 type TimelineRegionsProps = {
   height: number;
   minYear: number;
   maxYear: number;
-  regions: RegionStrip[];
-  widthEncodingKey?: keyof RegionStrip;
+  regions: TimeBoundGeographicRegion[];
+  widthEncodingKey?: keyof TimeBoundGeographicRegion;
 };
 
 export const TimelineRegions = ({

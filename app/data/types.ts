@@ -15,10 +15,26 @@ export type TimeBoundGeographicRegion = {
   timeRange: TimeRange;
   geographicRegions: GeographicRegion[];
   metadata: Metadata;
+  area: number;
+  hierarchy: string[];
 };
 
 export type TimeBoundGeographicRegionGroup = {
   children: (TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup)[];
+  metadata: Metadata;
+  hierarchy: string[];
+};
+
+export type PartialTimeBoundGeographicRegion = Omit<
+  TimeBoundGeographicRegion,
+  "area" | "hierarchy"
+>;
+
+export type PartialTimeBoundGeographicRegionGroup = {
+  children: (
+    | PartialTimeBoundGeographicRegion
+    | PartialTimeBoundGeographicRegionGroup
+  )[];
   metadata: Metadata;
 };
 

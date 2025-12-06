@@ -1,10 +1,17 @@
-import * as turf from "@turf/turf";
 import type {
   TimeBoundGeographicRegion,
   TimeBoundGeographicRegionGroup,
   TimeRange,
   GeographicRegion,
 } from "../data/types";
+import * as turf from "@turf/turf";
+
+export function calculateTotalArea(geographicRegions?: GeographicRegion[]): number {
+  return (geographicRegions || []).reduce(
+    (total, geoRegion) => total + turf.area(geoRegion),
+    0
+  );
+}
 
 function timeRangeOverlapsYear(timeRange: TimeRange, year: number): boolean {
   const [startYear, endYear] = timeRange;
@@ -73,46 +80,20 @@ export function filterRegionsByYear(
 }
 
 function traverseAllRegions(
-  item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup,
-  hierarchy: string[] = []
-): RegionWithHierarchy[] {
+  item: TimeBoundGeographicRegion | TimeBoundGeographicRegionGroup
+): TimeBoundGeographicRegion[] {
   if ("children" in item) {
-    const currentHierarchy = [...hierarchy, item.metadata.title];
-    return item.children.flatMap((child) =>
-      traverseAllRegions(child, currentHierarchy)
-    );
+    const group = item as TimeBoundGeographicRegionGroup;
+    return group.children.flatMap((child) => traverseAllRegions(child));
   } else {
-    return [{ region: item, hierarchy }];
+    return [item];
   }
 }
 
-export function getAllRegions(
+export function getAFlagListOfAllRegions(
   group: TimeBoundGeographicRegionGroup
-): RegionWithHierarchy[] {
+): TimeBoundGeographicRegion[] {
   return traverseAllRegions(group);
-}
-
-export function calculateTotalArea(
-  geographicRegions?: GeographicRegion[]
-): number {
-  return (geographicRegions || []).reduce(
-    (total, geoRegion) => total + turf.area(geoRegion),
-    0
-  );
-}
-
-// TODO: I'd like to ideally have one main data structure, that's consistent, and is used by all the components (you don't have to think "What version is there" or duplicate code deriving the same things)
-export function prepareTimelineRegions(group: TimeBoundGeographicRegionGroup) {
-  const allRegionsWithHierarchy = getAllRegions(group);
-  return allRegionsWithHierarchy.map(({ region, hierarchy }) => ({
-    id: region.metadata.id,
-    timeRange: region.timeRange,
-    color: region.metadata.color,
-    metadata: region.metadata,
-    hierarchy,
-    geographicRegions: region.geographicRegions,
-    area: calculateTotalArea(region.geographicRegions),
-  }));
 }
 
 export function isTimeRangeActive(

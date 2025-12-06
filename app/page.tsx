@@ -1,8 +1,8 @@
 "use client";
 
 import Map from "./components/map/Map";
-import { allData } from "./data/all-data";
-import { prepareTimelineRegions } from "./utils/data";
+import { completeDataset } from "./data/complete-dataset";
+import { getAFlagListOfAllRegions } from "./utils/data";
 import {
   renderTooltip,
   convertAllToMapRegions,
@@ -27,9 +27,9 @@ function MapContent() {
     return () => window.removeEventListener("resize", updateHeight);
   }, []);
 
-  const timelineRegions = prepareTimelineRegions(allData);
+  const timelineRegions = getAFlagListOfAllRegions(completeDataset);
 
-  const geographicRegions = convertAllToMapRegions(allData);
+  const geographicRegions = convertAllToMapRegions(completeDataset);
 
   const mapStyle = "mapbox://styles/davidnmora/cmikmelfl004601sqcjoe98co";
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";

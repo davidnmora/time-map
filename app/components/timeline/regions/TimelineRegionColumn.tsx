@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { useState } from "react";
 import { useHoveredElement } from "../../../contexts/HoveredElementContext";
 import { renderTooltip } from "../../map/map-utils";
-import type { RegionStrip } from "../timeline-utils";
+import type { TimeBoundGeographicRegion } from "../../../data/types";
 
 const DEFAULT_OPACITY = 0.3;
 const HOVERED_OPACITY = 1;
@@ -13,9 +13,9 @@ type TimelineRegionColumnProps = {
   height: number;
   minYear: number;
   maxYear: number;
-  regions: RegionStrip[];
+  regions: TimeBoundGeographicRegion[];
   columnWidth: number;
-  getWidthEncodingValue: (region: RegionStrip) => number;
+  getWidthEncodingValue: (region: TimeBoundGeographicRegion) => number;
 };
 
 export const TimelineRegionColumn = ({
@@ -61,7 +61,7 @@ export const TimelineRegionColumn = ({
     e: React.MouseEvent<HTMLDivElement>,
     strip: (typeof strips)[0]
   ) => {
-    setHoveredRegionId(strip.id);
+    setHoveredRegionId(strip.metadata.id);
     if (strip.metadata) {
       const hierarchy = strip.hierarchy || [];
       const title = strip.metadata.title || "";
@@ -105,17 +105,17 @@ export const TimelineRegionColumn = ({
         style={{ width: columnWidth, height: height }}
       >
         {strips.map((strip) => {
-          const isHovered = hoveredRegionId === strip.id;
+          const isHovered = hoveredRegionId === strip.metadata.id;
           return (
             <div
-              key={strip.id}
+              key={strip.metadata.id}
               className="absolute"
               style={{
                 left: 0,
                 top: strip.y,
                 width: strip.width,
                 height: strip.height,
-                backgroundColor: strip.color || "#0080ff",
+                backgroundColor: strip.metadata.color || "#0080ff",
                 opacity: isHovered ? HOVERED_OPACITY : DEFAULT_OPACITY,
                 cursor: "pointer",
               }}

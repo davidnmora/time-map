@@ -4,27 +4,18 @@ import { useRef, useEffect } from "react";
 import { TimelineAxis } from "./axis/TimelineAxis";
 import { TimelineRegions } from "./regions/TimelineRegions";
 import { useAppState } from "../../contexts/AppStateContext";
-import type { TimeRange, Metadata } from "../../data/types";
+import type { TimeBoundGeographicRegion } from "../../data/types";
 import {
   computeRegionColumns,
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
 } from "./timeline-utils";
 
-type RegionData = {
-  id: string;
-  timeRange: TimeRange;
-  color?: string;
-  metadata?: Metadata;
-  hierarchy?: string[];
-  area: number;
-};
-
 type TimelineProps = {
   height: number;
   currentYear: number;
-  regions: RegionData[];
-  widthEncodingKey?: keyof RegionData;
+  regions: TimeBoundGeographicRegion[];
+  widthEncodingKey?: keyof TimeBoundGeographicRegion;
 };
 
 export const Timeline = ({
