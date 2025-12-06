@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { TimelineAxis } from "./TimelineAxis";
-import { TimelineRegions } from "./TimelineRegions";
+import { TimelineAxis } from "./axis/TimelineAxis";
+import { TimelineRegions } from "./regions/TimelineRegions";
 import { useAppState } from "../../contexts/AppStateContext";
 import type { TimeRange, Metadata } from "../../data/types";
 import {

@@ -1,15 +1,15 @@
 "use client";
 
 import * as d3 from "d3";
-import { CurrentYearIndicator } from "./CurrentYearIndicator";
+import { CurrentYearIndicator } from "../CurrentYearIndicator";
 import {
   TIMELINE_WIDTH,
   generateDecadeTicks,
   generateFiftyYearMarks,
-} from "./axis/timeline-axis-utils";
-import { TimelineTicks } from "./axis/TimelineTicks";
-import { TimelineLabels } from "./axis/TimelineLabels";
-import { TimelineGuidelines } from "./axis/TimelineGuidelines";
+} from "./timeline-axis-utils";
+import { TimelineTicks } from "./TimelineTicks";
+import { TimelineLabels } from "./TimelineLabels";
+import { TimelineGuidelines } from "./TimelineGuidelines";
 
 type TimelineAxisProps = {
   height: number;

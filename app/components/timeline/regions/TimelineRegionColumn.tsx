@@ -2,9 +2,9 @@
 
 import * as d3 from "d3";
 import { useState } from "react";
-import { useHoveredElement } from "../../contexts/HoveredElementContext";
-import { renderTooltip } from "../map/map-utils";
-import type { RegionStrip } from "./timeline-utils";
+import { useHoveredElement } from "../../../contexts/HoveredElementContext";
+import { renderTooltip } from "../../map/map-utils";
+import type { RegionStrip } from "../timeline-utils";
 
 const DEFAULT_OPACITY = 0.3;
 const HOVERED_OPACITY = 1;
@@ -147,3 +147,4 @@ export const TimelineRegionColumn = ({
     </>
   );
 };
+

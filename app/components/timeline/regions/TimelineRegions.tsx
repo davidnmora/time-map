@@ -6,7 +6,7 @@ import {
   computeRegionColumns,
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
-} from "./timeline-utils";
+} from "../timeline-utils";
 
 type TimelineRegionsProps = {
   height: number;
@@ -55,3 +55,4 @@ export const TimelineRegions = ({
     </div>
   );
 };
+
