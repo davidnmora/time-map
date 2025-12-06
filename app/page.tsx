@@ -7,7 +7,7 @@ import {
   renderTooltip,
   convertAllToMapRegions,
 } from "./components/map/map-utils";
-import { TimelineAndTimelineRegions } from "./components/timeline/TimelineAndTimelineRegions";
+import { Timeline } from "./components/timeline/Timeline";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import { calculateTotalArea } from "./components/timeline/timeline-utils";
@@ -62,7 +62,7 @@ function MapContent() {
         </div>
         {isFinite(minYear) && isFinite(maxYear) && (
           <div className="bg-white overflow-hidden">
-            <TimelineAndTimelineRegions
+            <Timeline
               height={windowHeight}
               currentYear={year}
               regions={timelineRegions}
