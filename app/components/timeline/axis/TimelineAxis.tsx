@@ -1,7 +1,7 @@
 "use client";
 
 import * as d3 from "d3";
-import { CurrentYearIndicator } from "../CurrentYearIndicator";
+import { CurrentYearIndicator } from "./CurrentYearIndicator";
 import {
   TIMELINE_WIDTH,
   generateDecadeTicks,
