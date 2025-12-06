@@ -77,13 +77,13 @@ export const Timeline = ({ height, minYear, maxYear, currentYear, totalWidth }: 
             return (
               <div
                 key={year}
-                className="absolute"
+                className="absolute translate-y-[-50%]"
                 style={{
                   left: TIMELINE_WIDTH - TICK_LENGTH,
                   top: y,
                   width: TICK_LENGTH,
-                  height: 1,
-                  backgroundColor: "#000",
+                  height: isCenturyYear ? 2 : 1,
+                  backgroundColor: "black",
                 }}
               />
             );
@@ -97,10 +97,10 @@ export const Timeline = ({ height, minYear, maxYear, currentYear, totalWidth }: 
             return (
               <div
                 key={`label-${year}`}
-                className="absolute"
+                className="absolute translate-y-[-50%]"
                 style={{
                   left: TIMELINE_WIDTH - TICK_OFFSET,
-                  top: y + topOffset,
+                  top: y,
                   transform: "translateX(-100%)",
                   fontSize: `${fontSize}px`,
                   fontWeight: isCenturyYear ? "bold" : "normal",
@@ -124,6 +124,7 @@ export const Timeline = ({ height, minYear, maxYear, currentYear, totalWidth }: 
               top: y,
               width: totalWidth,
               height: isCenturyYear ? 2 : 1,
+              transform: "translateY(-50%)",
               backgroundColor: "black",
             }}
           />

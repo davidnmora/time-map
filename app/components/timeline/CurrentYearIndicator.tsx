@@ -27,7 +27,7 @@ export const CurrentYearIndicator = ({
       style={{ width: totalWidth, height: height }}
     >
       <div
-        className="absolute bg-black h-1"
+        className="absolute bg-black h-1 translate-y-[-50%]"
         style={{
           top: currentYearY,
           width: totalWidth,
