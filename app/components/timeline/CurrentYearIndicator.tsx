@@ -27,32 +27,20 @@ export const CurrentYearIndicator = ({
       style={{ width: totalWidth, height: height }}
     >
       <div
-        className="absolute"
+        className="absolute bg-black h-1"
         style={{
           top: currentYearY,
           width: totalWidth,
-          height: 4,
-          backgroundColor: "#000",
         }}
       />
       <div
-        className="absolute flex items-baseline"
+        className="absolute flex items-baseline -translate-y-full text-black pl-4"
         style={{
           top: currentYearY,
-          transform: "translateY(-100%)",
-          color: "#000",
-          paddingLeft: "16px",
         }}
       >
-        <span style={{ fontSize: "10px" }}>Current year: </span>
-        <span
-          style={{
-            fontFamily: "monospace",
-            fontSize: "48px",
-            fontWeight: "bold",
-            lineHeight: "32px",
-          }}
-        >
+        <span className="text-[10px]">Current year: </span>
+        <span className="font-mono text-[48px] font-bold leading-[32px]">
           {Math.round(currentYear)}
         </span>
       </div>
