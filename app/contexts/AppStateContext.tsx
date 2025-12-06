@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { getAllData } from "../data/all-data";
+import { allData } from "../data/all-data";
 import { getMinMaxYears } from "../utils/data";
 
 type AppState = {
@@ -57,9 +57,10 @@ const DEFAULT_ZOOM = 3;
 const DEFAULT_CENTER: [number, number] = [-68.137343, 45.137451];
 
 function getDefaultState(): AppState {
-  const allData = getAllData();
   const { min: dataMinYear, max: dataMaxYear } = getMinMaxYears(allData);
-  const defaultYear = isFinite(dataMinYear) ? dataMinYear : new Date().getFullYear();
+  const defaultYear = isFinite(dataMinYear)
+    ? dataMinYear
+    : new Date().getFullYear();
 
   return {
     zoom: DEFAULT_ZOOM,

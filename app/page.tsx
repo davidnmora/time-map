@@ -1,7 +1,7 @@
 "use client";
 
 import Map from "./components/map/Map";
-import { getAllData } from "./data/all-data";
+import { allData } from "./data/all-data";
 import { prepareTimelineRegions } from "./utils/data";
 import {
   renderTooltip,
@@ -27,7 +27,6 @@ function MapContent() {
     return () => window.removeEventListener("resize", updateHeight);
   }, []);
 
-  const allData = getAllData();
   const timelineRegions = prepareTimelineRegions(allData);
 
   const geographicRegions = convertAllToMapRegions(allData);
