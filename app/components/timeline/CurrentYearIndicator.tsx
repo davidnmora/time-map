@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef, useEffect } from "react";
 import * as d3 from "d3";
 
 type CurrentYearIndicatorProps = {
@@ -18,50 +17,35 @@ export const CurrentYearIndicator = ({
   currentYear,
   totalWidth,
 }: CurrentYearIndicatorProps) => {
-  const overlayRef = useRef<SVGSVGElement | null>(null);
+  const yScale = d3.scaleLinear().domain([minYear, maxYear]).range([height, 0]);
 
-  const boundsHeight = height;
-
-  useEffect(() => {
-    if (!overlayRef.current) return;
-
-    const yScale = d3
-      .scaleLinear()
-      .domain([minYear, maxYear])
-      .range([boundsHeight, 0]);
-
-    const currentYearY = yScale(currentYear);
-
-    const svgElement = d3.select(overlayRef.current);
-    svgElement.selectAll("*").remove();
-
-    svgElement
-      .append("line")
-      .attr("x1", 0)
-      .attr("x2", totalWidth)
-      .attr("y1", currentYearY)
-      .attr("y2", currentYearY)
-      .attr("stroke", "#000")
-      .attr("stroke-width", 4);
-
-    svgElement
-      .append("text")
-      .attr("x", totalWidth / 2)
-      .attr("y", currentYearY - 8)
-      .attr("text-anchor", "middle")
-      .attr("font-weight", "bold")
-      .attr("font-size", "14px")
-      .attr("fill", "#000")
-      .text(`Current Year: ${currentYear}`);
-  }, [currentYear, minYear, maxYear, boundsHeight, totalWidth]);
+  const currentYearY = yScale(currentYear);
 
   return (
     <svg
-      ref={overlayRef}
       width={totalWidth}
       height={height}
       className="absolute top-0 left-0 pointer-events-none"
-    />
+    >
+      <line
+        x1={0}
+        x2={totalWidth}
+        y1={currentYearY}
+        y2={currentYearY}
+        stroke="#000"
+        strokeWidth={4}
+      />
+      <text
+        x={totalWidth / 2}
+        y={currentYearY - 8}
+        textAnchor="middle"
+        fontWeight="bold"
+        fontSize="14px"
+        fill="#000"
+      >
+        Current Year: <tspan fontSize="48px">{currentYear}</tspan>
+      </text>
+    </svg>
   );
 };
 
