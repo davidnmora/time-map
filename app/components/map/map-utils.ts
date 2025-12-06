@@ -9,6 +9,8 @@ import { getAFlagListOfAllRegions } from "../../utils/data";
 
 const DEFAULT_FILL_OPACITY = 0.2;
 const DEFAULT_LINE_WIDTH = 1;
+const DEFAULT_LINE_COLOR = "#000";
+const DEFAULT_FILL_COLOR = "#0080ff";
 
 export type TooltipData = {
   hierarchy: string[];
@@ -51,9 +53,9 @@ export function convertAllToMapRegions(
       id: `${region.metadata.id}-${index}`,
       data: geoRegion,
       fillColor: region.metadata.color,
-      fillOpacity: 0.5,
-      lineColor: "#000",
-      lineWidth: 2,
+      fillOpacity: DEFAULT_FILL_OPACITY,
+      lineColor: DEFAULT_LINE_COLOR,
+      lineWidth: DEFAULT_LINE_WIDTH,
       metadata: region.metadata,
       timeRange: region.timeRange,
       hierarchy: [...region.hierarchy, region.metadata.title],
@@ -89,7 +91,7 @@ export function initializeGeographicRegions(
       type: "fill",
       source: sourceId,
       paint: {
-        "fill-color": region.fillColor || "#0080ff",
+        "fill-color": region.fillColor || DEFAULT_FILL_COLOR,
         "fill-opacity": [
           "case",
           ["boolean", ["feature-state", "hover"], false],
@@ -110,7 +112,7 @@ export function initializeGeographicRegions(
       type: "line",
       source: sourceId,
       paint: {
-        "line-color": region.lineColor || "#000",
+        "line-color": region.lineColor || DEFAULT_LINE_COLOR,
         "line-width": region.lineWidth ?? DEFAULT_LINE_WIDTH,
         "line-opacity": [
           "case",
