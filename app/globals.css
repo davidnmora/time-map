@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+.mapboxgl-ctrl-bottom-right,
+.mapboxgl-ctrl-bottom-left {
+  display: none !important;
+}
+
 /* :root {
   --background: #ffffff;
   --foreground: #171717;
