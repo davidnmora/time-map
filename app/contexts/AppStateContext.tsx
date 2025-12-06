@@ -14,11 +14,11 @@ import { getAllData } from "../data/all-data";
 import { getMinMaxYears } from "../utils/data";
 
 type AppState = {
-  zoom?: number;
-  center?: [number, number];
-  year?: number;
-  minYear?: number;
-  maxYear?: number;
+  zoom: number;
+  center: [number, number];
+  year: number;
+  minYear: number;
+  maxYear: number;
 };
 
 type PartialAppState = {
@@ -70,7 +70,7 @@ function getDefaultState(): AppState {
   };
 }
 
-function readStateFromURL(searchParams: URLSearchParams): AppState {
+function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
   const zoom = (() => {
     const zoomParam = searchParams.get("zoom");
     return zoomParam ? parseFloat(zoomParam) : undefined;
@@ -106,6 +106,16 @@ function readStateFromURL(searchParams: URLSearchParams): AppState {
   return { zoom, center, year, minYear, maxYear };
 }
 
+function isCompleteAppState(state: PartialAppState): state is AppState {
+  return (
+    state.zoom !== undefined &&
+    state.center !== undefined &&
+    state.year !== undefined &&
+    state.minYear !== undefined &&
+    state.maxYear !== undefined
+  );
+}
+
 function writeStateToURL(state: PartialAppState, currentParams: URLSearchParams): string {
   const params = new URLSearchParams(currentParams.toString());
 
@@ -132,32 +142,41 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const [state, setState] = useState<AppState>(() =>
-    readStateFromURL(searchParams)
-  );
+  const [state, setState] = useState<AppState>(() => {
+    const urlState = readStateFromURL(searchParams);
+    const defaults = getDefaultState();
+    return {
+      zoom: urlState.zoom ?? defaults.zoom,
+      center: urlState.center ?? defaults.center,
+      year: urlState.year ?? defaults.year,
+      minYear: urlState.minYear ?? defaults.minYear,
+      maxYear: urlState.maxYear ?? defaults.maxYear,
+    };
+  });
   const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingUpdatesRef = useRef<PartialAppState>({});
   const hasInitializedRef = useRef(false);
+  const lastWrittenStateRef = useRef<PartialAppState | null>(null);
 
   useEffect(() => {
+    const urlState = readStateFromURL(searchParams);
+    const defaults = getDefaultState();
+    
     if (hasInitializedRef.current) {
-      const urlState = readStateFromURL(searchParams);
-      setState(urlState);
+      setState((prevState) => ({
+        zoom: urlState.zoom ?? prevState.zoom,
+        center: urlState.center ?? prevState.center,
+        year: urlState.year ?? prevState.year,
+        minYear: urlState.minYear ?? prevState.minYear,
+        maxYear: urlState.maxYear ?? prevState.maxYear,
+      }));
       return;
     }
 
-    const urlState = readStateFromURL(searchParams);
     const hasURLParams = searchParams.toString().length > 0;
-    const needsInitialization =
-      !hasURLParams ||
-      urlState.minYear === undefined ||
-      urlState.maxYear === undefined ||
-      urlState.year === undefined ||
-      urlState.zoom === undefined ||
-      urlState.center === undefined;
+    const needsInitialization = !hasURLParams || !isCompleteAppState(urlState);
 
     if (needsInitialization) {
-      const defaults = getDefaultState();
       const initialState = {
         minYear: urlState.minYear ?? defaults.minYear,
         maxYear: urlState.maxYear ?? defaults.maxYear,
@@ -240,13 +259,12 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [flushURLUpdate]);
 
-  const defaults = getDefaultState();
   const contextValue: AppStateContextType = {
-    zoom: state.zoom ?? defaults.zoom!,
-    center: state.center ?? defaults.center!,
-    year: state.year ?? defaults.year!,
-    minYear: state.minYear ?? defaults.minYear!,
-    maxYear: state.maxYear ?? defaults.maxYear!,
+    zoom: state.zoom,
+    center: state.center,
+    year: state.year,
+    minYear: state.minYear,
+    maxYear: state.maxYear,
     updateState,
     updateTimelineRange,
   };
