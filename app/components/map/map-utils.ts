@@ -58,7 +58,7 @@ export function convertAllToMapRegions(
       lineWidth: DEFAULT_LINE_WIDTH,
       metadata: region.metadata,
       timeRange: region.timeRange,
-      hierarchy: [...region.hierarchy, region.metadata.title],
+      hierarchy: region.hierarchy,
     }))
   );
 }

@@ -5,7 +5,7 @@ import type {
   PartialTimeBoundGeographicRegionGroup,
 } from "./types";
 import { generateUSStatesData } from "./us-states";
-import { calculateTotalArea } from "../utils/data";
+import { calculateTotalArea, addTitleToHierarchy } from "../utils/data";
 
 function completeRegion(
   region: PartialTimeBoundGeographicRegion,
@@ -14,7 +14,7 @@ function completeRegion(
   return {
     ...region,
     area: calculateTotalArea(region.geographicRegions),
-    hierarchy,
+    hierarchy: addTitleToHierarchy(hierarchy, region.metadata.title),
   };
 }
 
@@ -22,7 +22,7 @@ function completeGroup(
   group: PartialTimeBoundGeographicRegionGroup,
   hierarchy: string[] = []
 ): TimeBoundGeographicRegionGroup {
-  const currentHierarchy = [...hierarchy, group.metadata.title];
+  const currentHierarchy = addTitleToHierarchy(hierarchy, group.metadata.title);
   return {
     ...group,
     hierarchy: currentHierarchy,

@@ -63,7 +63,7 @@ export const TimelineRegionColumn = ({
   ) => {
     setHoveredRegionId(strip.metadata.id);
     if (strip.metadata) {
-      const hierarchy = strip.hierarchy || [];
+      const hierarchy = strip.hierarchy;
       const title = strip.metadata.title || "";
       const description = strip.metadata.description;
       const timeRange = strip.timeRange;

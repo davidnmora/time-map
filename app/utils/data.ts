@@ -13,6 +13,13 @@ export function calculateTotalArea(geographicRegions?: GeographicRegion[]): numb
   );
 }
 
+export function addTitleToHierarchy(
+  hierarchy: string[],
+  title: string
+): string[] {
+  return [...hierarchy, title];
+}
+
 function timeRangeOverlapsYear(timeRange: TimeRange, year: number): boolean {
   const [startYear, endYear] = timeRange;
   if (endYear === null) {
@@ -60,9 +67,8 @@ export function traverseRegionsByYear(
   hierarchy: string[] = []
 ): RegionWithHierarchy[] {
   if ("children" in item) {
-    const currentHierarchy = [...hierarchy, item.metadata.title];
     return item.children.flatMap((child) =>
-      traverseRegionsByYear(child, year, currentHierarchy)
+      traverseRegionsByYear(child, year, hierarchy)
     );
   } else {
     if (timeRangeOverlapsYear(item.timeRange, year)) {
