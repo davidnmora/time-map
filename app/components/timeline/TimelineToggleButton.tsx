@@ -1,7 +1,7 @@
 "use client";
 
 import * as d3 from "d3";
-import { BACKDROP_BLUR, BACKDROP_COLOR } from "./timeline-utils";
+import { BACKDROP_COLOR } from "./timeline-utils";
 
 const CURRENT_YEAR_FONT_SIZE = 64;
 const CURRENT_YEAR_LABEL_FONT_SIZE = 10;
@@ -50,7 +50,8 @@ export const TimelineToggleButton = ({
       onClick={onToggle}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      className={`absolute left-0 -translate-x-full ${BACKDROP_COLOR} ${BACKDROP_BLUR} rounded-l-lg flex flex-col items-center justify-center hover:bg-white/70 transition-colors z-20`}
+      // Note: I wasn't able to get the backdrop blur to work with the button. So let's call that a "feature" that makes the button blend better with the map lol
+      className={`absolute left-0 -translate-x-full ${BACKDROP_COLOR} rounded-l-lg flex flex-col items-center justify-center hover:bg-white/70 transition-colors z-20`}
       style={{
         top: currentYearY - offsetFromButtonTopToTextCenter,
         paddingLeft: BUTTON_PADDING_X,
