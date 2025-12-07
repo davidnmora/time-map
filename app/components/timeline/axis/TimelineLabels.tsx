@@ -5,8 +5,6 @@ import {
   DECADE_FONT_SIZE,
   CENTURY_FONT_SIZE,
   isCentury,
-  isTwentyFiveYearMark,
-  isDecade,
 } from "./timeline-axis-utils";
 
 type TimelineLabelsProps = {
@@ -20,8 +18,6 @@ export const TimelineLabels = ({ ticks, yScale }: TimelineLabelsProps) => {
       {ticks.map((year) => {
         const y = yScale(year);
         const isCenturyYear = isCentury(year);
-        const is25Year = isTwentyFiveYearMark(year);
-        const isDecadeYear = isDecade(year);
 
         const fontSize = isCenturyYear ? CENTURY_FONT_SIZE : DECADE_FONT_SIZE;
 

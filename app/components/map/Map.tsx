@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import type { GeoJSON } from "geojson";
 import {
@@ -43,22 +43,6 @@ type MapProps = {
 };
 
 export default function Map(props: MapProps) {
-  if (!props) {
-    return null;
-  }
-
-  const {
-    center,
-    zoom,
-    pitch = 0,
-    bearing = 0,
-    style,
-    accessToken,
-    geographicRegions = [],
-    renderTooltip,
-    timelineExpanded = false,
-    timelineWidth = 0,
-  } = props;
   const { updateState, year, minYear, maxYear } = useAppState();
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -76,17 +60,38 @@ export default function Map(props: MapProps) {
   >(new globalThis.Map());
   const { hoveredRegionId: contextHoveredRegionId, setHoveredRegionId } =
     useHoveredElement();
-  const timelineExpandedRef = useRef(timelineExpanded);
-  const timelineWidthRef = useRef(timelineWidth);
+  const initializedRef = useRef(false);
+  const timelineExpandedRef = useRef(false);
+  const timelineWidthRef = useRef(0);
 
   useEffect(() => {
     updateStateRef.current = updateState;
   }, [updateState]);
 
+  const {
+    center,
+    zoom,
+    pitch = 0,
+    bearing = 0,
+    style,
+    accessToken,
+    geographicRegions = [],
+    renderTooltip,
+    timelineExpanded = false,
+    timelineWidth = 0,
+  } = props;
+
   useEffect(() => {
     timelineExpandedRef.current = timelineExpanded;
     timelineWidthRef.current = timelineWidth;
   }, [timelineExpanded, timelineWidth]);
+
+  const isRegionVisible = useCallback(
+    (region: GeographicRegion): boolean => {
+      return isTimeRangeActive(region.timeRange, year, minYear, maxYear);
+    },
+    [year, minYear, maxYear]
+  );
 
   // Initialize map
   useEffect(() => {
@@ -218,12 +223,6 @@ export default function Map(props: MapProps) {
     });
   }, [timelineExpanded, timelineWidth]);
 
-  const initializedRef = useRef(false);
-
-  const isRegionVisible = (region: GeographicRegion): boolean => {
-    return isTimeRangeActive(region.timeRange, year, minYear, maxYear);
-  };
-
   useEffect(() => {
     if (!mapRef.current || initializedRef.current) return;
 
@@ -257,7 +256,7 @@ export default function Map(props: MapProps) {
     }
 
     initialize();
-  }, [geographicRegions, renderTooltip, year, minYear, maxYear]);
+  }, [geographicRegions, renderTooltip, isRegionVisible, setHoveredRegionId]);
 
   useEffect(() => {
     if (
@@ -277,7 +276,7 @@ export default function Map(props: MapProps) {
     };
 
     map.once("idle", handleIdle);
-  }, [year, minYear, maxYear, geographicRegions]);
+  }, [geographicRegions, isRegionVisible]);
 
   useEffect(() => {
     if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;

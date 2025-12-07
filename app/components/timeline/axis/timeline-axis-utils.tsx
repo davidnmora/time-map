@@ -102,7 +102,6 @@ export const determineDensityLevel = (
   const individualYearTicks = generateIndividualYearTicks(minYear, maxYear);
   const centuriesYearsCount = centuriesCount + individualYearTicks.length;
 
-  const centuriesSpacing = calculateMinTickSpacing(centuriesCount, height);
   const centuriesHalfCenturiesSpacing = calculateMinTickSpacing(
     centuriesHalfCenturiesCount,
     height

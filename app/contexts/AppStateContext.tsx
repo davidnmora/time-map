@@ -7,6 +7,7 @@ import {
   useEffect,
   useRef,
   useCallback,
+  startTransition,
   type ReactNode,
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
@@ -168,9 +169,9 @@ function mergeAppState(partial: PartialAppState, complete: AppState): AppState {
   for (const key of APP_STATE_KEYS) {
     const value = partial[key];
     if (value !== undefined) {
-      (result as any)[key] = value;
+      (result as Record<string, unknown>)[key] = value;
     } else {
-      (result as any)[key] = complete[key];
+      (result as Record<string, unknown>)[key] = complete[key];
     }
   }
   return result;
@@ -211,14 +212,20 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
   const urlUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingUpdatesRef = useRef<PartialAppState>({});
   const hasInitializedRef = useRef(false);
-  const lastWrittenStateRef = useRef<PartialAppState | null>(null);
+  const previousURLRef = useRef<string>("");
 
   useEffect(() => {
     const urlState = readStateFromURL(searchParams);
     const defaults = getDefaultState();
+    const currentURL = searchParams.toString();
     
     if (hasInitializedRef.current) {
-      setState((prevState) => mergeAppState(urlState, prevState));
+      if (previousURLRef.current !== currentURL) {
+        previousURLRef.current = currentURL;
+        startTransition(() => {
+          setState((prevState) => mergeAppState(urlState, prevState));
+        });
+      }
       return;
     }
 
@@ -227,11 +234,15 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
 
     if (needsInitialization) {
       const initialState = mergeAppState(urlState, defaults);
+      // Syncing URL state to React state on initialization is a valid use case
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setState(initialState);
       const newParams = writeStateToURL(initialState, new URLSearchParams());
       router.replace(`${pathname}?${newParams}`);
+      previousURLRef.current = newParams;
     } else {
       setState(urlState);
+      previousURLRef.current = currentURL;
     }
     hasInitializedRef.current = true;
   }, [searchParams, router, pathname]);

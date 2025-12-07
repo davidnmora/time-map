@@ -148,12 +148,12 @@ export function updateRegionVisibility(
               { source: sourceId, id: feature.id },
               { visible }
             );
-          } catch (e) {
+          } catch {
             // Feature might not exist, ignore
           }
         }
       });
-    } catch (e) {
+    } catch {
       // Source might not be ready, ignore
     }
   });
@@ -216,12 +216,12 @@ export function updateHoverStateFromContext(
               { source: regionId, id: feature.id },
               { hover: isMatchingRegion }
             );
-          } catch (e) {
+          } catch {
             // Feature might not exist, ignore
           }
         }
       });
-    } catch (e) {
+    } catch {
       // Source might not be ready, ignore
     }
   });
@@ -265,7 +265,7 @@ export function setupHoverHandlers(
           },
           { hover: false }
         );
-      } catch (e) {
+      } catch {
         // Feature might not exist, ignore
       }
       hoveredFeatureRef.current = null;
@@ -312,7 +312,7 @@ export function setupHoverHandlers(
           sourceId: region.id,
           featureId: featureId,
         };
-      } catch (e) {
+      } catch {
         // Feature might not exist, ignore
       }
 
