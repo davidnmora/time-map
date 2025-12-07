@@ -28,12 +28,20 @@ export const formatTimeRange = (timeRange: TimeRange): string => {
 };
 
 export const renderTooltip = (data: TooltipData): string => {
-  const hierarchyText =
-    data.hierarchy.length > 0 ? data.hierarchy.join(" > ") : data.title;
   const timeRangeText = formatTimeRange(data.timeRange);
 
   let html = "";
-  html += `<div style="font-weight: 600; margin-bottom: 4px;">${hierarchyText}</div>`;
+
+  if (data.hierarchy.length > 0) {
+    const hierarchyParts = data.hierarchy.slice(0, -1);
+    const finalEntry = data.hierarchy[data.hierarchy.length - 1];
+    const hierarchyPrefix =
+      hierarchyParts.length > 0 ? `${hierarchyParts.join(" > ")} > ` : "";
+    html += `<div style="margin-bottom: 4px; font-weight: 200;">${hierarchyPrefix}<span style="font-weight: 600;">${finalEntry}</span></div>`;
+  } else {
+    html += `<div style="font-weight: 600; margin-bottom: 4px;">${data.title}</div>`;
+  }
+
   html += `<div style="color: #666; font-family: monospace;">${timeRangeText}</div>`;
   if (data.description) {
     html += `<div style="margin-bottom: 4px; color: #666;">${data.description}</div>`;
