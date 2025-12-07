@@ -3,7 +3,7 @@ import type {
   TimeBoundGeographicRegionGroup,
   TimeRange,
   GeographicRegion,
-} from "../data/types";
+} from "./types";
 import * as turf from "@turf/turf";
 
 export function calculateTotalArea(geographicRegions?: GeographicRegion[]): number {

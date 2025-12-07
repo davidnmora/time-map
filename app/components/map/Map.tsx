@@ -14,7 +14,7 @@ import {
 import type { Metadata, TimeRange } from "../../data/types";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { useAppState } from "../../contexts/AppStateContext";
-import { isTimeRangeActive } from "../../utils/data";
+import { isTimeRangeActive } from "../../data/data-utils";
 import { TRANSITION_DURATION_MS } from "../timeline/axis/timeline-axis-utils";
 
 export type GeographicRegion = {

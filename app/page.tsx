@@ -2,7 +2,7 @@
 
 import Map from "./components/map/Map";
 import { completeDataset } from "./data/complete-dataset";
-import { getAFlagListOfAllRegions } from "./utils/data";
+import { getAFlagListOfAllRegions } from "./data/data-utils";
 import {
   renderTooltip,
   convertAllToMapRegions,

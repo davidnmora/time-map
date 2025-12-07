@@ -5,7 +5,7 @@ import type {
   PartialTimeBoundGeographicRegionGroup,
 } from "./types";
 import { generateUSStatesData } from "./us-states";
-import { calculateTotalArea, addTitleToHierarchy } from "../utils/data";
+import { calculateTotalArea, addTitleToHierarchy } from "./data-utils";
 
 function completeRegion(
   region: PartialTimeBoundGeographicRegion,

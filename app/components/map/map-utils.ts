@@ -5,7 +5,7 @@ import type {
   TimeRange,
   TimeBoundGeographicRegionGroup,
 } from "../../data/types";
-import { getAFlagListOfAllRegions } from "../../utils/data";
+import { getAFlagListOfAllRegions } from "../../data/data-utils";
 
 const DEFAULT_FILL_OPACITY = 0.2;
 const DEFAULT_LINE_WIDTH = 1;

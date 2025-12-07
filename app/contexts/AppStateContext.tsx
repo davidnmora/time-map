@@ -12,7 +12,7 @@ import {
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { completeDataset } from "../data/complete-dataset";
-import { getMinMaxYears } from "../utils/data";
+import { getMinMaxYears } from "../data/data-utils";
 
 type AppState = {
   zoom: number;
