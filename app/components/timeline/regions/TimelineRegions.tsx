@@ -1,5 +1,6 @@
 "use client";
 
+import * as d3 from "d3";
 import { TimelineRegionColumn } from "./TimelineRegionColumn";
 import {
   computeRegionColumns,
@@ -10,20 +11,18 @@ import { TimeBoundGeographicRegion } from "@/app/data/types";
 
 type TimelineRegionsProps = {
   height: number;
-  minYear: number;
-  maxYear: number;
   currentYear: number;
   regions: TimeBoundGeographicRegion[];
   widthEncodingKey?: keyof TimeBoundGeographicRegion;
+  yScale: d3.ScaleLinear<number, number>;
 };
 
 export const TimelineRegions = ({
   height,
-  minYear,
-  maxYear,
   currentYear,
   regions,
   widthEncodingKey = "area",
+  yScale,
 }: TimelineRegionsProps) => {
   const columns = computeRegionColumns(regions);
   const domain = regions.map((region) => Number(region[widthEncodingKey]));
@@ -46,11 +45,10 @@ export const TimelineRegions = ({
         <TimelineRegionColumn
           key={index}
           height={height}
-          minYear={minYear}
-          maxYear={maxYear}
           currentYear={currentYear}
           regions={columnRegions}
           columnWidth={columnWidth}
+          yScale={yScale}
         />
       ))}
     </div>

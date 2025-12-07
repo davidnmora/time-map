@@ -31,33 +31,25 @@ function getRegionOpacity(
 
 type TimelineRegionColumnProps = {
   height: number;
-  minYear: number;
-  maxYear: number;
   currentYear: number;
   regions: TimeBoundGeographicRegion[];
   columnWidth: number;
+  yScale: d3.ScaleLinear<number, number>;
 };
 
 export const TimelineRegionColumn = ({
   height,
-  minYear,
-  maxYear,
   currentYear,
   regions,
   columnWidth,
+  yScale,
 }: TimelineRegionColumnProps) => {
-  const boundsHeight = height;
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
   const [tooltipData, setTooltipData] = useState<{
     x: number;
     y: number;
     html: string;
   } | null>(null);
-
-  const yScale = d3
-    .scaleLinear()
-    .domain([minYear, maxYear])
-    .range([boundsHeight, 0]);
 
   const strips = regions.map((region) => {
     const [startYear, endYear] = region.timeRange;

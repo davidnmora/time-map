@@ -4,21 +4,17 @@ import * as d3 from "d3";
 
 type CurrentYearIndicatorProps = {
   height: number;
-  minYear: number;
-  maxYear: number;
   currentYear: number;
   totalWidth: number;
+  yScale: d3.ScaleLinear<number, number>;
 };
 
 export const CurrentYearIndicator = ({
   height,
-  minYear,
-  maxYear,
   currentYear,
   totalWidth,
+  yScale,
 }: CurrentYearIndicatorProps) => {
-  const yScale = d3.scaleLinear().domain([minYear, maxYear]).range([height, 0]);
-
   const currentYearY = yScale(currentYear);
 
   return (

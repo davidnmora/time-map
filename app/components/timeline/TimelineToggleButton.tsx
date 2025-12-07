@@ -14,18 +14,15 @@ type TimelineToggleButtonProps = {
   currentYear: number;
   expanded: boolean;
   onToggle: () => void;
-  height: number;
-  minYear: number;
-  maxYear: number;
+  yScale: d3.ScaleLinear<number, number>;
 };
 
 export const TimelineToggleButton = ({
   currentYear,
   expanded,
   onToggle,
-  height,
-  minYear,
-  maxYear,
+
+  yScale,
 }: TimelineToggleButtonProps) => {
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -35,7 +32,6 @@ export const TimelineToggleButton = ({
     e.stopPropagation();
   };
 
-  const yScale = d3.scaleLinear().domain([minYear, maxYear]).range([height, 0]);
   const currentYearY = yScale(currentYear);
 
   const offsetFromButtonTopToTextCenter =

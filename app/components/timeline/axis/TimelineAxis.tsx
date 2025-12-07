@@ -18,6 +18,7 @@ type TimelineAxisProps = {
   maxYear: number;
   currentYear: number;
   totalWidth: number;
+  yScale: d3.ScaleLinear<number, number>;
 };
 
 export const TimelineAxis = ({
@@ -26,9 +27,8 @@ export const TimelineAxis = ({
   maxYear,
   currentYear,
   totalWidth,
+  yScale,
 }: TimelineAxisProps) => {
-  const yScale = d3.scaleLinear().domain([minYear, maxYear]).range([height, 0]);
-
   const densityLevel = determineDensityLevel(
     height,
     minYear,
@@ -84,10 +84,9 @@ export const TimelineAxis = ({
       >
         <CurrentYearIndicator
           height={height}
-          minYear={minYear}
-          maxYear={maxYear}
           currentYear={currentYear}
           totalWidth={TIMELINE_AXIS_WIDTH + totalWidth}
+          yScale={yScale}
         />
       </div>
     </div>

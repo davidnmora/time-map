@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import * as d3 from "d3";
 import { TimelineAxis } from "./axis/TimelineAxis";
 import { TimelineRegions } from "./regions/TimelineRegions";
 import { TimelineToggleButton } from "./TimelineToggleButton";
@@ -167,6 +168,8 @@ export const Timeline = ({
 
   const timelineTotalWidth = TIMELINE_AXIS_WIDTH + totalWidth;
 
+  const yScale = d3.scaleLinear().domain([minYear, maxYear]).range([height, 0]);
+
   return (
     <div
       className={`absolute top-0 right-0 h-full z-10 transition-transform`}
@@ -185,19 +188,16 @@ export const Timeline = ({
           currentYear={currentYear}
           expanded={expanded}
           onToggle={onToggle}
-          height={height}
-          minYear={minYear}
-          maxYear={maxYear}
+          yScale={yScale}
         />
         <div className="flex">
           <div style={{ width: TIMELINE_AXIS_WIDTH }} />
           <TimelineRegions
             height={height}
-            minYear={minYear}
-            maxYear={maxYear}
             currentYear={currentYear}
             regions={regions}
             widthEncodingKey={widthEncodingKey}
+            yScale={yScale}
           />
         </div>
         <TimelineAxis
@@ -206,6 +206,7 @@ export const Timeline = ({
           maxYear={maxYear}
           currentYear={currentYear}
           totalWidth={totalWidth}
+          yScale={yScale}
         />
       </div>
     </div>
