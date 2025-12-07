@@ -88,9 +88,9 @@ export default function Map(props: MapProps) {
 
   const isRegionVisible = useCallback(
     (region: GeographicRegion): boolean => {
-      return isTimeRangeActive(region.timeRange, year, minYear, maxYear);
+      return isTimeRangeActive(region.timeRange, year);
     },
-    [year, minYear, maxYear]
+    [year]
   );
 
   // Initialize map

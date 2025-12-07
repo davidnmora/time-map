@@ -4,15 +4,35 @@ import * as d3 from "d3";
 import { useState } from "react";
 import { useHoveredElement } from "../../../contexts/HoveredElementContext";
 import { renderTooltip } from "../../map/map-utils";
-import type { TimeBoundGeographicRegion } from "../../../data/types";
+import type { TimeBoundGeographicRegion, TimeRange } from "../../../data/types";
+import { isTimeRangeActive } from "@/app/data/data-utils";
 
-const DEFAULT_OPACITY = 0.3;
+const DEFAULT_OPACITY = 0.7;
+const DEFAULT_OPACITY_IF_NOT_OVERLAPPING_WITH_CURRENT_YEAR = 0.4;
 const HOVERED_OPACITY = 1;
+
+function getRegionOpacity(
+  isHovered: boolean,
+  timeRange: TimeRange,
+  currentYear: number
+): number {
+  if (isHovered) {
+    return HOVERED_OPACITY;
+  }
+  const isOverlappingWithCurrentYear = isTimeRangeActive(
+    timeRange,
+    currentYear
+  );
+  return isOverlappingWithCurrentYear
+    ? DEFAULT_OPACITY
+    : DEFAULT_OPACITY_IF_NOT_OVERLAPPING_WITH_CURRENT_YEAR;
+}
 
 type TimelineRegionColumnProps = {
   height: number;
   minYear: number;
   maxYear: number;
+  currentYear: number;
   regions: TimeBoundGeographicRegion[];
   columnWidth: number;
   getWidthEncodingValue: (region: TimeBoundGeographicRegion) => number;
@@ -22,6 +42,7 @@ export const TimelineRegionColumn = ({
   height,
   minYear,
   maxYear,
+  currentYear,
   regions,
   columnWidth,
   getWidthEncodingValue,
@@ -116,7 +137,11 @@ export const TimelineRegionColumn = ({
                 width: strip.width,
                 height: strip.height,
                 backgroundColor: strip.metadata.color || "#0080ff",
-                opacity: isHovered ? HOVERED_OPACITY : DEFAULT_OPACITY,
+                opacity: getRegionOpacity(
+                  isHovered,
+                  strip.timeRange,
+                  currentYear
+                ),
                 cursor: "pointer",
               }}
               onMouseEnter={(e) => handleMouseEnter(e, strip)}

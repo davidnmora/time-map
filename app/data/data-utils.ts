@@ -104,9 +104,7 @@ export function getAFlagListOfAllRegions(
 
 export function isTimeRangeActive(
   timeRange: TimeRange | undefined,
-  year: number,
-  minYear?: number,
-  maxYear?: number
+  year: number
 ): boolean {
   if (!timeRange) return true;
 
@@ -115,11 +113,5 @@ export function isTimeRangeActive(
   const effectiveEndYear = endYear !== null ? endYear : currentYear;
 
   const overlapsYear = effectiveEndYear >= year && startYear <= year;
-  if (!overlapsYear) return false;
-
-  if (minYear === undefined && maxYear === undefined) return true;
-
-  if (minYear !== undefined && effectiveEndYear < minYear) return false;
-  if (maxYear !== undefined && startYear > maxYear) return false;
-  return true;
+  return !!overlapsYear;
 }

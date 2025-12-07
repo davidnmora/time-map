@@ -12,6 +12,7 @@ type TimelineRegionsProps = {
   height: number;
   minYear: number;
   maxYear: number;
+  currentYear: number;
   regions: TimeBoundGeographicRegion[];
   widthEncodingKey?: keyof TimeBoundGeographicRegion;
 };
@@ -20,6 +21,7 @@ export const TimelineRegions = ({
   height,
   minYear,
   maxYear,
+  currentYear,
   regions,
   widthEncodingKey = "area",
 }: TimelineRegionsProps) => {
@@ -47,6 +49,7 @@ export const TimelineRegions = ({
           height={height}
           minYear={minYear}
           maxYear={maxYear}
+          currentYear={currentYear}
           regions={columnRegions}
           columnWidth={columnWidth}
           getWidthEncodingValue={getWidthEncodingValue}

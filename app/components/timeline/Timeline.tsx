@@ -195,6 +195,7 @@ export const Timeline = ({
             height={height}
             minYear={minYear}
             maxYear={maxYear}
+            currentYear={currentYear}
             regions={regions}
             widthEncodingKey={widthEncodingKey}
           />
