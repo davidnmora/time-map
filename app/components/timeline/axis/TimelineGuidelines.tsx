@@ -8,14 +8,14 @@ import {
 
 type TimelineGuidelinesProps = {
   ticks: number[];
-  yScale: d3.ScaleLinear<number, number>;
+  scaleYearToPageY: d3.ScaleLinear<number, number>;
   totalWidth: number;
   getAxisElementColor: (year: number) => string;
 };
 
 export const TimelineGuidelines = ({
   ticks,
-  yScale,
+  scaleYearToPageY,
   totalWidth,
   getAxisElementColor,
 }: TimelineGuidelinesProps) => {
@@ -25,7 +25,7 @@ export const TimelineGuidelines = ({
   return (
     <>
       {guidelineYears.map((year) => {
-        const y = yScale(year);
+        const y = scaleYearToPageY(year);
         return (
           <div
             key={`guideline-${year}`}

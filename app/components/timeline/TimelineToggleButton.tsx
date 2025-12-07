@@ -14,7 +14,7 @@ type TimelineToggleButtonProps = {
   currentYear: number;
   expanded: boolean;
   onToggle: () => void;
-  yScale: d3.ScaleLinear<number, number>;
+  scaleYearToPageY: d3.ScaleLinear<number, number>;
 };
 
 export const TimelineToggleButton = ({
@@ -22,7 +22,7 @@ export const TimelineToggleButton = ({
   expanded,
   onToggle,
 
-  yScale,
+  scaleYearToPageY,
 }: TimelineToggleButtonProps) => {
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -32,7 +32,7 @@ export const TimelineToggleButton = ({
     e.stopPropagation();
   };
 
-  const currentYearY = yScale(currentYear);
+  const currentYearY = scaleYearToPageY(currentYear);
 
   const offsetFromButtonTopToTextCenter =
     BUTTON_PADDING_Y +

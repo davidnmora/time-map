@@ -168,7 +168,10 @@ export const Timeline = ({
 
   const timelineTotalWidth = TIMELINE_AXIS_WIDTH + totalWidth;
 
-  const yScale = d3.scaleLinear().domain([minYear, maxYear]).range([height, 0]);
+  const scaleYearToPageY = d3
+    .scaleLinear()
+    .domain([minYear, maxYear])
+    .range([height, 0]);
 
   return (
     <div
@@ -188,7 +191,7 @@ export const Timeline = ({
           currentYear={currentYear}
           expanded={expanded}
           onToggle={onToggle}
-          yScale={yScale}
+          scaleYearToPageY={scaleYearToPageY}
         />
         <div className="flex">
           <div style={{ width: TIMELINE_AXIS_WIDTH }} />
@@ -197,7 +200,7 @@ export const Timeline = ({
             currentYear={currentYear}
             regions={regions}
             widthEncodingKey={widthEncodingKey}
-            yScale={yScale}
+            scaleYearToPageY={scaleYearToPageY}
           />
         </div>
         <TimelineAxis
@@ -206,7 +209,7 @@ export const Timeline = ({
           maxYear={maxYear}
           currentYear={currentYear}
           totalWidth={totalWidth}
-          yScale={yScale}
+          scaleYearToPageY={scaleYearToPageY}
         />
       </div>
     </div>

@@ -18,7 +18,7 @@ type TimelineAxisProps = {
   maxYear: number;
   currentYear: number;
   totalWidth: number;
-  yScale: d3.ScaleLinear<number, number>;
+  scaleYearToPageY: d3.ScaleLinear<number, number>;
 };
 
 export const TimelineAxis = ({
@@ -27,7 +27,7 @@ export const TimelineAxis = ({
   maxYear,
   currentYear,
   totalWidth,
-  yScale,
+  scaleYearToPageY,
 }: TimelineAxisProps) => {
   const densityLevel = determineDensityLevel(
     height,
@@ -57,19 +57,19 @@ export const TimelineAxis = ({
         <div className="relative w-full h-full">
           <TimelineTicks
             ticks={ticks}
-            yScale={yScale}
+            scaleYearToPageY={scaleYearToPageY}
             getAxisElementColor={getAxisElementColor}
           />
           <TimelineLabels
             ticks={ticks}
-            yScale={yScale}
+            scaleYearToPageY={scaleYearToPageY}
             getAxisElementColor={getAxisElementColor}
           />
         </div>
       </div>
       <TimelineGuidelines
         ticks={ticks}
-        yScale={yScale}
+        scaleYearToPageY={scaleYearToPageY}
         totalWidth={totalWidth}
         getAxisElementColor={getAxisElementColor}
       />
@@ -86,7 +86,7 @@ export const TimelineAxis = ({
           height={height}
           currentYear={currentYear}
           totalWidth={TIMELINE_AXIS_WIDTH + totalWidth}
-          yScale={yScale}
+          scaleYearToPageY={scaleYearToPageY}
         />
       </div>
     </div>

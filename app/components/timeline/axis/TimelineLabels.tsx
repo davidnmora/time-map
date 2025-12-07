@@ -9,19 +9,19 @@ import {
 
 type TimelineLabelsProps = {
   ticks: number[];
-  yScale: d3.ScaleLinear<number, number>;
+  scaleYearToPageY: d3.ScaleLinear<number, number>;
   getAxisElementColor: (year: number) => string;
 };
 
 export const TimelineLabels = ({
   ticks,
-  yScale,
+  scaleYearToPageY,
   getAxisElementColor,
 }: TimelineLabelsProps) => {
   return (
     <>
       {ticks.map((year) => {
-        const y = yScale(year);
+        const y = scaleYearToPageY(year);
         const isCenturyYear = isCentury(year);
         const fontSize = isCenturyYear ? CENTURY_FONT_SIZE : DECADE_FONT_SIZE;
 

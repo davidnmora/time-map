@@ -7,19 +7,19 @@ import {
 
 type TimelineTicksProps = {
   ticks: number[];
-  yScale: d3.ScaleLinear<number, number>;
+  scaleYearToPageY: d3.ScaleLinear<number, number>;
   getAxisElementColor: (year: number) => string;
 };
 
 export const TimelineTicks = ({
   ticks,
-  yScale,
+  scaleYearToPageY,
   getAxisElementColor,
 }: TimelineTicksProps) => {
   return (
     <>
       {ticks.map((year) => {
-        const y = yScale(year);
+        const y = scaleYearToPageY(year);
         const tickHeight = getTickThickness(year);
         const color = getAxisElementColor(year);
 

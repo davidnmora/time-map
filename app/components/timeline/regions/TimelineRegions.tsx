@@ -14,7 +14,7 @@ type TimelineRegionsProps = {
   currentYear: number;
   regions: TimeBoundGeographicRegion[];
   widthEncodingKey?: keyof TimeBoundGeographicRegion;
-  yScale: d3.ScaleLinear<number, number>;
+  scaleYearToPageY: d3.ScaleLinear<number, number>;
 };
 
 export const TimelineRegions = ({
@@ -22,7 +22,7 @@ export const TimelineRegions = ({
   currentYear,
   regions,
   widthEncodingKey = "area",
-  yScale,
+  scaleYearToPageY,
 }: TimelineRegionsProps) => {
   const columns = computeRegionColumns(regions);
   const domain = regions.map((region) => Number(region[widthEncodingKey]));
@@ -48,7 +48,7 @@ export const TimelineRegions = ({
           currentYear={currentYear}
           regions={columnRegions}
           columnWidth={columnWidth}
-          yScale={yScale}
+          scaleYearToPageY={scaleYearToPageY}
         />
       ))}
     </div>

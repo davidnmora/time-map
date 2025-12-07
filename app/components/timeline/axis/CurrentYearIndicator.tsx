@@ -6,16 +6,16 @@ type CurrentYearIndicatorProps = {
   height: number;
   currentYear: number;
   totalWidth: number;
-  yScale: d3.ScaleLinear<number, number>;
+  scaleYearToPageY: d3.ScaleLinear<number, number>;
 };
 
 export const CurrentYearIndicator = ({
   height,
   currentYear,
   totalWidth,
-  yScale,
+  scaleYearToPageY,
 }: CurrentYearIndicatorProps) => {
-  const currentYearY = yScale(currentYear);
+  const currentYearY = scaleYearToPageY(currentYear);
 
   return (
     <div

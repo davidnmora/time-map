@@ -34,7 +34,7 @@ type TimelineRegionColumnProps = {
   currentYear: number;
   regions: TimeBoundGeographicRegion[];
   columnWidth: number;
-  yScale: d3.ScaleLinear<number, number>;
+  scaleYearToPageY: d3.ScaleLinear<number, number>;
 };
 
 export const TimelineRegionColumn = ({
@@ -42,7 +42,7 @@ export const TimelineRegionColumn = ({
   currentYear,
   regions,
   columnWidth,
-  yScale,
+  scaleYearToPageY,
 }: TimelineRegionColumnProps) => {
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
   const [tooltipData, setTooltipData] = useState<{
@@ -56,8 +56,8 @@ export const TimelineRegionColumn = ({
     const currentYear = new Date().getFullYear();
     const effectiveEndYear = endYear !== null ? endYear : currentYear;
 
-    const startY = yScale(effectiveEndYear);
-    const endY = yScale(startYear);
+    const startY = scaleYearToPageY(effectiveEndYear);
+    const endY = scaleYearToPageY(startYear);
     const stripHeight = Math.abs(endY - startY);
 
     return {
