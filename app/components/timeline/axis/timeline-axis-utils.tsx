@@ -1,7 +1,7 @@
 export const CENTURY_TICK_THICKNESS = 2;
 export const REGULAR_TICK_THICKNESS = 1;
 
-export const TIMELINE_AXIS_WIDTH = 50;
+export const TIMELINE_AXIS_WIDTH = 60;
 export const TICK_LENGTH = 6;
 export const TICK_OFFSET = 10;
 
