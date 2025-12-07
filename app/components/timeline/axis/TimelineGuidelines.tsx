@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import {
-  TIMELINE_WIDTH,
+  TIMELINE_AXIS_WIDTH,
   isCentury,
   isHalfCentury,
   getTickThickness,
@@ -29,7 +29,7 @@ export const TimelineGuidelines = ({
             key={`guideline-${year}`}
             className="absolute pointer-events-none"
             style={{
-              left: TIMELINE_WIDTH,
+              left: TIMELINE_AXIS_WIDTH,
               top: y,
               width: totalWidth,
               height: getTickThickness(year),

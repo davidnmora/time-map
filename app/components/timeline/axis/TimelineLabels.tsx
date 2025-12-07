@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import {
-  TIMELINE_WIDTH,
+  TIMELINE_AXIS_WIDTH,
   TICK_OFFSET,
   DECADE_FONT_SIZE,
   CENTURY_FONT_SIZE,
@@ -30,7 +30,7 @@ export const TimelineLabels = ({ ticks, yScale }: TimelineLabelsProps) => {
             key={`label-${year}`}
             className="absolute translate-y-[-50%] font-mono"
             style={{
-              left: TIMELINE_WIDTH - TICK_OFFSET,
+              left: TIMELINE_AXIS_WIDTH - TICK_OFFSET,
               top: y,
               transform: "translateX(-100%)",
               fontSize: `${fontSize}px`,

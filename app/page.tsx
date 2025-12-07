@@ -10,15 +10,15 @@ import {
 import { Timeline } from "./components/timeline/Timeline";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
+import { calculateTimelineWidth } from "./components/timeline/timeline-utils";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
-import { Suspense, useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect } from "react";
 
 function MapContent() {
   const { zoom, center, year, minYear, maxYear } = useAppState();
   const [windowHeight, setWindowHeight] = useState(800);
   const [timelineExpanded, setTimelineExpanded] = useState(true);
-  const [timelineWidth, setTimelineWidth] = useState(0);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -29,11 +29,8 @@ function MapContent() {
     return () => window.removeEventListener("resize", updateHeight);
   }, []);
 
-  const handleTimelineWidthChange = useCallback((width: number) => {
-    setTimelineWidth(width);
-  }, []);
-
   const timelineRegions = getAFlagListOfAllRegions(completeDataset);
+  const timelineWidth = calculateTimelineWidth(timelineRegions, "area");
 
   const geographicRegions = convertAllToMapRegions(completeDataset);
 
@@ -74,7 +71,6 @@ function MapContent() {
             widthEncodingKey="area"
             expanded={timelineExpanded}
             onToggle={() => setTimelineExpanded((prev) => !prev)}
-            onWidthChange={handleTimelineWidthChange}
           />
         )}
       </div>

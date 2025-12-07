@@ -1,4 +1,5 @@
 import type { TimeRange, TimeBoundGeographicRegion } from "../../data/types";
+import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
 
 export type Column = TimeBoundGeographicRegion[];
 
@@ -73,3 +74,31 @@ export function computeRegionColumns(
 
   return columns;
 }
+
+export const calculateTimelineWidth = (
+  regions: TimeBoundGeographicRegion[],
+  widthEncodingKey: keyof TimeBoundGeographicRegion = "area"
+): number => {
+  const columns = computeRegionColumns(regions);
+  const domain = regions.map((region) => Number(region[widthEncodingKey]));
+  const getWidthEncodingValue = createGetWidthEncodingValue(
+    domain,
+    widthEncodingKey
+  );
+
+  const columnsWithWidths = columns.map((columnRegions) => {
+    const stripWidths = columnRegions.map((region) =>
+      getWidthEncodingValue(region)
+    );
+    const columnWidth =
+      Math.round(Math.max(...stripWidths, DEFAULT_STRIP_WIDTH) * 100) / 100;
+    return { columnRegions, columnWidth };
+  });
+
+  const totalWidth = columnsWithWidths.reduce(
+    (sum, { columnWidth }) => sum + columnWidth,
+    0
+  );
+
+  return TIMELINE_AXIS_WIDTH + totalWidth;
+};

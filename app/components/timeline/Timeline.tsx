@@ -11,7 +11,7 @@ import {
   DEFAULT_STRIP_WIDTH,
 } from "./timeline-utils";
 import {
-  TIMELINE_WIDTH,
+  TIMELINE_AXIS_WIDTH,
   TRANSITION_DURATION_MS,
 } from "./axis/timeline-axis-utils";
 
@@ -22,7 +22,6 @@ type TimelineProps = {
   widthEncodingKey?: keyof TimeBoundGeographicRegion;
   expanded: boolean;
   onToggle: () => void;
-  onWidthChange: (width: number) => void;
 };
 
 export const Timeline = ({
@@ -32,7 +31,6 @@ export const Timeline = ({
   widthEncodingKey,
   expanded,
   onToggle,
-  onWidthChange,
 }: TimelineProps) => {
   const { minYear, maxYear, updateTimelineRange } = useAppState();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -162,11 +160,7 @@ export const Timeline = ({
     0
   );
 
-  const timelineTotalWidth = TIMELINE_WIDTH + totalWidth;
-
-  useEffect(() => {
-    onWidthChange(timelineTotalWidth);
-  }, [timelineTotalWidth, onWidthChange]);
+  const timelineTotalWidth = TIMELINE_AXIS_WIDTH + totalWidth;
 
   return (
     <div
@@ -192,7 +186,7 @@ export const Timeline = ({
           </span>
         </button>
         <div className="flex">
-          <div style={{ width: TIMELINE_WIDTH }} />
+          <div style={{ width: TIMELINE_AXIS_WIDTH }} />
           <TimelineRegions
             height={height}
             minYear={minYear}

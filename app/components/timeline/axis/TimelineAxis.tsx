@@ -3,7 +3,7 @@
 import * as d3 from "d3";
 import { CurrentYearIndicator } from "./CurrentYearIndicator";
 import {
-  TIMELINE_WIDTH,
+  TIMELINE_AXIS_WIDTH,
   determineDensityLevel,
   generateTicksForDensityLevel,
   CENTURY_FONT_SIZE,
@@ -40,11 +40,11 @@ export const TimelineAxis = ({
   return (
     <div
       className="absolute top-0 left-0 pointer-events-none"
-      style={{ width: TIMELINE_WIDTH + totalWidth, height: height }}
+      style={{ width: TIMELINE_AXIS_WIDTH + totalWidth, height: height }}
     >
       <div
         className="relative overflow-hidden"
-        style={{ width: TIMELINE_WIDTH, height: height }}
+        style={{ width: TIMELINE_AXIS_WIDTH, height: height }}
       >
         <div className="relative w-full h-full">
           <TimelineTicks ticks={ticks} yScale={yScale} />
@@ -59,7 +59,7 @@ export const TimelineAxis = ({
       <div
         className="absolute pointer-events-none"
         style={{
-          left: TIMELINE_WIDTH,
+          left: TIMELINE_AXIS_WIDTH,
           top: 0,
           width: totalWidth,
           height: height,

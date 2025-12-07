@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import {
-  TIMELINE_WIDTH,
+  TIMELINE_AXIS_WIDTH,
   TICK_LENGTH,
   getTickThickness,
 } from "./timeline-axis-utils";
@@ -22,7 +22,7 @@ export const TimelineTicks = ({ ticks, yScale }: TimelineTicksProps) => {
             key={year}
             className="absolute translate-y-[-50%]"
             style={{
-              left: TIMELINE_WIDTH - TICK_LENGTH,
+              left: TIMELINE_AXIS_WIDTH - TICK_LENGTH,
               top: y,
               width: TICK_LENGTH,
               height: tickHeight,
