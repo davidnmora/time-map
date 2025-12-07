@@ -69,19 +69,25 @@ const DEFAULT_PITCH = 0;
 const DEFAULT_BEARING = 0;
 const DEFAULT_TIMELINE_EXPANDED = true;
 
+// Note: due to our timeline choice, we always place the currentYear at the midpoint of the min and max years
+function calculateMidpointYear(minYear: number, maxYear: number): number {
+  return maxYear - (maxYear - minYear) / 2;
+}
+
 function getDefaultState(): AppState {
   const { min: dataMinYear, max: dataMaxYear } =
     getMinMaxYears(completeDataset);
-  const defaultYear = isFinite(dataMinYear)
-    ? dataMinYear
-    : new Date().getFullYear();
+  const defaultCurrentYear =
+    isFinite(dataMinYear) && isFinite(dataMaxYear)
+      ? calculateMidpointYear(dataMinYear, dataMaxYear)
+      : new Date().getFullYear();
 
   return {
     zoom: DEFAULT_ZOOM,
     center: DEFAULT_CENTER,
     pitch: DEFAULT_PITCH,
     bearing: DEFAULT_BEARING,
-    currentYear: defaultYear,
+    currentYear: defaultCurrentYear,
     minYear: dataMinYear,
     maxYear: dataMaxYear,
     timelineExpanded: DEFAULT_TIMELINE_EXPANDED,
@@ -174,6 +180,13 @@ function mergeAppState(partial: PartialAppState, complete: AppState): AppState {
       (result as Record<string, unknown>)[key] = complete[key];
     }
   }
+
+  const finalMinYear = result.minYear;
+  const finalMaxYear = result.maxYear;
+  if (isFinite(finalMinYear) && isFinite(finalMaxYear)) {
+    result.currentYear = calculateMidpointYear(finalMinYear, finalMaxYear);
+  }
+
   return result;
 }
 
@@ -285,9 +298,10 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
         stateUpdates.minYear !== undefined &&
         stateUpdates.maxYear !== undefined
       ) {
-        stateUpdates.currentYear =
-          stateUpdates.maxYear -
-          (stateUpdates.maxYear - stateUpdates.minYear) / 2;
+        stateUpdates.currentYear = calculateMidpointYear(
+          stateUpdates.minYear,
+          stateUpdates.maxYear
+        );
       }
 
       setState((prevState) => ({ ...prevState, ...stateUpdates }));
@@ -300,7 +314,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     (minYear: number, maxYear: number, options?: UpdateOptions) => {
       const updates: PartialAppState = { minYear, maxYear };
       if (options?.autoCalculateYear !== false) {
-        updates.currentYear = maxYear - (maxYear - minYear) / 2;
+        updates.currentYear = calculateMidpointYear(minYear, maxYear);
       }
       updateState(updates);
     },
