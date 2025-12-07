@@ -14,6 +14,7 @@ export type DensityLevel =
   | "centuries"
   | "centuries-and-half-centuries"
   | "centuries-25"
+  | "centuries-and-half-decades"
   | "centuries-decades"
   | "centuries-years";
 
@@ -41,6 +42,23 @@ export const generateTwentyFiveYearMarks = (
   const marks: number[] = [];
 
   for (let year = startMark; year <= endMark; year += 25) {
+    if (year % 100 !== 0) {
+      marks.push(year);
+    }
+  }
+
+  return marks;
+};
+
+export const generateHalfDecadeMarks = (
+  minYear: number,
+  maxYear: number
+): number[] => {
+  const startMark = Math.floor(minYear / 5) * 5;
+  const endMark = Math.ceil(maxYear / 5) * 5;
+  const marks: number[] = [];
+
+  for (let year = startMark; year <= endMark; year += 5) {
     if (year % 100 !== 0) {
       marks.push(year);
     }
@@ -145,6 +163,9 @@ export const determineDensityLevel = (
   const twentyFiveYearMarks = generateTwentyFiveYearMarks(minYear, maxYear);
   const centuries25Count = centuriesCount + twentyFiveYearMarks.length;
 
+  const halfDecadeMarks = generateHalfDecadeMarks(minYear, maxYear);
+  const centuriesHalfDecadesCount = centuriesCount + halfDecadeMarks.length;
+
   const decadeTicks = generateDecadeTicks(minYear, maxYear);
   const centuriesDecadesCount = centuriesCount + decadeTicks.length;
 
@@ -157,6 +178,10 @@ export const determineDensityLevel = (
     height
   );
   const centuries25Spacing = calculateMinTickSpacing(centuries25Count, height);
+  const centuriesHalfDecadesSpacing = calculateMinTickSpacing(
+    centuriesHalfDecadesCount,
+    height
+  );
   const centuriesDecadesSpacing = calculateMinTickSpacing(
     centuriesDecadesCount,
     height
@@ -168,6 +193,10 @@ export const determineDensityLevel = (
 
   if (centuriesYearsSpacing >= minimumSpacing) {
     return "centuries-years";
+  }
+
+  if (centuriesHalfDecadesSpacing >= minimumSpacing) {
+    return "centuries-and-half-decades";
   }
 
   if (centuriesDecadesSpacing >= minimumSpacing) {
@@ -204,6 +233,11 @@ export const generateTicksForDensityLevel = (
       return [
         ...centuryTicks,
         ...generateTwentyFiveYearMarks(minYear, maxYear),
+      ].sort((a, b) => a - b);
+    case "centuries-and-half-decades":
+      return [
+        ...centuryTicks,
+        ...generateHalfDecadeMarks(minYear, maxYear),
       ].sort((a, b) => a - b);
     case "centuries-decades":
       return [...centuryTicks, ...generateDecadeTicks(minYear, maxYear)].sort(
