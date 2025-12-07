@@ -27,9 +27,11 @@ function MapContent() {
     timelineExpanded,
     updateState,
   } = useAppState();
-  const [windowHeight, setWindowHeight] = useState(800);
+  const [windowHeight, setWindowHeight] = useState<number | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const updateHeight = () => {
       setWindowHeight(window.innerHeight);
     };
@@ -58,18 +60,21 @@ function MapContent() {
             timelineWidth={timelineWidth}
           />
         </div>
-        {isFinite(minYear) && isFinite(maxYear) && (
-          <Timeline
-            height={windowHeight}
-            currentYear={currentYear}
-            regions={timelineRegions}
-            widthEncodingKey="area"
-            expanded={timelineExpanded}
-            onToggle={() =>
-              updateState({ timelineExpanded: !timelineExpanded })
-            }
-          />
-        )}
+        {isMounted &&
+          windowHeight !== null &&
+          isFinite(minYear) &&
+          isFinite(maxYear) && (
+            <Timeline
+              height={windowHeight}
+              currentYear={currentYear}
+              regions={timelineRegions}
+              widthEncodingKey="area"
+              expanded={timelineExpanded}
+              onToggle={() =>
+                updateState({ timelineExpanded: !timelineExpanded })
+              }
+            />
+          )}
       </div>
     </HoveredElementProvider>
   );
