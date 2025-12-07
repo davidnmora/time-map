@@ -7,8 +7,11 @@ export const MIN_STRIP_WIDTH = 2;
 export const MAX_STRIP_WIDTH = 30;
 export const DEFAULT_STRIP_WIDTH = 3;
 
+export const TIMELINE_BACKDROP_OPACITY = 0.8;
 export const BACKDROP_BLUR = `backdrop-blur-xs`;
-export const BACKDROP_COLOR = "bg-white/70";
+export const BACKDROP_COLOR = `bg-white/${Math.round(
+  TIMELINE_BACKDROP_OPACITY * 100
+)}`;
 export const DROP_SHADOW = "shadow-[-2px_2px_4px_rgba(0,0,0,0.1)]";
 export const TIMELINE_TOGGLE_BUTTON_Z_INDEX = "z-20";
 export const CURRENT_YEAR_INDICATOR_Z_INDEX = "z-30";

@@ -9,16 +9,25 @@ import { useAppState } from "../../contexts/AppStateContext";
 import type { TimeBoundGeographicRegion } from "../../data/types";
 import {
   BACKDROP_BLUR,
-  BACKDROP_COLOR,
   computeRegionColumns,
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
   DROP_SHADOW,
+  TIMELINE_BACKDROP_OPACITY,
 } from "./timeline-utils";
 import {
   TIMELINE_AXIS_WIDTH,
   TRANSITION_DURATION_MS,
 } from "./axis/timeline-axis-utils";
+
+const TIMELINE_GRADIENT_FADE_PERCENT = 10;
+const TIMELINE_GRADIENT_COLOR = "255, 255, 255";
+
+const TIMELINE_BACKGROUND_GRADIENT = `
+  linear-gradient(to bottom, rgba(${TIMELINE_GRADIENT_COLOR}, 0) 0%,rgba(${TIMELINE_GRADIENT_COLOR}, ${TIMELINE_BACKDROP_OPACITY}) ${TIMELINE_GRADIENT_FADE_PERCENT}%, rgba(${TIMELINE_GRADIENT_COLOR}, ${TIMELINE_BACKDROP_OPACITY}) ${
+  100 - TIMELINE_GRADIENT_FADE_PERCENT
+  }%, rgba(${TIMELINE_GRADIENT_COLOR}, 0) 100%)
+`;
 
 type TimelineProps = {
   height: number;
@@ -185,8 +194,12 @@ export const Timeline = ({
     >
       <div
         ref={containerRef}
-        className={`relative h-full ${BACKDROP_COLOR} ${BACKDROP_BLUR} ${DROP_SHADOW}`}
-        style={{ height: height, cursor: "grab" }}
+        className={`relative h-full ${BACKDROP_BLUR} ${DROP_SHADOW}`}
+        style={{
+          height: height,
+          cursor: "grab",
+          background: TIMELINE_BACKGROUND_GRADIENT,
+        }}
       >
         <TimelineToggleButton
           currentYear={currentYear}
