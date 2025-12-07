@@ -32,6 +32,8 @@ export type GeographicRegion = {
 type MapProps = {
   center: [number, number];
   zoom: number;
+  pitch: number;
+  bearing: number;
   style: string;
   accessToken: string;
   geographicRegions?: GeographicRegion[];
@@ -48,6 +50,8 @@ export default function Map(props: MapProps) {
   const {
     center,
     zoom,
+    pitch = 0,
+    bearing = 0,
     style,
     accessToken,
     geographicRegions = [],
@@ -86,16 +90,22 @@ export default function Map(props: MapProps) {
 
   // Initialize map
   useEffect(() => {
-    if (!accessToken || !center || !zoom || !style) {
+    if (!accessToken || !center || typeof zoom !== "number" || !style) {
+      return;
+    }
+
+    if (!mapContainerRef.current) {
       return;
     }
 
     mapboxgl.accessToken = accessToken;
 
     mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current as HTMLElement,
+      container: mapContainerRef.current,
       center,
       zoom,
+      pitch,
+      bearing,
       style,
     });
 
@@ -110,21 +120,33 @@ export default function Map(props: MapProps) {
       if (!mapRef.current || !isUserInteractionRef.current) return;
       const newCenter = mapRef.current.getCenter();
       const newZoom = mapRef.current.getZoom();
+      const newPitch = mapRef.current.getPitch();
+      const newBearing = mapRef.current.getBearing();
       updateStateRef.current({
         center: [newCenter.lng, newCenter.lat],
         zoom: newZoom,
+        pitch: newPitch,
+        bearing: newBearing,
       });
       isUserInteractionRef.current = false;
     };
 
     mapRef.current.on("moveend", handleMoveEnd);
     mapRef.current.on("zoomend", handleMoveEnd);
+    mapRef.current.on("pitchend", handleMoveEnd);
+    mapRef.current.on("rotateend", handleMoveEnd);
 
     // Track user interactions
     mapRef.current.on("movestart", () => {
       isUserInteractionRef.current = true;
     });
     mapRef.current.on("zoomstart", () => {
+      isUserInteractionRef.current = true;
+    });
+    mapRef.current.on("pitchstart", () => {
+      isUserInteractionRef.current = true;
+    });
+    mapRef.current.on("rotatestart", () => {
       isUserInteractionRef.current = true;
     });
 
@@ -151,29 +173,35 @@ export default function Map(props: MapProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only initialize once
 
-  // Update center and zoom with smooth transitions
+  // Update center, zoom, pitch, and bearing with smooth transitions
   useEffect(() => {
     if (!mapRef.current) return;
 
     // Check if we need to update
     const currentCenter = mapRef.current.getCenter();
     const currentZoom = mapRef.current.getZoom();
+    const currentPitch = mapRef.current.getPitch();
+    const currentBearing = mapRef.current.getBearing();
     const centerChanged =
       Math.abs(currentCenter.lng - center[0]) > 0.0001 ||
       Math.abs(currentCenter.lat - center[1]) > 0.0001;
     const zoomChanged = Math.abs(currentZoom - zoom) > 0.01;
+    const pitchChanged = Math.abs(currentPitch - pitch) > 0.01;
+    const bearingChanged = Math.abs(currentBearing - bearing) > 0.01;
 
-    if (centerChanged || zoomChanged) {
+    if (centerChanged || zoomChanged || pitchChanged || bearingChanged) {
       // Only transition if the change is significant (not from user interaction)
       if (!isUserInteractionRef.current) {
         mapRef.current.easeTo({
           center,
           zoom,
+          pitch,
+          bearing,
           duration: 500,
         });
       }
     }
-  }, [center, zoom]);
+  }, [center, zoom, pitch, bearing]);
 
   // Update map padding when timeline expands/collapses
   useEffect(() => {

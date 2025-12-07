@@ -16,17 +16,23 @@ import { getMinMaxYears } from "../utils/data";
 type AppState = {
   zoom: number;
   center: [number, number];
+  pitch: number;
+  bearing: number;
   year: number;
   minYear: number;
   maxYear: number;
+  timelineExpanded: boolean;
 };
 
 type PartialAppState = {
   zoom?: number;
   center?: [number, number];
+  pitch?: number;
+  bearing?: number;
   year?: number;
   minYear?: number;
   maxYear?: number;
+  timelineExpanded?: boolean;
 };
 
 type UpdateOptions = {
@@ -36,9 +42,12 @@ type UpdateOptions = {
 type AppStateContextType = {
   zoom: number;
   center: [number, number];
+  pitch: number;
+  bearing: number;
   year: number;
   minYear: number;
   maxYear: number;
+  timelineExpanded: boolean;
   updateState: (updates: PartialAppState, options?: UpdateOptions) => void;
   updateTimelineRange: (
     minYear: number,
@@ -55,6 +64,9 @@ const URL_DEBOUNCE_MS = 300;
 
 const DEFAULT_ZOOM = 3;
 const DEFAULT_CENTER: [number, number] = [-68.137343, 45.137451];
+const DEFAULT_PITCH = 0;
+const DEFAULT_BEARING = 0;
+const DEFAULT_TIMELINE_EXPANDED = true;
 
 function getDefaultState(): AppState {
   const { min: dataMinYear, max: dataMaxYear } =
@@ -66,9 +78,12 @@ function getDefaultState(): AppState {
   return {
     zoom: DEFAULT_ZOOM,
     center: DEFAULT_CENTER,
+    pitch: DEFAULT_PITCH,
+    bearing: DEFAULT_BEARING,
     year: defaultYear,
     minYear: dataMinYear,
     maxYear: dataMaxYear,
+    timelineExpanded: DEFAULT_TIMELINE_EXPANDED,
   };
 }
 
@@ -105,19 +120,50 @@ function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
     return maxYearParam ? parseFloat(maxYearParam) : undefined;
   })();
 
-  return { zoom, center, year, minYear, maxYear };
+  const pitch = (() => {
+    const pitchParam = searchParams.get("pitch");
+    return pitchParam ? parseFloat(pitchParam) : undefined;
+  })();
+
+  const bearing = (() => {
+    const bearingParam = searchParams.get("bearing");
+    return bearingParam ? parseFloat(bearingParam) : undefined;
+  })();
+
+  const timelineExpanded = (() => {
+    const timelineExpandedParam = searchParams.get("timelineExpanded");
+    if (timelineExpandedParam === null) return undefined;
+    return timelineExpandedParam === "true";
+  })();
+
+  return {
+    zoom,
+    center,
+    pitch,
+    bearing,
+    year,
+    minYear,
+    maxYear,
+    timelineExpanded,
+  };
 }
 
-const APP_STATE_KEYS: Array<keyof AppState> = ["zoom", "center", "year", "minYear", "maxYear"];
+const APP_STATE_KEYS: Array<keyof AppState> = [
+  "zoom",
+  "center",
+  "pitch",
+  "bearing",
+  "year",
+  "minYear",
+  "maxYear",
+  "timelineExpanded",
+];
 
 function isCompleteAppState(state: PartialAppState): state is AppState {
   return APP_STATE_KEYS.every((key) => state[key] !== undefined);
 }
 
-function mergeAppState(
-  partial: PartialAppState,
-  complete: AppState
-): AppState {
+function mergeAppState(partial: PartialAppState, complete: AppState): AppState {
   const result = {} as AppState;
   for (const key of APP_STATE_KEYS) {
     const value = partial[key];
@@ -130,7 +176,10 @@ function mergeAppState(
   return result;
 }
 
-function writeStateToURL(state: PartialAppState, currentParams: URLSearchParams): string {
+function writeStateToURL(
+  state: PartialAppState,
+  currentParams: URLSearchParams
+): string {
   const params = new URLSearchParams(currentParams.toString());
 
   APP_STATE_KEYS.forEach((key) => {
@@ -139,6 +188,8 @@ function writeStateToURL(state: PartialAppState, currentParams: URLSearchParams)
       if (key === "center") {
         const center = value as [number, number];
         params.set(key, `${center[0]},${center[1]}`);
+      } else if (key === "timelineExpanded") {
+        params.set(key, (value as boolean).toString());
       } else {
         params.set(key, (value as number).toString());
       }

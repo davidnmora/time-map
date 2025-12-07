@@ -16,9 +16,18 @@ import "./globals.css";
 import { Suspense, useState, useEffect } from "react";
 
 function MapContent() {
-  const { zoom, center, year, minYear, maxYear } = useAppState();
+  const {
+    zoom,
+    center,
+    pitch,
+    bearing,
+    year,
+    minYear,
+    maxYear,
+    timelineExpanded,
+    updateState,
+  } = useAppState();
   const [windowHeight, setWindowHeight] = useState(800);
-  const [timelineExpanded, setTimelineExpanded] = useState(true);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -55,6 +64,8 @@ function MapContent() {
           <Map
             center={center}
             zoom={zoom}
+            pitch={pitch}
+            bearing={bearing}
             style={mapStyle}
             accessToken={accessToken}
             geographicRegions={geographicRegions}
@@ -70,7 +81,9 @@ function MapContent() {
             regions={timelineRegions}
             widthEncodingKey="area"
             expanded={timelineExpanded}
-            onToggle={() => setTimelineExpanded((prev) => !prev)}
+            onToggle={() =>
+              updateState({ timelineExpanded: !timelineExpanded })
+            }
           />
         )}
       </div>
