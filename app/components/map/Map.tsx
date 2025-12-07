@@ -43,7 +43,7 @@ type MapProps = {
 };
 
 export default function Map(props: MapProps) {
-  const { updateState, year, minYear, maxYear } = useAppState();
+  const { updateState, currentYear, minYear, maxYear } = useAppState();
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const sourcesRef = useRef<Set<string>>(new Set());
@@ -88,9 +88,9 @@ export default function Map(props: MapProps) {
 
   const isRegionVisible = useCallback(
     (region: GeographicRegion): boolean => {
-      return isTimeRangeActive(region.timeRange, year);
+      return isTimeRangeActive(region.timeRange, currentYear);
     },
-    [year]
+    [currentYear]
   );
 
   // Initialize map

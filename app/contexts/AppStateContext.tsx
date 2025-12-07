@@ -19,7 +19,7 @@ type AppState = {
   center: [number, number];
   pitch: number;
   bearing: number;
-  year: number;
+  currentYear: number;
   minYear: number;
   maxYear: number;
   timelineExpanded: boolean;
@@ -30,7 +30,7 @@ type PartialAppState = {
   center?: [number, number];
   pitch?: number;
   bearing?: number;
-  year?: number;
+  currentYear?: number;
   minYear?: number;
   maxYear?: number;
   timelineExpanded?: boolean;
@@ -45,7 +45,7 @@ type AppStateContextType = {
   center: [number, number];
   pitch: number;
   bearing: number;
-  year: number;
+  currentYear: number;
   minYear: number;
   maxYear: number;
   timelineExpanded: boolean;
@@ -81,7 +81,7 @@ function getDefaultState(): AppState {
     center: DEFAULT_CENTER,
     pitch: DEFAULT_PITCH,
     bearing: DEFAULT_BEARING,
-    year: defaultYear,
+    currentYear: defaultYear,
     minYear: dataMinYear,
     maxYear: dataMaxYear,
     timelineExpanded: DEFAULT_TIMELINE_EXPANDED,
@@ -106,9 +106,9 @@ function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
     }
   })();
 
-  const year = (() => {
-    const yearParam = searchParams.get("year");
-    return yearParam ? parseFloat(yearParam) : undefined;
+  const currentYear = (() => {
+    const currentYearParam = searchParams.get("currentYear");
+    return currentYearParam ? parseFloat(currentYearParam) : undefined;
   })();
 
   const minYear = (() => {
@@ -142,7 +142,7 @@ function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
     center,
     pitch,
     bearing,
-    year,
+    currentYear,
     minYear,
     maxYear,
     timelineExpanded,
@@ -154,7 +154,7 @@ const APP_STATE_KEYS: Array<keyof AppState> = [
   "center",
   "pitch",
   "bearing",
-  "year",
+  "currentYear",
   "minYear",
   "maxYear",
   "timelineExpanded",
@@ -218,7 +218,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     const urlState = readStateFromURL(searchParams);
     const defaults = getDefaultState();
     const currentURL = searchParams.toString();
-    
+
     if (hasInitializedRef.current) {
       if (previousURLRef.current !== currentURL) {
         previousURLRef.current = currentURL;
@@ -280,8 +280,14 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     (updates: PartialAppState, options?: UpdateOptions) => {
       const stateUpdates = { ...updates };
 
-      if (options?.autoCalculateYear && stateUpdates.minYear !== undefined && stateUpdates.maxYear !== undefined) {
-        stateUpdates.year = stateUpdates.maxYear - (stateUpdates.maxYear - stateUpdates.minYear) / 2;
+      if (
+        options?.autoCalculateYear &&
+        stateUpdates.minYear !== undefined &&
+        stateUpdates.maxYear !== undefined
+      ) {
+        stateUpdates.currentYear =
+          stateUpdates.maxYear -
+          (stateUpdates.maxYear - stateUpdates.minYear) / 2;
       }
 
       setState((prevState) => ({ ...prevState, ...stateUpdates }));
@@ -294,7 +300,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     (minYear: number, maxYear: number, options?: UpdateOptions) => {
       const updates: PartialAppState = { minYear, maxYear };
       if (options?.autoCalculateYear !== false) {
-        updates.year = maxYear - (maxYear - minYear) / 2;
+        updates.currentYear = maxYear - (maxYear - minYear) / 2;
       }
       updateState(updates);
     },

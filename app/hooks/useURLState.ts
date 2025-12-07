@@ -11,7 +11,7 @@ import { useCallback, useMemo } from "react";
 type URLState = {
   zoom?: number;
   center?: [number, number];
-  year?: number;
+  currentYear?: number;
   minYear?: number;
   maxYear?: number;
 };
@@ -19,7 +19,7 @@ type URLState = {
 type PartialURLState = {
   zoom?: number;
   center?: [number, number];
-  year?: number;
+  currentYear?: number;
   minYear?: number;
   maxYear?: number;
 };
@@ -51,9 +51,9 @@ export function useURLState(): URLState & {
     }
   }, [searchParams]);
 
-  const year = useMemo(() => {
-    const yearParam = searchParams.get("year");
-    return yearParam ? parseInt(yearParam, 10) : undefined;
+  const currentYear = useMemo(() => {
+    const currentYearParam = searchParams.get("currentYear");
+    return currentYearParam ? parseInt(currentYearParam, 10) : undefined;
   }, [searchParams]);
 
   const minYear = useMemo(() => {
@@ -76,8 +76,8 @@ export function useURLState(): URLState & {
       if (updates.center !== undefined) {
         params.set("center", `${updates.center[0]},${updates.center[1]}`);
       }
-      if (updates.year !== undefined) {
-        params.set("year", updates.year.toString());
+      if (updates.currentYear !== undefined) {
+        params.set("currentYear", updates.currentYear.toString());
       }
       if (updates.minYear !== undefined) {
         params.set("minYear", updates.minYear.toString());
@@ -94,7 +94,7 @@ export function useURLState(): URLState & {
   return {
     zoom,
     center,
-    year,
+    currentYear,
     minYear,
     maxYear,
     setURLState,

@@ -21,7 +21,7 @@ function MapContent() {
     center,
     pitch,
     bearing,
-    year,
+    currentYear,
     minYear,
     maxYear,
     timelineExpanded,
@@ -77,7 +77,7 @@ function MapContent() {
         {isFinite(minYear) && isFinite(maxYear) && (
           <Timeline
             height={windowHeight}
-            currentYear={year}
+            currentYear={currentYear}
             regions={timelineRegions}
             widthEncodingKey="area"
             expanded={timelineExpanded}
