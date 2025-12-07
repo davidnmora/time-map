@@ -183,6 +183,9 @@ export const Timeline = ({
           currentYear={currentYear}
           expanded={expanded}
           onToggle={onToggle}
+          height={height}
+          minYear={minYear}
+          maxYear={maxYear}
         />
         <div className="flex">
           <div style={{ width: TIMELINE_AXIS_WIDTH }} />
