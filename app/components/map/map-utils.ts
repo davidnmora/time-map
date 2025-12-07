@@ -19,6 +19,32 @@ const NOT_HOVERED_INACTIVE_OPACITY = 0;
 
 export const TOOLTIP_WIDTH = 200;
 
+const LAYER_ID_SEPARATOR = "---";
+const FILL_LAYER_SUFFIX = "fill";
+const LINE_LAYER_SUFFIX = "line";
+
+export function createRegionId(baseId: string, index: number): string {
+  return `${baseId}${LAYER_ID_SEPARATOR}${index}`;
+}
+
+export function createFillLayerId(regionId: string): string {
+  return `${regionId}${LAYER_ID_SEPARATOR}${FILL_LAYER_SUFFIX}`;
+}
+
+export function createLineLayerId(regionId: string): string {
+  return `${regionId}${LAYER_ID_SEPARATOR}${LINE_LAYER_SUFFIX}`;
+}
+
+export function doesRegionIdMatch(
+  regionId: string,
+  baseRegionId: string
+): boolean {
+  return (
+    regionId === baseRegionId ||
+    regionId.startsWith(`${baseRegionId}${LAYER_ID_SEPARATOR}`)
+  );
+}
+
 export type TooltipData = {
   hierarchy: string[];
   title: string;
@@ -63,7 +89,7 @@ export function convertAllToMapRegions(
   const regions = getAFlagListOfAllRegions(group);
   return regions.flatMap((region) =>
     region.geographicRegions.map((geoRegion, index) => ({
-      id: `${region.metadata.id}-${index}`,
+      id: createRegionId(region.metadata.id, index),
       data: geoRegion,
       fillColor: region.metadata.color,
       fillOpacity: DEFAULT_FILL_OPACITY,
@@ -85,8 +111,8 @@ export function initializeGeographicRegions(
 
   geographicRegions.forEach((region) => {
     const sourceId = region.id;
-    const fillLayerId = `${sourceId}-fill`;
-    const lineLayerId = `${sourceId}-line`;
+    const fillLayerId = createFillLayerId(sourceId);
+    const lineLayerId = createLineLayerId(sourceId);
 
     if (map.getSource(sourceId)) {
       return;
@@ -223,10 +249,8 @@ export function updateHoverStateFromContext(
 
   const matchingRegionIds = contextHoveredRegionId
     ? geographicRegions
-        .filter(
-          (region) =>
-            region.id === contextHoveredRegionId ||
-            region.id.startsWith(`${contextHoveredRegionId}-`)
+        .filter((region) =>
+          doesRegionIdMatch(region.id, contextHoveredRegionId)
         )
         .map((region) => region.id)
     : [];
@@ -310,7 +334,7 @@ export function setupHoverHandlers(
   };
 
   regions.forEach((region) => {
-    const fillLayerId = `${region.id}-fill`;
+    const fillLayerId = createFillLayerId(region.id);
 
     if (!map.getLayer(fillLayerId)) return;
 
