@@ -8,6 +8,7 @@ import {
   updateRegionVisibility,
   updateHoverStateFromContext,
   setupHoverHandlers,
+  TOOLTIP_WIDTH,
   type TooltipData,
   type HoverHandlers,
 } from "./map-utils";
@@ -115,6 +116,7 @@ export default function Map(props: MapProps) {
       closeButton: false,
       closeOnClick: false,
       offset: [0, -20],
+      maxWidth: `${TOOLTIP_WIDTH}px`,
     });
 
     // Set up position update listeners

@@ -12,6 +12,8 @@ const DEFAULT_LINE_WIDTH = 1;
 const DEFAULT_LINE_COLOR = "#000";
 const DEFAULT_FILL_COLOR = "#0080ff";
 
+export const TOOLTIP_WIDTH = 200;
+
 export type TooltipData = {
   hierarchy: string[];
   title: string;

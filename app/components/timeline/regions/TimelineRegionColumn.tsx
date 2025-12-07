@@ -2,8 +2,9 @@
 
 import * as d3 from "d3";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useHoveredElement } from "../../../contexts/HoveredElementContext";
-import { renderTooltip } from "../../map/map-utils";
+import { renderTooltip, TOOLTIP_WIDTH } from "../../map/map-utils";
 import type { TimeBoundGeographicRegion, TimeRange } from "../../../data/types";
 import { isTimeRangeActive } from "@/app/data/data-utils";
 
@@ -148,24 +149,28 @@ export const TimelineRegionColumn = ({
           );
         })}
       </div>
-      {tooltipData && (
-        <div
-          style={{
-            position: "fixed",
-            left: tooltipData.x + 10,
-            top: tooltipData.y - 10,
-            pointerEvents: "none",
-            zIndex: 10000,
-            backgroundColor: "white",
-            padding: "8px",
-            borderRadius: "4px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            fontSize: "12px",
-            maxWidth: "300px",
-          }}
-          dangerouslySetInnerHTML={{ __html: tooltipData.html }}
-        />
-      )}
+      {tooltipData &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            style={{
+              position: "fixed",
+              left: tooltipData.x,
+              top: tooltipData.y - 10,
+              transform: "translateX(calc(-100% - 10px))",
+              pointerEvents: "none",
+              zIndex: 10000,
+              backgroundColor: "white",
+              padding: "8px",
+              borderRadius: "4px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              fontSize: "12px",
+              width: `${TOOLTIP_WIDTH}px`,
+            }}
+            dangerouslySetInnerHTML={{ __html: tooltipData.html }}
+          />,
+          document.body
+        )}
     </>
   );
 };
