@@ -37,7 +37,10 @@ export const TimelineAxis = ({
     CENTURY_FONT_SIZE
   );
   const ticks = generateTicksForDensityLevel(densityLevel, minYear, maxYear);
-  const fiftyYearMarks = generateFiftyYearMarks(minYear, maxYear);
+  const fiftyYearMarks =
+    densityLevel !== "centuries"
+      ? generateFiftyYearMarks(minYear, maxYear)
+      : [];
 
   return (
     <div
