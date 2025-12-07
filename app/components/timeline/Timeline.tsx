@@ -13,6 +13,7 @@ import {
   computeRegionColumns,
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
+  DROP_SHADOW,
 } from "./timeline-utils";
 import {
   TIMELINE_AXIS_WIDTH,
@@ -184,7 +185,7 @@ export const Timeline = ({
     >
       <div
         ref={containerRef}
-        className={`relative h-full ${BACKDROP_COLOR} ${BACKDROP_BLUR}`}
+        className={`relative h-full ${BACKDROP_COLOR} ${BACKDROP_BLUR} ${DROP_SHADOW}`}
         style={{ height: height, cursor: "grab" }}
       >
         <TimelineToggleButton

@@ -9,6 +9,7 @@ export const DEFAULT_STRIP_WIDTH = 3;
 
 export const BACKDROP_BLUR = `backdrop-blur-xs`;
 export const BACKDROP_COLOR = "bg-white/70";
+export const DROP_SHADOW = "shadow-[-2px_2px_4px_rgba(0,0,0,0.1)]";
 
 export function createGetWidthEncodingValue(
   domain: number[],
