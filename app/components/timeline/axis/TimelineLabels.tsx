@@ -17,7 +17,7 @@ export const TimelineLabels = ({ decadeTicks, yScale }: TimelineLabelsProps) => 
         return (
           <div
             key={`label-${year}`}
-            className="absolute translate-y-[-50%]"
+            className="absolute translate-y-[-50%] font-mono"
             style={{
               left: TIMELINE_WIDTH - TICK_OFFSET,
               top: y,
