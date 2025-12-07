@@ -72,10 +72,17 @@ export default function Map(props: MapProps) {
   >(new globalThis.Map());
   const { hoveredRegionId: contextHoveredRegionId, setHoveredRegionId } =
     useHoveredElement();
+  const timelineExpandedRef = useRef(timelineExpanded);
+  const timelineWidthRef = useRef(timelineWidth);
 
   useEffect(() => {
     updateStateRef.current = updateState;
   }, [updateState]);
+
+  useEffect(() => {
+    timelineExpandedRef.current = timelineExpanded;
+    timelineWidthRef.current = timelineWidth;
+  }, [timelineExpanded, timelineWidth]);
 
   // Initialize map
   useEffect(() => {
@@ -120,6 +127,20 @@ export default function Map(props: MapProps) {
     mapRef.current.on("zoomstart", () => {
       isUserInteractionRef.current = true;
     });
+
+    const applyInitialPadding = () => {
+      if (!mapRef.current) return;
+      const padding =
+        timelineExpandedRef.current && timelineWidthRef.current > 0
+          ? { right: timelineWidthRef.current }
+          : { right: 0 };
+      mapRef.current.easeTo({
+        padding,
+        duration: TRANSITION_DURATION_MS,
+      });
+    };
+
+    mapRef.current.once("load", applyInitialPadding);
 
     return () => {
       popupRef.current?.remove();
