@@ -10,12 +10,19 @@ import {
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
 } from "./timeline-utils";
+import {
+  TIMELINE_WIDTH,
+  TRANSITION_DURATION_MS,
+} from "./axis/timeline-axis-utils";
 
 type TimelineProps = {
   height: number;
   currentYear: number;
   regions: TimeBoundGeographicRegion[];
   widthEncodingKey?: keyof TimeBoundGeographicRegion;
+  expanded: boolean;
+  onToggle: () => void;
+  onWidthChange: (width: number) => void;
 };
 
 export const Timeline = ({
@@ -23,6 +30,9 @@ export const Timeline = ({
   currentYear,
   regions,
   widthEncodingKey,
+  expanded,
+  onToggle,
+  onWidthChange,
 }: TimelineProps) => {
   const { minYear, maxYear, updateTimelineRange } = useAppState();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -152,29 +162,53 @@ export const Timeline = ({
     0
   );
 
+  const timelineTotalWidth = TIMELINE_WIDTH + totalWidth;
+
+  useEffect(() => {
+    onWidthChange(timelineTotalWidth);
+  }, [timelineTotalWidth, onWidthChange]);
+
   return (
     <div
-      ref={containerRef}
-      className="relative overflow-hidden"
-      style={{ height: height, cursor: "grab" }}
+      className={`absolute top-0 right-0 h-full z-10 transition-transform`}
+      style={{
+        transform: expanded ? "translateX(0)" : "translateX(100%)",
+        transitionDuration: `${TRANSITION_DURATION_MS}ms`,
+        width: `${timelineTotalWidth}px`,
+      }}
     >
-      <div className="flex">
-        <div style={{ width: 50 }} />
-        <TimelineRegions
+      <div
+        ref={containerRef}
+        className="relative h-full bg-white/50 backdrop-blur-[5px]"
+        style={{ height: height, cursor: "grab" }}
+      >
+        <button
+          onClick={onToggle}
+          className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 w-8 h-12 bg-white/50 backdrop-blur-[5px] rounded-l-lg flex items-center justify-center hover:bg-white/70 transition-colors z-20"
+          aria-label={expanded ? "Collapse timeline" : "Expand timeline"}
+        >
+          <span className="text-gray-700 text-lg font-bold">
+            {expanded ? "→" : "←"}
+          </span>
+        </button>
+        <div className="flex">
+          <div style={{ width: TIMELINE_WIDTH }} />
+          <TimelineRegions
+            height={height}
+            minYear={minYear}
+            maxYear={maxYear}
+            regions={regions}
+            widthEncodingKey={widthEncodingKey}
+          />
+        </div>
+        <TimelineAxis
           height={height}
           minYear={minYear}
           maxYear={maxYear}
-          regions={regions}
-          widthEncodingKey={widthEncodingKey}
+          currentYear={currentYear}
+          totalWidth={totalWidth}
         />
       </div>
-      <TimelineAxis
-        height={height}
-        minYear={minYear}
-        maxYear={maxYear}
-        currentYear={currentYear}
-        totalWidth={totalWidth}
-      />
     </div>
   );
 };

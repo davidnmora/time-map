@@ -12,11 +12,13 @@ import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 
 function MapContent() {
   const { zoom, center, year, minYear, maxYear } = useAppState();
   const [windowHeight, setWindowHeight] = useState(800);
+  const [timelineExpanded, setTimelineExpanded] = useState(true);
+  const [timelineWidth, setTimelineWidth] = useState(0);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -25,6 +27,10 @@ function MapContent() {
     updateHeight();
     window.addEventListener("resize", updateHeight);
     return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
+  const handleTimelineWidthChange = useCallback((width: number) => {
+    setTimelineWidth(width);
   }, []);
 
   const timelineRegions = getAFlagListOfAllRegions(completeDataset);
@@ -47,8 +53,8 @@ function MapContent() {
 
   return (
     <HoveredElementProvider>
-      <div className="h-screen w-screen flex">
-        <div className="flex-1 relative">
+      <div className="h-screen w-screen relative">
+        <div className="absolute inset-0">
           <Map
             center={center}
             zoom={zoom}
@@ -56,17 +62,20 @@ function MapContent() {
             accessToken={accessToken}
             geographicRegions={geographicRegions}
             renderTooltip={renderTooltip}
+            timelineExpanded={timelineExpanded}
+            timelineWidth={timelineWidth}
           />
         </div>
         {isFinite(minYear) && isFinite(maxYear) && (
-          <div className="bg-white overflow-hidden">
-            <Timeline
-              height={windowHeight}
-              currentYear={year}
-              regions={timelineRegions}
-              widthEncodingKey="area"
-            />
-          </div>
+          <Timeline
+            height={windowHeight}
+            currentYear={year}
+            regions={timelineRegions}
+            widthEncodingKey="area"
+            expanded={timelineExpanded}
+            onToggle={() => setTimelineExpanded((prev) => !prev)}
+            onWidthChange={handleTimelineWidthChange}
+          />
         )}
       </div>
     </HoveredElementProvider>

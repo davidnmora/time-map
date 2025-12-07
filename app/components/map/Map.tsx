@@ -15,6 +15,7 @@ import type { Metadata, TimeRange } from "../../data/types";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { useAppState } from "../../contexts/AppStateContext";
 import { isTimeRangeActive } from "../../utils/data";
+import { TRANSITION_DURATION_MS } from "../timeline/axis/timeline-axis-utils";
 
 export type GeographicRegion = {
   id: string;
@@ -35,6 +36,8 @@ type MapProps = {
   accessToken: string;
   geographicRegions?: GeographicRegion[];
   renderTooltip?: (data: TooltipData) => string;
+  timelineExpanded?: boolean;
+  timelineWidth?: number;
 };
 
 export default function Map(props: MapProps) {
@@ -49,6 +52,8 @@ export default function Map(props: MapProps) {
     accessToken,
     geographicRegions = [],
     renderTooltip,
+    timelineExpanded = false,
+    timelineWidth = 0,
   } = props;
   const { updateState, year, minYear, maxYear } = useAppState();
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -148,6 +153,21 @@ export default function Map(props: MapProps) {
       }
     }
   }, [center, zoom]);
+
+  // Update map padding when timeline expands/collapses
+  useEffect(() => {
+    if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;
+
+    const padding =
+      timelineExpanded && timelineWidth > 0
+        ? { right: timelineWidth }
+        : { right: 0 };
+
+    mapRef.current.easeTo({
+      padding,
+      duration: TRANSITION_DURATION_MS,
+    });
+  }, [timelineExpanded, timelineWidth]);
 
   const initializedRef = useRef(false);
 
