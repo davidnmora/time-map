@@ -7,6 +7,8 @@ import { TimelineToggleButton } from "./TimelineToggleButton";
 import { useAppState } from "../../contexts/AppStateContext";
 import type { TimeBoundGeographicRegion } from "../../data/types";
 import {
+  BACKDROP_BLUR,
+  BACKDROP_COLOR,
   computeRegionColumns,
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
@@ -176,7 +178,7 @@ export const Timeline = ({
     >
       <div
         ref={containerRef}
-        className="relative h-full bg-white/50 backdrop-blur-[5px]"
+        className={`relative h-full ${BACKDROP_COLOR} ${BACKDROP_BLUR}`}
         style={{ height: height, cursor: "grab" }}
       >
         <TimelineToggleButton

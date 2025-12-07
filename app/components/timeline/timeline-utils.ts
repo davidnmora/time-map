@@ -7,6 +7,10 @@ export const MIN_STRIP_WIDTH = 2;
 export const MAX_STRIP_WIDTH = 30;
 export const DEFAULT_STRIP_WIDTH = 3;
 
+const BLUR_RADIUS = 5;
+export const BACKDROP_BLUR = `backdrop-blur-[${BLUR_RADIUS}px]`;
+export const BACKDROP_COLOR = "bg-white/50";
+
 export function createGetWidthEncodingValue(
   domain: number[],
   domainKey: keyof TimeBoundGeographicRegion
