@@ -18,105 +18,33 @@ export type DensityLevel =
   | "centuries-decades"
   | "centuries-years";
 
-export const generateCenturyTicks = (
-  minYear: number,
-  maxYear: number
-): number[] => {
-  const startCentury = Math.floor(minYear / 100) * 100;
-  const endCentury = Math.ceil(maxYear / 100) * 100;
-  const ticks: number[] = [];
+export const generateTicksAtResolution =
+  (resolution: number, excludeCenturies: boolean = true) =>
+  (minYear: number, maxYear: number): number[] => {
+    const startMark = Math.floor(minYear / resolution) * resolution;
+    const endMark = Math.ceil(maxYear / resolution) * resolution;
+    const ticks: number[] = [];
 
-  for (let year = startCentury; year <= endCentury; year += 100) {
-    ticks.push(year);
-  }
-
-  return ticks;
-};
-
-export const generateTwentyFiveYearMarks = (
-  minYear: number,
-  maxYear: number
-): number[] => {
-  const startMark = Math.floor(minYear / 25) * 25;
-  const endMark = Math.ceil(maxYear / 25) * 25;
-  const marks: number[] = [];
-
-  for (let year = startMark; year <= endMark; year += 25) {
-    if (year % 100 !== 0) {
-      marks.push(year);
+    for (let year = startMark; year <= endMark; year += resolution) {
+      if (!excludeCenturies || year % 100 !== 0) {
+        ticks.push(year);
+      }
     }
-  }
 
-  return marks;
-};
+    return ticks;
+  };
 
-export const generateHalfDecadeMarks = (
-  minYear: number,
-  maxYear: number
-): number[] => {
-  const startMark = Math.floor(minYear / 5) * 5;
-  const endMark = Math.ceil(maxYear / 5) * 5;
-  const marks: number[] = [];
+export const generateCenturyTicks = generateTicksAtResolution(100, false);
 
-  for (let year = startMark; year <= endMark; year += 5) {
-    if (year % 100 !== 0) {
-      marks.push(year);
-    }
-  }
+export const generateTwentyFiveYearMarks = generateTicksAtResolution(25);
 
-  return marks;
-};
+export const generateHalfDecadeMarks = generateTicksAtResolution(5);
 
-export const generateDecadeTicks = (
-  minYear: number,
-  maxYear: number
-): number[] => {
-  const startDecade = Math.floor(minYear / 10) * 10;
-  const endDecade = Math.ceil(maxYear / 10) * 10;
-  const ticks: number[] = [];
+export const generateDecadeTicks = generateTicksAtResolution(10);
 
-  for (let year = startDecade; year <= endDecade; year += 10) {
-    if (year % 100 !== 0) {
-      ticks.push(year);
-    }
-  }
+export const generateIndividualYearTicks = generateTicksAtResolution(1);
 
-  return ticks;
-};
-
-export const generateIndividualYearTicks = (
-  minYear: number,
-  maxYear: number
-): number[] => {
-  const startYear = Math.floor(minYear);
-  const endYear = Math.ceil(maxYear);
-  const ticks: number[] = [];
-
-  for (let year = startYear; year <= endYear; year += 1) {
-    if (year % 100 !== 0) {
-      ticks.push(year);
-    }
-  }
-
-  return ticks;
-};
-
-export const generateHalfCenturyMarks = (
-  minYear: number,
-  maxYear: number
-): number[] => {
-  const startMark = Math.floor(minYear / 50) * 50;
-  const endMark = Math.ceil(maxYear / 50) * 50;
-  const marks: number[] = [];
-
-  for (let year = startMark; year <= endMark; year += 50) {
-    if (year % 100 !== 0) {
-      marks.push(year);
-    }
-  }
-
-  return marks;
-};
+export const generateHalfCenturyMarks = generateTicksAtResolution(50);
 
 export const isCentury = (year: number): boolean => {
   return year % 100 === 0;
