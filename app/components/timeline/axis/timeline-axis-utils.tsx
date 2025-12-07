@@ -14,6 +14,7 @@ export const calculateLabelTopOffset = (fontSize: number): number => {
 
 export type DensityLevel =
   | "centuries"
+  | "centuries-and-half-centuries"
   | "centuries-25"
   | "centuries-decades"
   | "centuries-years";
@@ -84,20 +85,29 @@ export const generateIndividualYearTicks = (
   return ticks;
 };
 
-export const generateFiftyYearMarks = (minYear: number, maxYear: number): number[] => {
+export const generateHalfCenturyMarks = (
+  minYear: number,
+  maxYear: number
+): number[] => {
   const startMark = Math.floor(minYear / 50) * 50;
   const endMark = Math.ceil(maxYear / 50) * 50;
   const marks: number[] = [];
-  
+
   for (let year = startMark; year <= endMark; year += 50) {
-    marks.push(year);
+    if (year % 100 !== 0) {
+      marks.push(year);
+    }
   }
-  
+
   return marks;
 };
 
 export const isCentury = (year: number): boolean => {
   return year % 100 === 0;
+};
+
+export const isHalfCentury = (year: number): boolean => {
+  return year % 50 === 0 && year % 100 !== 0;
 };
 
 export const isTwentyFiveYearMark = (year: number): boolean => {
@@ -127,6 +137,9 @@ export const determineDensityLevel = (
   const centuryTicks = generateCenturyTicks(minYear, maxYear);
   const centuriesCount = centuryTicks.length;
 
+  const halfCenturyMarks = generateHalfCenturyMarks(minYear, maxYear);
+  const centuriesHalfCenturiesCount = centuriesCount + halfCenturyMarks.length;
+
   const twentyFiveYearMarks = generateTwentyFiveYearMarks(minYear, maxYear);
   const centuries25Count = centuriesCount + twentyFiveYearMarks.length;
 
@@ -137,6 +150,10 @@ export const determineDensityLevel = (
   const centuriesYearsCount = centuriesCount + individualYearTicks.length;
 
   const centuriesSpacing = calculateMinTickSpacing(centuriesCount, height);
+  const centuriesHalfCenturiesSpacing = calculateMinTickSpacing(
+    centuriesHalfCenturiesCount,
+    height
+  );
   const centuries25Spacing = calculateMinTickSpacing(centuries25Count, height);
   const centuriesDecadesSpacing = calculateMinTickSpacing(
     centuriesDecadesCount,
@@ -159,6 +176,10 @@ export const determineDensityLevel = (
     return "centuries-25";
   }
 
+  if (centuriesHalfCenturiesSpacing >= minimumSpacing) {
+    return "centuries-and-half-centuries";
+  }
+
   return "centuries";
 };
 
@@ -172,6 +193,11 @@ export const generateTicksForDensityLevel = (
   switch (densityLevel) {
     case "centuries":
       return centuryTicks;
+    case "centuries-and-half-centuries":
+      return [
+        ...centuryTicks,
+        ...generateHalfCenturyMarks(minYear, maxYear),
+      ].sort((a, b) => a - b);
     case "centuries-25":
       return [
         ...centuryTicks,

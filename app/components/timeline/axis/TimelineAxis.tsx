@@ -4,7 +4,6 @@ import * as d3 from "d3";
 import { CurrentYearIndicator } from "./CurrentYearIndicator";
 import {
   TIMELINE_WIDTH,
-  generateFiftyYearMarks,
   determineDensityLevel,
   generateTicksForDensityLevel,
   CENTURY_FONT_SIZE,
@@ -37,10 +36,6 @@ export const TimelineAxis = ({
     CENTURY_FONT_SIZE
   );
   const ticks = generateTicksForDensityLevel(densityLevel, minYear, maxYear);
-  const fiftyYearMarks =
-    densityLevel !== "centuries"
-      ? generateFiftyYearMarks(minYear, maxYear)
-      : [];
 
   return (
     <div
@@ -57,7 +52,7 @@ export const TimelineAxis = ({
         </div>
       </div>
       <TimelineGuidelines
-        fiftyYearMarks={fiftyYearMarks}
+        ticks={ticks}
         yScale={yScale}
         totalWidth={totalWidth}
       />

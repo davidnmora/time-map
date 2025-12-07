@@ -1,16 +1,27 @@
 import * as d3 from "d3";
-import { TIMELINE_WIDTH, isCentury } from "./timeline-axis-utils";
+import {
+  TIMELINE_WIDTH,
+  isCentury,
+  isHalfCentury,
+} from "./timeline-axis-utils";
 
 type TimelineGuidelinesProps = {
-  fiftyYearMarks: number[];
+  ticks: number[];
   yScale: d3.ScaleLinear<number, number>;
   totalWidth: number;
 };
 
-export const TimelineGuidelines = ({ fiftyYearMarks, yScale, totalWidth }: TimelineGuidelinesProps) => {
+export const TimelineGuidelines = ({
+  ticks,
+  yScale,
+  totalWidth,
+}: TimelineGuidelinesProps) => {
+  const guidelineYears = ticks.filter(
+    (year) => isCentury(year) || isHalfCentury(year)
+  );
   return (
     <>
-      {fiftyYearMarks.map((year) => {
+      {guidelineYears.map((year) => {
         const y = yScale(year);
         const isCenturyYear = isCentury(year);
         return (
