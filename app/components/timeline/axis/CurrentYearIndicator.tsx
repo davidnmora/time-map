@@ -1,6 +1,7 @@
 "use client";
 
 import * as d3 from "d3";
+import { CURRENT_YEAR_INDICATOR_Z_INDEX } from "../timeline-utils";
 
 type CurrentYearIndicatorProps = {
   height: number;
@@ -8,6 +9,9 @@ type CurrentYearIndicatorProps = {
   totalWidth: number;
   scaleYearToPageY: d3.ScaleLinear<number, number>;
 };
+
+const OVERLAP_WITH_TOGGLE_BUTTON = 12;
+const DROP_SHADOW = "shadow-[-2px_2px_5px_rgba(0,0,0,0.7)]";
 
 export const CurrentYearIndicator = ({
   height,
@@ -23,10 +27,11 @@ export const CurrentYearIndicator = ({
       style={{ width: totalWidth, height: height }}
     >
       <div
-        className="absolute bg-black h-1 translate-y-[-50%]"
+        className={`absolute bg-black h-1.5 translate-y-[-50%] ${DROP_SHADOW} ${CURRENT_YEAR_INDICATOR_Z_INDEX}`}
         style={{
           top: currentYearY,
-          width: totalWidth,
+          left: -OVERLAP_WITH_TOGGLE_BUTTON,
+          width: totalWidth + OVERLAP_WITH_TOGGLE_BUTTON,
         }}
       />
     </div>
