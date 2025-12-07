@@ -37,6 +37,14 @@ export const TimelineAxis = ({
   );
   const ticks = generateTicksForDensityLevel(densityLevel, minYear, maxYear);
 
+  const isInTheFuture = (year: number) => {
+    return year > new Date().getFullYear();
+  };
+
+  const getAxisElementColor = (year: number) => {
+    return isInTheFuture(year) ? "gray" : "black";
+  };
+
   return (
     <div
       className="absolute top-0 left-0 pointer-events-none"
@@ -47,14 +55,23 @@ export const TimelineAxis = ({
         style={{ width: TIMELINE_AXIS_WIDTH, height: height }}
       >
         <div className="relative w-full h-full">
-          <TimelineTicks ticks={ticks} yScale={yScale} />
-          <TimelineLabels ticks={ticks} yScale={yScale} />
+          <TimelineTicks
+            ticks={ticks}
+            yScale={yScale}
+            getAxisElementColor={getAxisElementColor}
+          />
+          <TimelineLabels
+            ticks={ticks}
+            yScale={yScale}
+            getAxisElementColor={getAxisElementColor}
+          />
         </div>
       </div>
       <TimelineGuidelines
         ticks={ticks}
         yScale={yScale}
         totalWidth={totalWidth}
+        getAxisElementColor={getAxisElementColor}
       />
       <div
         className="absolute pointer-events-none"

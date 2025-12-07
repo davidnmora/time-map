@@ -10,12 +10,14 @@ type TimelineGuidelinesProps = {
   ticks: number[];
   yScale: d3.ScaleLinear<number, number>;
   totalWidth: number;
+  getAxisElementColor: (year: number) => string;
 };
 
 export const TimelineGuidelines = ({
   ticks,
   yScale,
   totalWidth,
+  getAxisElementColor,
 }: TimelineGuidelinesProps) => {
   const guidelineYears = ticks.filter(
     (year) => isCentury(year) || isHalfCentury(year)
@@ -34,7 +36,7 @@ export const TimelineGuidelines = ({
               width: totalWidth,
               height: getTickThickness(year),
               transform: "translateY(-50%)",
-              backgroundColor: "black",
+              backgroundColor: getAxisElementColor(year),
             }}
           />
         );

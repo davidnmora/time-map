@@ -10,15 +10,19 @@ import {
 type TimelineLabelsProps = {
   ticks: number[];
   yScale: d3.ScaleLinear<number, number>;
+  getAxisElementColor: (year: number) => string;
 };
 
-export const TimelineLabels = ({ ticks, yScale }: TimelineLabelsProps) => {
+export const TimelineLabels = ({
+  ticks,
+  yScale,
+  getAxisElementColor,
+}: TimelineLabelsProps) => {
   return (
     <>
       {ticks.map((year) => {
         const y = yScale(year);
         const isCenturyYear = isCentury(year);
-
         const fontSize = isCenturyYear ? CENTURY_FONT_SIZE : DECADE_FONT_SIZE;
 
         return (
@@ -31,6 +35,7 @@ export const TimelineLabels = ({ ticks, yScale }: TimelineLabelsProps) => {
               transform: "translateX(-100%)",
               fontSize: `${fontSize}px`,
               fontWeight: isCenturyYear ? "bold" : "normal",
+              color: getAxisElementColor(year),
             }}
           >
             {year}
