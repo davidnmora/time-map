@@ -35,7 +35,6 @@ type TimelineRegionColumnProps = {
   currentYear: number;
   regions: TimeBoundGeographicRegion[];
   columnWidth: number;
-  getWidthEncodingValue: (region: TimeBoundGeographicRegion) => number;
 };
 
 export const TimelineRegionColumn = ({
@@ -45,7 +44,6 @@ export const TimelineRegionColumn = ({
   currentYear,
   regions,
   columnWidth,
-  getWidthEncodingValue,
 }: TimelineRegionColumnProps) => {
   const boundsHeight = height;
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
@@ -68,13 +66,12 @@ export const TimelineRegionColumn = ({
     const startY = yScale(effectiveEndYear);
     const endY = yScale(startYear);
     const stripHeight = Math.abs(endY - startY);
-    const width = getWidthEncodingValue(region);
 
     return {
       ...region,
       y: Math.min(startY, endY),
       height: Math.max(stripHeight, 1),
-      width,
+      width: columnWidth,
     };
   });
 

@@ -36,8 +36,7 @@ export const TimelineRegions = ({
     const stripWidths = columnRegions.map((region) =>
       getWidthEncodingValue(region)
     );
-    const columnWidth =
-      Math.round(Math.max(...stripWidths, DEFAULT_STRIP_WIDTH) * 100) / 100;
+    const columnWidth = Math.max(...stripWidths, DEFAULT_STRIP_WIDTH);
     return { columnRegions, columnWidth };
   });
 
@@ -52,7 +51,6 @@ export const TimelineRegions = ({
           currentYear={currentYear}
           regions={columnRegions}
           columnWidth={columnWidth}
-          getWidthEncodingValue={getWidthEncodingValue}
         />
       ))}
     </div>
