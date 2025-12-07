@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { TimelineAxis } from "./axis/TimelineAxis";
 import { TimelineRegions } from "./regions/TimelineRegions";
+import { TimelineToggleButton } from "./TimelineToggleButton";
 import { useAppState } from "../../contexts/AppStateContext";
 import type { TimeBoundGeographicRegion } from "../../data/types";
 import {
@@ -61,6 +62,10 @@ export const Timeline = ({
 
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
+      const target = e.target as HTMLElement;
+      if (target.closest("[data-timeline-toggle-button]")) {
+        return;
+      }
       hasMovedRef.current = false;
       dragStartRef.current = {
         y: e.clientY,
@@ -100,17 +105,15 @@ export const Timeline = ({
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      if (isDraggingRef.current) {
-        if (hasMovedRef.current) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        isDraggingRef.current = false;
-        dragStartRef.current = null;
-        hasMovedRef.current = false;
-        container.style.cursor = "grab";
-        container.style.userSelect = "";
+      if (isDraggingRef.current && hasMovedRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
       }
+      isDraggingRef.current = false;
+      dragStartRef.current = null;
+      hasMovedRef.current = false;
+      container.style.cursor = "grab";
+      container.style.userSelect = "";
     };
 
     const handleMouseLeave = () => {
@@ -176,21 +179,11 @@ export const Timeline = ({
         className="relative h-full bg-white/50 backdrop-blur-[5px]"
         style={{ height: height, cursor: "grab" }}
       >
-        <button
-          onClick={onToggle}
-          className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 w-20 bg-white/50 backdrop-blur-[5px] rounded-l-lg flex flex-col items-center justify-center gap-1 py-2 hover:bg-white/70 transition-colors z-20"
-          aria-label={expanded ? "Collapse timeline" : "Expand timeline"}
-        >
-          <span className="text-gray-700 text-[10px] leading-tight">
-            Current Year
-          </span>
-          <span className="text-gray-700 font-mono text-xl font-bold leading-none">
-            {Math.round(currentYear)}
-          </span>
-          <span className="text-gray-700 text-lg font-bold">
-            {expanded ? "→" : "←"}
-          </span>
-        </button>
+        <TimelineToggleButton
+          currentYear={currentYear}
+          expanded={expanded}
+          onToggle={onToggle}
+        />
         <div className="flex">
           <div style={{ width: TIMELINE_AXIS_WIDTH }} />
           <TimelineRegions
