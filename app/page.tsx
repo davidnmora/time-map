@@ -43,20 +43,6 @@ function MapContent() {
 
   const geographicRegions = convertAllToMapRegions(completeDataset);
 
-  const mapStyle = "mapbox://styles/davidnmora/cmikmelfl004601sqcjoe98co";
-  const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
-
-  if (!accessToken) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center">
-        <p className="text-red-500">
-          Mapbox access token is not configured. Please set
-          NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <HoveredElementProvider>
       <div className="h-screen w-screen relative">
@@ -66,8 +52,6 @@ function MapContent() {
             zoom={zoom}
             pitch={pitch}
             bearing={bearing}
-            style={mapStyle}
-            accessToken={accessToken}
             geographicRegions={geographicRegions}
             renderTooltip={renderTooltip}
             timelineExpanded={timelineExpanded}

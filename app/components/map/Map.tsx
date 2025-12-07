@@ -16,6 +16,7 @@ import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { useAppState } from "../../contexts/AppStateContext";
 import { isTimeRangeActive } from "../../data/data-utils";
 import { TRANSITION_DURATION_MS } from "../timeline/axis/timeline-axis-utils";
+import { MAP_STYLE, MAPBOX_ACCESS_TOKEN } from "./map-config";
 
 export type GeographicRegion = {
   id: string;
@@ -34,8 +35,6 @@ type MapProps = {
   zoom: number;
   pitch: number;
   bearing: number;
-  style: string;
-  accessToken: string;
   geographicRegions?: GeographicRegion[];
   renderTooltip?: (data: TooltipData) => string;
   timelineExpanded?: boolean;
@@ -73,8 +72,6 @@ export default function Map(props: MapProps) {
     zoom,
     pitch = 0,
     bearing = 0,
-    style,
-    accessToken,
     geographicRegions = [],
     renderTooltip,
     timelineExpanded = false,
@@ -95,7 +92,7 @@ export default function Map(props: MapProps) {
 
   // Initialize map
   useEffect(() => {
-    if (!accessToken || !center || typeof zoom !== "number" || !style) {
+    if (!MAPBOX_ACCESS_TOKEN || !center || typeof zoom !== "number") {
       return;
     }
 
@@ -103,7 +100,7 @@ export default function Map(props: MapProps) {
       return;
     }
 
-    mapboxgl.accessToken = accessToken;
+    mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
@@ -111,7 +108,7 @@ export default function Map(props: MapProps) {
       zoom,
       pitch,
       bearing,
-      style,
+      style: MAP_STYLE,
     });
 
     popupRef.current = new mapboxgl.Popup({
