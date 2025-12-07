@@ -7,6 +7,7 @@ const CURRENT_YEAR_LABEL_FONT_SIZE = 10;
 const ARROW_FONT_SIZE = 18;
 const BUTTON_PADDING_X = 16;
 const BUTTON_PADDING_Y = 8;
+const GAP_SIZE = 4;
 
 type TimelineToggleButtonProps = {
   currentYear: number;
@@ -36,8 +37,11 @@ export const TimelineToggleButton = ({
   const yScale = d3.scaleLinear().domain([minYear, maxYear]).range([height, 0]);
   const currentYearY = yScale(currentYear);
 
-  const currentYearTextHeight = CURRENT_YEAR_FONT_SIZE;
-  const currentYearTextMiddleOffset = currentYearTextHeight / 2;
+  const offsetFromButtonTopToTextCenter =
+    BUTTON_PADDING_Y +
+    CURRENT_YEAR_LABEL_FONT_SIZE +
+    GAP_SIZE +
+    CURRENT_YEAR_FONT_SIZE / 2;
 
   return (
     <button
@@ -45,13 +49,14 @@ export const TimelineToggleButton = ({
       onClick={onToggle}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      className="absolute left-0 -translate-x-full bg-white/50 backdrop-blur-[5px] rounded-l-lg flex flex-col items-center justify-center gap-1 hover:bg-white/70 transition-colors z-20"
+      className="absolute left-0 -translate-x-full bg-white/50 backdrop-blur-[5px] rounded-l-lg flex flex-col items-center justify-center hover:bg-white/70 transition-colors z-20"
       style={{
-        top: currentYearY - currentYearTextMiddleOffset,
+        top: currentYearY - offsetFromButtonTopToTextCenter,
         paddingLeft: BUTTON_PADDING_X,
         paddingRight: BUTTON_PADDING_X,
         paddingTop: BUTTON_PADDING_Y,
         paddingBottom: BUTTON_PADDING_Y,
+        gap: GAP_SIZE,
       }}
       aria-label={expanded ? "Collapse timeline" : "Expand timeline"}
     >
