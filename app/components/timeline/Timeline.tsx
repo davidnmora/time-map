@@ -178,9 +178,15 @@ export const Timeline = ({
       >
         <button
           onClick={onToggle}
-          className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 w-8 h-12 bg-white/50 backdrop-blur-[5px] rounded-l-lg flex items-center justify-center hover:bg-white/70 transition-colors z-20"
+          className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 w-20 bg-white/50 backdrop-blur-[5px] rounded-l-lg flex flex-col items-center justify-center gap-1 py-2 hover:bg-white/70 transition-colors z-20"
           aria-label={expanded ? "Collapse timeline" : "Expand timeline"}
         >
+          <span className="text-gray-700 text-[10px] leading-tight">
+            Current Year
+          </span>
+          <span className="text-gray-700 font-mono text-xl font-bold leading-none">
+            {Math.round(currentYear)}
+          </span>
           <span className="text-gray-700 text-lg font-bold">
             {expanded ? "→" : "←"}
           </span>

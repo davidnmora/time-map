@@ -59,9 +59,9 @@ export const TimelineAxis = ({
       <div
         className="absolute pointer-events-none"
         style={{
-          left: TIMELINE_AXIS_WIDTH,
+          left: 0,
           top: 0,
-          width: totalWidth,
+          width: TIMELINE_AXIS_WIDTH + totalWidth,
           height: height,
         }}
       >
@@ -70,7 +70,7 @@ export const TimelineAxis = ({
           minYear={minYear}
           maxYear={maxYear}
           currentYear={currentYear}
-          totalWidth={totalWidth}
+          totalWidth={TIMELINE_AXIS_WIDTH + totalWidth}
         />
       </div>
     </div>
