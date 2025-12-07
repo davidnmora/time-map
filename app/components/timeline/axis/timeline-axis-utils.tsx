@@ -8,6 +8,9 @@ export const BASELINE_OFFSET_RATIO = 0.67;
 
 export const MIN_TICK_SPACING_MULTIPLIER = 1.5;
 
+export const CENTURY_TICK_THICKNESS = 2;
+export const REGULAR_TICK_THICKNESS = 1;
+
 export const calculateLabelTopOffset = (fontSize: number): number => {
   return -fontSize * BASELINE_OFFSET_RATIO;
 };
@@ -116,6 +119,10 @@ export const isTwentyFiveYearMark = (year: number): boolean => {
 
 export const isDecade = (year: number): boolean => {
   return year % 10 === 0 && year % 100 !== 0;
+};
+
+export const getTickThickness = (year: number): number => {
+  return isCentury(year) ? CENTURY_TICK_THICKNESS : REGULAR_TICK_THICKNESS;
 };
 
 export const calculateMinTickSpacing = (

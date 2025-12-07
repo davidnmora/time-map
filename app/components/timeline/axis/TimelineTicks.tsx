@@ -5,6 +5,7 @@ import {
   isCentury,
   isTwentyFiveYearMark,
   isDecade,
+  getTickThickness,
 } from "./timeline-axis-utils";
 
 type TimelineTicksProps = {
@@ -21,7 +22,7 @@ export const TimelineTicks = ({ ticks, yScale }: TimelineTicksProps) => {
         const is25Year = isTwentyFiveYearMark(year);
         const isDecadeYear = isDecade(year);
 
-        const tickHeight = isCenturyYear ? 2 : 1;
+        const tickHeight = getTickThickness(year);
 
         return (
           <div

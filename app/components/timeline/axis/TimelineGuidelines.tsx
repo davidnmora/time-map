@@ -3,6 +3,7 @@ import {
   TIMELINE_WIDTH,
   isCentury,
   isHalfCentury,
+  getTickThickness,
 } from "./timeline-axis-utils";
 
 type TimelineGuidelinesProps = {
@@ -23,7 +24,6 @@ export const TimelineGuidelines = ({
     <>
       {guidelineYears.map((year) => {
         const y = yScale(year);
-        const isCenturyYear = isCentury(year);
         return (
           <div
             key={`guideline-${year}`}
@@ -32,7 +32,7 @@ export const TimelineGuidelines = ({
               left: TIMELINE_WIDTH,
               top: y,
               width: totalWidth,
-              height: isCenturyYear ? 2 : 1,
+              height: getTickThickness(year),
               transform: "translateY(-50%)",
               backgroundColor: "black",
             }}
