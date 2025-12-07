@@ -1,4 +1,4 @@
-import type { TimeRange, TimeBoundGeographicRegion } from "../../data/types";
+import type { TimeBoundGeographicRegion } from "../../data/types";
 import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
 
 export type Column = TimeBoundGeographicRegion[];
@@ -32,18 +32,6 @@ export function createGetWidthEncodingValue(
   };
 }
 
-export function timeRangesOverlap(
-  timeRange1: TimeRange,
-  timeRange2: TimeRange
-): boolean {
-  const [start1, end1] = timeRange1;
-  const [start2, end2] = timeRange2;
-  const currentYear = new Date().getFullYear();
-  const effectiveEnd1 = end1 !== null ? end1 : currentYear;
-  const effectiveEnd2 = end2 !== null ? end2 : currentYear;
-  return start1 <= effectiveEnd2 && start2 <= effectiveEnd1;
-}
-
 export function computeRegionColumns(
   regions: TimeBoundGeographicRegion[]
 ): Column[] {
@@ -53,29 +41,7 @@ export function computeRegionColumns(
     return startA - startB;
   });
 
-  const columns: Column[] = [];
-
-  for (const region of sortedRegions) {
-    let placed = false;
-    for (let colIndex = 0; colIndex < columns.length; colIndex++) {
-      const column = columns[colIndex];
-      const hasOverlap = column.some((existingRegion) =>
-        timeRangesOverlap(existingRegion.timeRange, region.timeRange)
-      );
-
-      if (!hasOverlap) {
-        column.push(region);
-        placed = true;
-        break;
-      }
-    }
-
-    if (!placed) {
-      columns.push([region]);
-    }
-  }
-
-  return columns;
+  return sortedRegions.map((region) => [region]);
 }
 
 export const calculateTimelineWidth = (
