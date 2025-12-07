@@ -12,6 +12,11 @@ const DEFAULT_LINE_WIDTH = 1;
 const DEFAULT_LINE_COLOR = "#000";
 const DEFAULT_FILL_COLOR = "#0080ff";
 
+const HOVERED_ACTIVE_OPACITY = 1;
+const HOVERED_INACTIVE_OPACITY = 0.2;
+const NOT_HOVERED_ACTIVE_OPACITY = 0.4;
+const NOT_HOVERED_INACTIVE_OPACITY = 0;
+
 export const TOOLTIP_WIDTH = 200;
 
 export type TooltipData = {
@@ -102,13 +107,30 @@ export function initializeGeographicRegions(
         "fill-color": region.fillColor || DEFAULT_FILL_COLOR,
         "fill-opacity": [
           "case",
-          ["boolean", ["feature-state", "hover"], false],
-          1,
+          [
+            "all",
+            ["boolean", ["feature-state", "hover"], false],
+            ["boolean", ["feature-state", "visible"], false],
+          ],
+          HOVERED_ACTIVE_OPACITY,
           [
             "case",
-            ["boolean", ["feature-state", "visible"], false],
-            region.fillOpacity ?? DEFAULT_FILL_OPACITY,
-            0,
+            [
+              "all",
+              ["boolean", ["feature-state", "hover"], false],
+              ["!", ["boolean", ["feature-state", "visible"], false]],
+            ],
+            HOVERED_INACTIVE_OPACITY,
+            [
+              "case",
+              [
+                "all",
+                ["!", ["boolean", ["feature-state", "hover"], false]],
+                ["boolean", ["feature-state", "visible"], false],
+              ],
+              NOT_HOVERED_ACTIVE_OPACITY,
+              NOT_HOVERED_INACTIVE_OPACITY,
+            ],
           ],
         ],
       },
