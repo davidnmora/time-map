@@ -1,4 +1,14 @@
-# Layout algorithm to produce the `regionColumns` [ORIGINAL PLAN]
+# [SIMPLER PLAN] Simplest possible layout algorithm to prevent overlap of regions in the timeline: every region gets its own "column" and no column is ever reused.
+
+The concept is simple:
+- for each new region
+- just place it to the right of the last, right-most region
+  - we don't necessarily need to keep track of what's "in" each column (or have a column abstraction, unless its needed), we could just keep a running record of how far right we've filled up with regions, and then add the next region on the x-axis to the right the most-right most thing (could be the right most thing at any point in time, even if its no longer overlapping time-wise with the next region).
+
+This is the most naive way to prevent overlap in the vertical dimension (and in the horizontal, too, to point out the obvious). Let's start here before we get more fancy-pantsy.
+
+
+# [ORIGINAL PLAN, MORE COMPLEX] Layout algorithm to produce the `regionColumns`
 
 Generally speaking, we will place these vertical strips in non-overlapping columns just to the right of the timeline line. Our aim is to place the strips as close to the timeline line as possible, while avoiding overlap. When there's overlap, we look for the nearest (earliest/leftmost) column without an overlap, or add another column to the right if needed.
 

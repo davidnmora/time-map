@@ -22,11 +22,17 @@ Given the nested nature of data (e.g. a region in Britain is part of the larger 
 See `app/data/types.ts` for the precise definitions of the data structures.
 
 
-# Data resources and inspiration
+# Resources
 
+### inspiration
 - Pinterest board for design [inspiration](https://www.pinterest.com/itsdavidmora/time-map/)
+
+### tools
 - Open Source QGIS can [help](https://docs.qgis.org/3.40/en/docs/training_manual/forestry/map_georeferencing.html) you "georeference" a map image onto a digital map, so you can export it, say, as a [GeoJSON file](https://stackoverflow.com/questions/70455885/how-to-create-a-geojson-file-from-an-image-overlay)
+
+### existing data, maps, and creators
 - [OmniAtlas](https://omniatlas.com/) made a series of static images (with overlay annotations) for an incredible swath of history and geography, I think it may be the most comprehensive set of static map images on the web.
+- UsefulCharts has an incredible [collection of timelines](https://usefulcharts.com/), from family trees to world religion family trees to historical states and societies. UsefulCharts is an interesting comparison because they committed (simplified?) completely to both static views, but also to not trying to represent geographic area or population size etc in the width of timeline elements, instead using very approximate sizes to represent the "importance" of the region.
 
 
 # Development
