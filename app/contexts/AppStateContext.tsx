@@ -65,14 +65,17 @@ const URL_DEBOUNCE_MS = 300;
 
 const DEFAULT_ZOOM = 2.175393325182904;
 const DEFAULT_CENTER: [number, number] = [
-  -85.53107857918123, 34.06934691684232,
+  -85.53107857918121, 34.06934691684232,
 ];
-const DEFAULT_PITCH = 3.4991960837899105;
-const DEFAULT_BEARING = 11.997243715851255;
+const DEFAULT_PITCH = 3.4;
+const DEFAULT_BEARING = 11.9;
 const DEFAULT_TIMELINE_EXPANDED = true;
-const DEFAULT_MIN_YEAR = 1734.2629161882894;
-const DEFAULT_MAX_YEAR = 1972.2629161882894;
-const DEFAULT_CURRENT_YEAR = 1853.2629161882894;
+const DEFAULT_MIN_YEAR = 1731;
+const DEFAULT_MAX_YEAR = 2050;
+const DEFAULT_CURRENT_YEAR = calculateMidpointYear(
+  DEFAULT_MIN_YEAR,
+  DEFAULT_MAX_YEAR
+);
 
 // Note: due to our timeline choice, we always place the currentYear at the midpoint of the min and max years
 function calculateMidpointYear(minYear: number, maxYear: number): number {
