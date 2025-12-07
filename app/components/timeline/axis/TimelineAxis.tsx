@@ -4,8 +4,10 @@ import * as d3 from "d3";
 import { CurrentYearIndicator } from "./CurrentYearIndicator";
 import {
   TIMELINE_WIDTH,
-  generateDecadeTicks,
   generateFiftyYearMarks,
+  determineDensityLevel,
+  generateTicksForDensityLevel,
+  CENTURY_FONT_SIZE,
 } from "./timeline-axis-utils";
 import { TimelineTicks } from "./TimelineTicks";
 import { TimelineLabels } from "./TimelineLabels";
@@ -19,13 +21,22 @@ type TimelineAxisProps = {
   totalWidth: number;
 };
 
-export const TimelineAxis = ({ height, minYear, maxYear, currentYear, totalWidth }: TimelineAxisProps) => {
-  const yScale = d3
-    .scaleLinear()
-    .domain([minYear, maxYear])
-    .range([height, 0]);
+export const TimelineAxis = ({
+  height,
+  minYear,
+  maxYear,
+  currentYear,
+  totalWidth,
+}: TimelineAxisProps) => {
+  const yScale = d3.scaleLinear().domain([minYear, maxYear]).range([height, 0]);
 
-  const decadeTicks = generateDecadeTicks(minYear, maxYear);
+  const densityLevel = determineDensityLevel(
+    height,
+    minYear,
+    maxYear,
+    CENTURY_FONT_SIZE
+  );
+  const ticks = generateTicksForDensityLevel(densityLevel, minYear, maxYear);
   const fiftyYearMarks = generateFiftyYearMarks(minYear, maxYear);
 
   return (
@@ -38,8 +49,8 @@ export const TimelineAxis = ({ height, minYear, maxYear, currentYear, totalWidth
         style={{ width: TIMELINE_WIDTH, height: height }}
       >
         <div className="relative w-full h-full">
-          <TimelineTicks decadeTicks={decadeTicks} yScale={yScale} />
-          <TimelineLabels decadeTicks={decadeTicks} yScale={yScale} />
+          <TimelineTicks ticks={ticks} yScale={yScale} />
+          <TimelineLabels ticks={ticks} yScale={yScale} />
         </div>
       </div>
       <TimelineGuidelines

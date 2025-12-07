@@ -1,18 +1,28 @@
 import * as d3 from "d3";
-import { TIMELINE_WIDTH, TICK_LENGTH, isCentury } from "./timeline-axis-utils";
+import {
+  TIMELINE_WIDTH,
+  TICK_LENGTH,
+  isCentury,
+  isTwentyFiveYearMark,
+  isDecade,
+} from "./timeline-axis-utils";
 
 type TimelineTicksProps = {
-  decadeTicks: number[];
+  ticks: number[];
   yScale: d3.ScaleLinear<number, number>;
 };
 
-export const TimelineTicks = ({ decadeTicks, yScale }: TimelineTicksProps) => {
+export const TimelineTicks = ({ ticks, yScale }: TimelineTicksProps) => {
   return (
     <>
-      {decadeTicks.map((year) => {
+      {ticks.map((year) => {
         const y = yScale(year);
         const isCenturyYear = isCentury(year);
-        
+        const is25Year = isTwentyFiveYearMark(year);
+        const isDecadeYear = isDecade(year);
+
+        const tickHeight = isCenturyYear ? 2 : 1;
+
         return (
           <div
             key={year}
@@ -21,7 +31,7 @@ export const TimelineTicks = ({ decadeTicks, yScale }: TimelineTicksProps) => {
               left: TIMELINE_WIDTH - TICK_LENGTH,
               top: y,
               width: TICK_LENGTH,
-              height: isCenturyYear ? 2 : 1,
+              height: tickHeight,
               backgroundColor: "black",
             }}
           />
