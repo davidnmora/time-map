@@ -1,19 +1,14 @@
+export const CENTURY_TICK_THICKNESS = 2;
+export const REGULAR_TICK_THICKNESS = 1;
+
 export const TIMELINE_WIDTH = 50;
 export const TICK_LENGTH = 6;
 export const TICK_OFFSET = 10;
 
 export const DECADE_FONT_SIZE = 12;
 export const CENTURY_FONT_SIZE = 16;
-export const BASELINE_OFFSET_RATIO = 0.67;
 
 export const MIN_TICK_SPACING_MULTIPLIER = 1.5;
-
-export const CENTURY_TICK_THICKNESS = 2;
-export const REGULAR_TICK_THICKNESS = 1;
-
-export const calculateLabelTopOffset = (fontSize: number): number => {
-  return -fontSize * BASELINE_OFFSET_RATIO;
-};
 
 export type DensityLevel =
   | "centuries"
@@ -221,4 +216,3 @@ export const generateTicksForDensityLevel = (
       ].sort((a, b) => a - b);
   }
 };
-
