@@ -43,7 +43,7 @@ type MapProps = {
 };
 
 export default function Map(props: MapProps) {
-  const { updateState, currentYear, minYear, maxYear } = useAppState();
+  const { updateState, currentYear } = useAppState();
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const sourcesRef = useRef<Set<string>>(new Set());

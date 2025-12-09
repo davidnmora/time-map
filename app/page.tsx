@@ -13,7 +13,7 @@ import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import { calculateTimelineWidth } from "./components/timeline/timeline-utils";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, startTransition } from "react";
 
 function MapContent() {
   const {
@@ -31,7 +31,9 @@ function MapContent() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    startTransition(() => {
+      setIsMounted(true);
+    });
     const updateHeight = () => {
       setWindowHeight(window.innerHeight);
     };
