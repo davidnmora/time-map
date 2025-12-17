@@ -94,13 +94,11 @@ function getDefaultState(): AppState {
 }
 
 function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
-  const zoom = (() => {
-    const zoomParam = searchParams.get("zoom");
-    return zoomParam ? parseFloat(zoomParam) : undefined;
-  })();
+  const zoomParam = searchParams.get("zoom");
+  const zoom = zoomParam ? parseFloat(zoomParam) : undefined;
 
+  const centerParam = searchParams.get("center");
   const center = (() => {
-    const centerParam = searchParams.get("center");
     if (!centerParam) return undefined;
     try {
       const [lng, lat] = centerParam.split(",").map(Number);
@@ -111,36 +109,28 @@ function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
     }
   })();
 
-  const currentYear = (() => {
-    const currentYearParam = searchParams.get("currentYear");
-    return currentYearParam ? parseFloat(currentYearParam) : undefined;
-  })();
+  const currentYearParam = searchParams.get("currentYear");
+  const currentYear = currentYearParam
+    ? parseFloat(currentYearParam)
+    : undefined;
 
-  const minYear = (() => {
-    const minYearParam = searchParams.get("minYear");
-    return minYearParam ? parseFloat(minYearParam) : undefined;
-  })();
+  const minYearParam = searchParams.get("minYear");
+  const minYear = minYearParam ? parseFloat(minYearParam) : undefined;
 
-  const maxYear = (() => {
-    const maxYearParam = searchParams.get("maxYear");
-    return maxYearParam ? parseFloat(maxYearParam) : undefined;
-  })();
+  const maxYearParam = searchParams.get("maxYear");
+  const maxYear = maxYearParam ? parseFloat(maxYearParam) : undefined;
 
-  const pitch = (() => {
-    const pitchParam = searchParams.get("pitch");
-    return pitchParam ? parseFloat(pitchParam) : undefined;
-  })();
+  const pitchParam = searchParams.get("pitch");
+  const pitch = pitchParam ? parseFloat(pitchParam) : undefined;
 
-  const bearing = (() => {
-    const bearingParam = searchParams.get("bearing");
-    return bearingParam ? parseFloat(bearingParam) : undefined;
-  })();
+  const bearingParam = searchParams.get("bearing");
+  const bearing = bearingParam ? parseFloat(bearingParam) : undefined;
 
-  const timelineExpanded = (() => {
-    const timelineExpandedParam = searchParams.get("timelineExpanded");
-    if (timelineExpandedParam === null) return undefined;
-    return timelineExpandedParam === "true";
-  })();
+  const timelineExpandedParam = searchParams.get("timelineExpanded");
+  const timelineExpanded =
+    timelineExpandedParam === null
+      ? undefined
+      : timelineExpandedParam === "true";
 
   return {
     zoom,
