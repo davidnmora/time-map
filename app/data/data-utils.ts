@@ -17,6 +17,9 @@ export function addTitleToHierarchy(
   hierarchy: string[],
   title: string
 ): string[] {
+  if (!title) {
+    return hierarchy;
+  }
   return [...hierarchy, title];
 }
 

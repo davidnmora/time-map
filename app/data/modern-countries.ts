@@ -12,14 +12,30 @@ type CountryIndependence = {
   independence: number | null;
 };
 
+const COUNTRY_NAME_MAPPING: Record<string, string> = {
+  "North Macedonia": "Macedonia",
+  "Eswatini": "Swaziland",
+  "Fiji Islands": "Fiji",
+  "The Democratic Republic of Congo": "Democratic Republic of the Congo",
+  "Congo": "Republic of the Congo",
+  "Serbia": "Republic of Serbia",
+  "Tanzania": "United Republic of Tanzania",
+  "Guinea-Bissau": "Guinea Bissau",
+};
+
+function normalizeCountryName(countryName: string): string {
+  return COUNTRY_NAME_MAPPING[countryName] || countryName;
+}
+
 function findCountryFeature(
   countryName: string,
   geojson: GeoJSON.FeatureCollection
 ): GeoJSON.Feature | null {
+  const normalizedName = normalizeCountryName(countryName);
   return (
     geojson.features.find(
       (feature) =>
-        feature.properties?.name?.toLowerCase() === countryName.toLowerCase()
+        feature.properties?.name?.toLowerCase() === normalizedName.toLowerCase()
     ) || null
   );
 }
@@ -43,7 +59,7 @@ function createTimeBoundRegionForCountry(
       id: `country-${countryName.toLowerCase().replace(/\s+/g, "-")}`,
       title: countryName,
       description: `${countryName}, independent since ${independenceYear}`,
-      color: "#00ff80",
+      color: "black",
     },
   };
 }

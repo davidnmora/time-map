@@ -41,7 +41,7 @@ const partialDataset: PartialTimeBoundGeographicRegionGroup = {
   children: [generateUSStatesData(), generateModernCountriesData()],
   metadata: {
     id: "complete-dataset",
-    title: "Complete Dataset",
+    title: "",
     description: "All geographic regions by time period",
   },
 };

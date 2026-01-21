@@ -5,7 +5,7 @@ export type Column = TimeBoundGeographicRegion[];
 
 export const MIN_STRIP_WIDTH = 2;
 export const MAX_STRIP_WIDTH = 30;
-export const DEFAULT_STRIP_WIDTH = 3;
+export const DEFAULT_STRIP_WIDTH = 0.001;
 
 export const TIMELINE_BACKDROP_OPACITY = 0.8;
 export const BACKDROP_BLUR = `backdrop-blur-xs`;
