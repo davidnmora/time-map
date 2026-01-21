@@ -5,6 +5,7 @@ import type {
   PartialTimeBoundGeographicRegionGroup,
 } from "./types";
 import { generateUSStatesData } from "./us-states";
+import { generateModernCountriesData } from "./modern-countries";
 import { calculateTotalArea, addTitleToHierarchy } from "./data-utils";
 
 function completeRegion(
@@ -36,7 +37,14 @@ function completeGroup(
   };
 }
 
-const partialDataset = generateUSStatesData();
+const partialDataset: PartialTimeBoundGeographicRegionGroup = {
+  children: [generateUSStatesData(), generateModernCountriesData()],
+  metadata: {
+    id: "complete-dataset",
+    title: "Complete Dataset",
+    description: "All geographic regions by time period",
+  },
+};
 
 export const completeDataset = completeGroup(partialDataset);
 
