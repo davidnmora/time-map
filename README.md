@@ -35,6 +35,8 @@ See `app/data/types.ts` for the precise definitions of the data structures.
   - [allmaps.org](https://allmaps.org/) is a tool for projecting map images over digital maps, and it's open source. They also have a big repository of map images (often historic) digitized.
 
 ### existing data, maps, and creators
+- Geological Scale
+    - [EarthViewer](https://www.biointeractive.org/classroom-resources/earthviewer) is a globe that lets you explore where modern locations/countries existed on the earth's surface as far back as 540 Mya. It's the best tool I've found for seeing (the latest slice) of tectonic shifts. It's got this nice vertical timeline with the major geological eras and epochs labeled. It also lets you pull up line charts of specific properties over time, such as CO2 or temperature.
 - [OmniAtlas](https://omniatlas.com/) made a series of static images (with overlay annotations) for an incredible swath of history and geography, I think it may be the most comprehensive set of static map images on the web.
 - UsefulCharts has an incredible [collection of timelines](https://usefulcharts.com/), from family trees to world religion family trees to historical states and societies. UsefulCharts is an interesting comparison because they committed (simplified?) completely to both static views, but also to not trying to represent geographic area or population size etc in the width of timeline elements, instead using very approximate sizes to represent the "importance" of the region.
 - [Native Land](https://native-land.ca/maps/native-land) shows indigenous lands, globally. Amazing resource.
