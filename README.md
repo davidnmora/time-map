@@ -26,6 +26,7 @@ See `app/data/types.ts` for the precise definitions of the data structures.
 
 ### inspiration
 - Pinterest board for design [inspiration](https://www.pinterest.com/itsdavidmora/time-map/)
+- For map style, rather than an image of geometries, you can represent the earth surface with a series of dots, raised based on (exsadurated) elavation. Here's [a tutorial with source code](https://www.youtube.com/watch?v=XaDQI1HmoOQ), and here's a [visually stunning](https://www.youtube.com/watch?v=3hgt_GrkAm0) example of it being done in a very performant manner (they downsampled a massive dataset on the earth's elevation using Python).
 
 ### tools
 - Digitizing a map image:
@@ -34,7 +35,11 @@ See `app/data/types.ts` for the precise definitions of the data structures.
   - [mapbox-gl-draw](https://docs.mapbox.com/mapbox-gl-js/example/mapbox-gl-draw/)
   - [allmaps.org](https://allmaps.org/) is a tool for projecting map images over digital maps, and it's open source. They also have a big repository of map images (often historic) digitized.
 
-### existing data, maps, and creators
+### data sources
+- Easy, open source download of variable resolution [GeoJSON countries](https://geojson-maps.kyd.au/)
+
+
+### existing maps, timelines, and creators
 
 #### Maps
 
