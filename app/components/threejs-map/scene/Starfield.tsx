@@ -3,14 +3,16 @@
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
+import { ORBIT_MAX_DISTANCE } from "./constants";
 
 const CIRCLE_TEXTURE_URL = "/threejs-map/circle.png";
 const POINT_SIZE = 0.2;
 const STAR_COUNT = 3000;
 const HSL_HUE = 0.6;
 const HSL_SATURATION = 0.2;
-const MIN_RADIUS = 25;
-const RADIUS_SPREAD = 25;
+const BEYOND_MAX_ZOOM_BUFFER = 1.2;
+const MIN_RADIUS = ORBIT_MAX_DISTANCE * BEYOND_MAX_ZOOM_BUFFER;
+const RADIUS_SPREAD = ORBIT_MAX_DISTANCE * 0.5;
 
 type StarSample = {
   pos: THREE.Vector3;
