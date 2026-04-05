@@ -6,14 +6,16 @@ import { useLayoutEffect, useMemo } from "react";
 
 const TEXTURE_URLS = [
   "/threejs-map/textures/earth-daymap-4k.jpg",
-  "/threejs-map/textures/earth-nightmap-4k.jpg",
   "/threejs-map/textures/earth-clouds-4k.jpg",
 ] as const;
+
+const AMBIENT_SURFACE_SCALE = 0.68;
+const TERMINATOR_SHADOW_EDGE = -0.52;
+const TERMINATOR_DAY_EDGE = 0.52;
 
 const EARTH_VERTEX_SHADER = `
     varying vec2 vUv;
     varying vec3 vNormal;
-    varying vec3 vPosition;
 
     void main() {
       vec4 modelPosition = modelMatrix * vec4(position, 1.0);
@@ -23,31 +25,26 @@ const EARTH_VERTEX_SHADER = `
 
       vUv = uv;
       vNormal = modelNormal;
-      vPosition = modelPosition.xyz;
     }
   `;
 
 const EARTH_FRAGMENT_SHADER = `
     uniform sampler2D dayTexture;
-    uniform sampler2D nightTexture;
     uniform sampler2D cloudsTexture;
     uniform vec3 sunDirection;
 
     varying vec2 vUv;
     varying vec3 vNormal;
-    varying vec3 vPosition;
 
     void main() {
-      vec3 viewDirection = normalize(vPosition - cameraPosition);
       vec3 normal = normalize(vNormal);
       vec3 color = vec3(0.0);
 
       float sunOrientation = dot(sunDirection, normal);
 
-      float dayMix = smoothstep(- 0.25, 0.5, sunOrientation);
+      float dayMix = smoothstep(float(${TERMINATOR_SHADOW_EDGE}), float(${TERMINATOR_DAY_EDGE}), sunOrientation);
       vec3 dayColor = texture(dayTexture, vUv).rgb;
-      vec3 nightColor = texture(nightTexture, vUv).rgb;
-      color = mix(nightColor, dayColor, dayMix);
+      color = dayColor * mix(float(${AMBIENT_SURFACE_SCALE}), 1.0, dayMix);
 
       vec3 cloudsPacked = texture(cloudsTexture, vUv).rgb;
 
@@ -64,7 +61,7 @@ type EarthMaterialProps = {
 };
 
 export default function EarthMaterial({ sunDirection }: EarthMaterialProps) {
-  const [dayTexture, nightTexture, cloudsTexture] = useLoader(
+  const [dayTexture, cloudsTexture] = useLoader(
     THREE.TextureLoader,
     [...TEXTURE_URLS],
   );
@@ -72,7 +69,7 @@ export default function EarthMaterial({ sunDirection }: EarthMaterialProps) {
 
   useLayoutEffect(() => {
     const maxAnisotropy = gl.capabilities.getMaxAnisotropy();
-    const textures = [dayTexture, nightTexture, cloudsTexture];
+    const textures = [dayTexture, cloudsTexture];
     for (const texture of textures) {
       texture.anisotropy = maxAnisotropy;
       texture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -80,20 +77,19 @@ export default function EarthMaterial({ sunDirection }: EarthMaterialProps) {
       texture.generateMipmaps = true;
       texture.needsUpdate = true;
     }
-  }, [gl, dayTexture, nightTexture, cloudsTexture]);
+  }, [gl, dayTexture, cloudsTexture]);
 
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
         dayTexture: { value: dayTexture },
-        nightTexture: { value: nightTexture },
         cloudsTexture: { value: cloudsTexture },
         sunDirection: { value: sunDirection.clone() },
       },
       vertexShader: EARTH_VERTEX_SHADER,
       fragmentShader: EARTH_FRAGMENT_SHADER,
     });
-  }, [dayTexture, nightTexture, cloudsTexture, sunDirection]);
+  }, [dayTexture, cloudsTexture, sunDirection]);
 
   return <primitive object={material} attach="material" />;
 }
