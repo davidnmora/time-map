@@ -1,26 +1,26 @@
 "use client";
 
-import Map from "./components/map/Map";
+import dynamic from "next/dynamic";
 import { completeDataset } from "./data/complete-dataset";
 import { getAFlagListOfAllRegions } from "./data/data-utils";
-import {
-  renderTooltip,
-  convertAllToMapRegions,
-} from "./components/map/map-utils";
 import { Timeline } from "./components/timeline/Timeline";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
-import { calculateTimelineWidth } from "./components/timeline/timeline-utils";
-import "mapbox-gl/dist/mapbox-gl.css";
 import "./globals.css";
 import { Suspense, useState, useEffect, startTransition } from "react";
 
+const ThreeJSMap = dynamic(
+  () => import("./components/threejs-map/ThreeJSMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="absolute inset-0 bg-black" aria-hidden />
+    ),
+  },
+);
+
 function MapContent() {
   const {
-    zoom,
-    center,
-    pitch,
-    bearing,
     currentYear,
     minYear,
     maxYear,
@@ -43,24 +43,12 @@ function MapContent() {
   }, []);
 
   const timelineRegions = getAFlagListOfAllRegions(completeDataset);
-  const timelineWidth = calculateTimelineWidth(timelineRegions, "area");
-
-  const geographicRegions = convertAllToMapRegions(completeDataset);
 
   return (
     <HoveredElementProvider>
       <div className="h-screen w-screen relative">
         <div className="absolute inset-0">
-          <Map
-            center={center}
-            zoom={zoom}
-            pitch={pitch}
-            bearing={bearing}
-            geographicRegions={geographicRegions}
-            renderTooltip={renderTooltip}
-            timelineExpanded={timelineExpanded}
-            timelineWidth={timelineWidth}
-          />
+          <ThreeJSMap />
         </div>
         {isMounted &&
           windowHeight !== null &&
