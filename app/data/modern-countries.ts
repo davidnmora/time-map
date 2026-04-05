@@ -23,6 +23,7 @@ const COUNTRY_NAME_MAPPING: Record<string, string> = {
   "Serbia": "Republic of Serbia",
   "Tanzania": "United Republic of Tanzania",
   "Guinea-Bissau": "Guinea Bissau",
+  "United States": "United States of America",
 };
 
 function normalizeCountryName(countryName: string): string {
