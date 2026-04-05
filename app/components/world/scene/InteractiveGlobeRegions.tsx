@@ -3,17 +3,15 @@
 import { useState } from "react";
 import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
-import type { GeographicRegionMapLayer } from "@/lib/regions/types";
+import type { InteractiveGeographicRegionMapLayer } from "@/lib/regions/types";
 import { doesRegionIdMatch } from "@/lib/regions/region-utils";
 import { isTimeRangeActive } from "@/app/data/data-utils";
 import { createRegionGeometry, FILL_SURFACE_OFFSET } from "@/lib/geo/globe-region-utils";
 import { EARTH_ICOSAHEDRON_RADIUS } from "./constants";
 
-const DEFAULT_FILL_COLOR = "#0080ff";
-
-const HOVERED_ACTIVE_OPACITY = 1;
-const HOVERED_INACTIVE_OPACITY = 0.2;
-const NOT_HOVERED_ACTIVE_OPACITY = 0.6;
+const HOVERED_ACTIVE_OPACITY = 0.5;
+const HOVERED_INACTIVE_OPACITY = 0.15;
+const NOT_HOVERED_ACTIVE_OPACITY = 0.3;
 const NOT_HOVERED_INACTIVE_OPACITY = 0;
 
 const FILL_RADIUS = EARTH_ICOSAHEDRON_RADIUS + FILL_SURFACE_OFFSET;
@@ -26,12 +24,12 @@ function getRegionFillOpacity(isHovered: boolean, isActive: boolean): number {
 }
 
 type RegionMeshProps = {
-  region: GeographicRegionMapLayer;
+  region: InteractiveGeographicRegionMapLayer;
   isHovered: boolean;
   isActive: boolean;
   onPointerOver: (
     e: ThreeEvent<PointerEvent>,
-    region: GeographicRegionMapLayer,
+    region: InteractiveGeographicRegionMapLayer,
   ) => void;
   onPointerOut: () => void;
 };
@@ -66,7 +64,7 @@ function RegionMesh({
       }}
     >
       <meshBasicMaterial
-        color={region.fillColor || DEFAULT_FILL_COLOR}
+        color={region.fillColor}
         transparent
         opacity={opacity}
         side={THREE.FrontSide}
@@ -80,11 +78,11 @@ function RegionMesh({
 }
 
 type InteractiveGlobeRegionsProps = {
-  regions: GeographicRegionMapLayer[];
+  regions: InteractiveGeographicRegionMapLayer[];
   currentYear: number;
   hoveredRegionId: string | null;
   onRegionHoverStart: (
-    region: GeographicRegionMapLayer,
+    region: InteractiveGeographicRegionMapLayer,
     clientX: number,
     clientY: number,
   ) => void;
@@ -100,7 +98,7 @@ export default function InteractiveGlobeRegions({
 }: InteractiveGlobeRegionsProps) {
   const handlePointerOver = (
     e: ThreeEvent<PointerEvent>,
-    region: GeographicRegionMapLayer,
+    region: InteractiveGeographicRegionMapLayer,
   ) => {
     onRegionHoverStart(region, e.clientX, e.clientY);
   };

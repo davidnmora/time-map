@@ -2,7 +2,10 @@
 
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useState } from "react";
-import type { GeographicRegionMapLayer } from "@/lib/regions/types";
+import type {
+  GeographicRegionMapLayer,
+  InteractiveGeographicRegionMapLayer,
+} from "@/lib/regions/types";
 import type { TooltipData } from "@/lib/regions/region-utils";
 import {
   useAppState,
@@ -30,6 +33,7 @@ const HEMISPHERE_GROUND = 0x000000;
 const HEMISPHERE_INTENSITY = 3.0;
 
 const EMPTY_REGIONS: GeographicRegionMapLayer[] = [];
+const EMPTY_INTERACTIVE_REGIONS: InteractiveGeographicRegionMapLayer[] = [];
 const CAMERA_OFFSET_HALF_SHIFT_MULTIPLIER = 0.5;
 
 type TooltipState = {
@@ -49,14 +53,14 @@ function buildTooltipData(region: GeographicRegionMapLayer): TooltipData {
 
 type WorldProps = {
   geographicRegions?: GeographicRegionMapLayer[];
-  interactiveRegions?: GeographicRegionMapLayer[];
+  interactiveRegions?: InteractiveGeographicRegionMapLayer[];
   timelineWidth: number;
   timelineExpanded: boolean;
 };
 
 export default function World({
   geographicRegions = EMPTY_REGIONS,
-  interactiveRegions = EMPTY_REGIONS,
+  interactiveRegions = EMPTY_INTERACTIVE_REGIONS,
   timelineWidth,
   timelineExpanded,
 }: WorldProps) {
@@ -76,7 +80,7 @@ export default function World({
   };
 
   const handleRegionHoverStart = (
-    region: GeographicRegionMapLayer,
+    region: InteractiveGeographicRegionMapLayer,
     clientX: number,
     clientY: number,
   ) => {

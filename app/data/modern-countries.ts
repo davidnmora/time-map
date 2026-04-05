@@ -13,6 +13,8 @@ type CountryIndependence = {
 };
 
 const EXCLUDED_COUNTRY_IDS = new Set(["ATA"]);
+const MODERN_COUNTRY_COLOR = "#0080ff";
+const MODERN_COUNTRY_GROUP_COLOR = MODERN_COUNTRY_COLOR;
 
 const COUNTRY_NAME_MAPPING: Record<string, string> = {
   "North Macedonia": "Macedonia",
@@ -79,7 +81,7 @@ function createTimeBoundRegionForCountry(
       id: `country-${countryName.toLowerCase().replace(/\s+/g, "-")}`,
       title: countryName,
       description: `${countryName}, independent since ${independenceYear}`,
-      color: "black",
+      color: MODERN_COUNTRY_COLOR,
     },
   };
 }
@@ -114,6 +116,7 @@ export function generateModernCountriesData(): PartialTimeBoundGeographicRegionG
       id: "modern-countries",
       title: "Modern Countries",
       description: "Countries of the world by independence date",
+      color: MODERN_COUNTRY_GROUP_COLOR,
     },
   };
 }

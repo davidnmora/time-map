@@ -7,6 +7,8 @@ import type {
 import { generateModernCountriesData } from "./modern-countries";
 import { calculateTotalArea, addTitleToHierarchy } from "./data-utils";
 
+const COMPLETE_DATASET_COLOR = "#0080ff";
+
 function completeRegion(
   region: PartialTimeBoundGeographicRegion,
   hierarchy: string[] = []
@@ -42,6 +44,7 @@ const partialDataset: PartialTimeBoundGeographicRegionGroup = {
     id: "complete-dataset",
     title: "",
     description: "All geographic regions by time period",
+    color: COMPLETE_DATASET_COLOR,
   },
 };
 

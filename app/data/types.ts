@@ -4,7 +4,7 @@ export type Metadata = {
   id: string;
   title: string;
   description?: string;
-  color?: string;
+  color: string;
 };
 
 export type TimeRange = [number, number | null];

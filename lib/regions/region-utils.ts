@@ -1,4 +1,6 @@
-import type { GeographicRegionMapLayer } from "./types";
+import type {
+  InteractiveGeographicRegionMapLayer,
+} from "./types";
 import type {
   TimeRange,
   TimeBoundGeographicRegionGroup,
@@ -44,7 +46,7 @@ export const formatTimeRange = (timeRange: TimeRange): string => {
 
 export function convertAllToMapRegions(
   group: TimeBoundGeographicRegionGroup
-): GeographicRegionMapLayer[] {
+): InteractiveGeographicRegionMapLayer[] {
   const regions = getAFlagListOfAllRegions(group);
   return regions.flatMap((region) =>
     region.geographicRegions.map((geoRegion, index) => ({

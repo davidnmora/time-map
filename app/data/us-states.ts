@@ -12,6 +12,8 @@ type StateFounded = {
   founded: number;
 };
 
+const US_STATE_COLOR = "#0080ff";
+
 function findStateFeature(
   stateName: string,
   geojson: GeoJSON.FeatureCollection
@@ -43,7 +45,7 @@ function createTimeBoundRegionForState(
       id: `state-${stateName.toLowerCase().replace(/\s+/g, "-")}`,
       title: stateName,
       description: `State of ${stateName}, founded in ${foundedYear}`,
-      color: "#0080ff",
+      color: US_STATE_COLOR,
     },
   };
 }
@@ -71,6 +73,7 @@ export function generateUSStatesData(): PartialTimeBoundGeographicRegionGroup {
       id: "united-states",
       title: "United States",
       description: "'MERICA! F**K YEAH!'",
+      color: US_STATE_COLOR,
     },
   };
 }

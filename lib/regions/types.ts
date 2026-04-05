@@ -12,3 +12,10 @@ export type GeographicRegionMapLayer = {
   timeRange?: TimeRange;
   hierarchy?: string[];
 };
+
+export type InteractiveGeographicRegionMapLayer = Omit<
+  GeographicRegionMapLayer,
+  "fillColor"
+> & {
+  fillColor: string;
+};
