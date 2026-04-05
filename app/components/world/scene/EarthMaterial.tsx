@@ -5,8 +5,8 @@ import { useLoader, useThree } from "@react-three/fiber";
 import { useLayoutEffect, useMemo } from "react";
 
 const TEXTURE_URLS = [
-  "/threejs-map/textures/earth-daymap-4k.jpg",
-  "/threejs-map/textures/earth-clouds-4k.jpg",
+  "/world/textures/earth-daymap-4k.jpg",
+  "/world/textures/earth-clouds-4k.jpg",
 ] as const;
 
 const AMBIENT_SURFACE_SCALE = 0.68;

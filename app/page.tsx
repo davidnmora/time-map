@@ -8,7 +8,7 @@ import type { GeographicRegionMapLayer } from "@/lib/regions/types";
 import { convertAllToMapRegions } from "@/lib/regions/region-utils";
 import { Timeline } from "./components/timeline/Timeline";
 import { calculateTimelineWidth } from "./components/timeline/timeline-utils";
-import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/threejs-map/scene/constants";
+import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/world/scene/constants";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { completeDataset } from "./data/complete-dataset";
@@ -16,8 +16,8 @@ import { getAFlagListOfAllRegions } from "./data/data-utils";
 import modernCountries from "./data/modern-countries.json";
 import "./globals.css";
 
-const ThreeJSMap = dynamic(
-  () => import("./components/threejs-map/ThreeJSMap"),
+const World = dynamic(
+  () => import("./components/world/World"),
   {
     ssr: false,
     loading: () => (
@@ -26,7 +26,7 @@ const ThreeJSMap = dynamic(
   },
 );
 
-const THREE_JS_MAP_GEOGRAPHIC_REGIONS: GeographicRegionMapLayer[] = [
+const WORLD_GEOGRAPHIC_REGIONS: GeographicRegionMapLayer[] = [
   {
     id: "modern-countries",
     data: modernCountries as GeoJSON.FeatureCollection,
@@ -70,8 +70,8 @@ function MapContent() {
     <HoveredElementProvider>
       <div className="h-screen w-screen relative">
         <div className="absolute inset-0">
-          <ThreeJSMap
-            geographicRegions={THREE_JS_MAP_GEOGRAPHIC_REGIONS}
+          <World
+            geographicRegions={WORLD_GEOGRAPHIC_REGIONS}
             interactiveRegions={INTERACTIVE_MAP_REGIONS}
             timelineWidth={timelineWidth}
             timelineExpanded={timelineExpanded}

@@ -47,19 +47,19 @@ function buildTooltipData(region: GeographicRegionMapLayer): TooltipData {
   };
 }
 
-type ThreeJSMapProps = {
+type WorldProps = {
   geographicRegions?: GeographicRegionMapLayer[];
   interactiveRegions?: GeographicRegionMapLayer[];
   timelineWidth: number;
   timelineExpanded: boolean;
 };
 
-export default function ThreeJSMap({
+export default function World({
   geographicRegions = EMPTY_REGIONS,
   interactiveRegions = EMPTY_REGIONS,
   timelineWidth,
   timelineExpanded,
-}: ThreeJSMapProps) {
+}: WorldProps) {
   const { cameraPosition, currentYear, updateState } = useAppState();
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
   const [tooltipState, setTooltipState] = useState<TooltipState | null>(null);

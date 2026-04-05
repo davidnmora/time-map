@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { useMemo, useRef } from "react";
 import { ORBIT_MAX_DISTANCE } from "./constants";
 
-const CIRCLE_TEXTURE_URL = "/threejs-map/circle.png";
+const CIRCLE_TEXTURE_URL = "/world/circle.png";
 const POINT_SIZE = 0.2;
 const STAR_COUNT = 3000;
 const HSL_HUE = 0.6;

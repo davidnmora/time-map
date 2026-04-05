@@ -11,7 +11,7 @@ import {
   SUN_DIRECTION,
 } from "./constants";
 
-const MOON_TEXTURE_URL = "/threejs-map/textures/moon-2k.jpg";
+const MOON_TEXTURE_URL = "/world/textures/moon-2k.jpg";
 const SPHERE_SEGMENTS = 32;
 const ORBIT_RING_SEGMENTS = 256;
 const ORBIT_RING_COLOR = 0x555577;
