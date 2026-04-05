@@ -6,7 +6,7 @@ import { useThree } from "@react-three/fiber";
 import { Line2 } from "three/examples/jsm/lines/Line2.js";
 import * as THREE from "three";
 import type { GeographicRegionMapLayer } from "@/app/components/map/geographic-region-map-layer";
-import { drawThreeGeo } from "@/lib/threeGeoJSON";
+import { drawThreeGeo } from "@/lib/geo/threeGeoJSON";
 import {
   EARTH_ICOSAHEDRON_RADIUS,
   GEOJSON_OVERLAY_LINE_COLOR,

@@ -11,7 +11,7 @@ import {
 import { useHoveredElement } from "@/app/contexts/HoveredElementContext";
 import { RegionTooltip } from "@/app/components/shared/RegionTooltip";
 import Earth from "./scene/Earth";
-import EarthOrbitControls from "./scene/EarthOrbitControls";
+import EarthOrbitControls from "./controls/EarthOrbitControls";
 import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
 import InteractiveGlobeRegions from "./scene/InteractiveGlobeRegions";
 import Moon from "./scene/Moon";

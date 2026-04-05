@@ -1,7 +1,7 @@
 import { useThree, useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { MAPBOX_EASE, createCubicBezierEasing } from "./cubic-bezier";
+import { MAPBOX_EASE, createCubicBezierEasing } from "@/lib/math/cubic-bezier";
 import {
   ORBIT_MIN_DISTANCE_FROM_CENTER,
   ORBIT_MAX_DISTANCE,
@@ -10,7 +10,7 @@ import {
   ZOOM_MAX_SCALE_PER_FRAME,
   ZOOM_WHEEL_EASING_DURATION_MS,
   ZOOM_WHEEL_DELTA_DIVISOR,
-} from "./constants";
+} from "../scene/constants";
 
 const LINE_DELTA_MULTIPLIER = 40;
 const TRACKPAD_ABS_THRESHOLD = 4;

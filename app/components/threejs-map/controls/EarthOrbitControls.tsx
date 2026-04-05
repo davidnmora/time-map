@@ -13,7 +13,7 @@ import {
   ORBIT_ROTATE_PROXIMITY_DAMPENING,
   ORBIT_ROTATE_TRACKING_SCALE,
   ORBIT_TARGET,
-} from "./constants";
+} from "../scene/constants";
 import useMapboxStyleZoom from "./useMapboxStyleZoom";
 
 const CAMERA_SETTLED_THRESHOLD_SQ = 1e-8;

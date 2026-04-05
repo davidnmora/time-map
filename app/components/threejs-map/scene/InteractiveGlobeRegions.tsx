@@ -6,7 +6,7 @@ import type { ThreeEvent } from "@react-three/fiber";
 import type { GeographicRegionMapLayer } from "@/app/components/map/geographic-region-map-layer";
 import { doesRegionIdMatch } from "@/app/components/map/map-utils";
 import { isTimeRangeActive } from "@/app/data/data-utils";
-import { createRegionGeometry, FILL_SURFACE_OFFSET } from "./globe-region-utils";
+import { createRegionGeometry, FILL_SURFACE_OFFSET } from "@/lib/geo/globe-region-utils";
 import { EARTH_ICOSAHEDRON_RADIUS } from "./constants";
 
 const DEFAULT_FILL_COLOR = "#0080ff";
