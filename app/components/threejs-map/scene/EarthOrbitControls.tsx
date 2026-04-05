@@ -5,11 +5,11 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
-  EARTH_ICOSAHEDRON_RADIUS,
   ORBIT_DAMPING_FACTOR,
   ORBIT_MAX_DISTANCE,
-  ORBIT_MIN_CAMERA_TO_TARGET_AT_SURFACE,
-  ORBIT_SURFACE_CLEARANCE,
+  ORBIT_MIN_DISTANCE_FROM_CENTER,
+  ORBIT_TARGET,
+  ORBIT_ZOOM_SPEED_CURVE_EXPONENT,
   ORBIT_ZOOM_SPEED_FAR,
   ORBIT_ZOOM_SPEED_NEAR,
 } from "./constants";
@@ -22,25 +22,28 @@ export default function EarthOrbitControls() {
     if (!controls) {
       return;
     }
-    const targetRadius = controls.target.length();
-    const clearanceFromCenter =
-      EARTH_ICOSAHEDRON_RADIUS + ORBIT_SURFACE_CLEARANCE - targetRadius;
-    controls.minDistance = Math.max(
-      ORBIT_MIN_CAMERA_TO_TARGET_AT_SURFACE,
-      clearanceFromCenter,
+    controls.target.set(
+      ORBIT_TARGET[0],
+      ORBIT_TARGET[1],
+      ORBIT_TARGET[2],
     );
-
+    controls.minDistance = ORBIT_MIN_DISTANCE_FROM_CENTER;
     const distance = controls.getDistance();
-    const span = ORBIT_MAX_DISTANCE - controls.minDistance;
+    const span = ORBIT_MAX_DISTANCE - ORBIT_MIN_DISTANCE_FROM_CENTER;
     const zoomT =
       span > 0
         ? Math.max(
             0,
-            Math.min(1, (distance - controls.minDistance) / span),
+            Math.min(
+              1,
+              (distance - ORBIT_MIN_DISTANCE_FROM_CENTER) / span,
+            ),
           )
         : 0;
+    const responsiveness = Math.pow(zoomT, ORBIT_ZOOM_SPEED_CURVE_EXPONENT);
     controls.zoomSpeed =
-      ORBIT_ZOOM_SPEED_NEAR + zoomT * (ORBIT_ZOOM_SPEED_FAR - ORBIT_ZOOM_SPEED_NEAR);
+      ORBIT_ZOOM_SPEED_NEAR +
+      responsiveness * (ORBIT_ZOOM_SPEED_FAR - ORBIT_ZOOM_SPEED_NEAR);
   });
 
   return (
@@ -48,9 +51,11 @@ export default function EarthOrbitControls() {
       ref={ref}
       enableDamping
       dampingFactor={ORBIT_DAMPING_FACTOR}
+      enablePan={false}
       maxDistance={ORBIT_MAX_DISTANCE}
+      minDistance={ORBIT_MIN_DISTANCE_FROM_CENTER}
+      target={ORBIT_TARGET}
       zoomSpeed={ORBIT_ZOOM_SPEED_NEAR}
-      zoomToCursor
     />
   );
 }

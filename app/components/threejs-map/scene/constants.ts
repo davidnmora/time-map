@@ -7,11 +7,14 @@ export const EARTH_ICOSAHEDRON_DETAIL = 64;
 export const EARTH_AXIAL_TILT_DEGREES = 23.4;
 
 export const ORBIT_SURFACE_CLEARANCE = 0.22;
-export const ORBIT_MIN_CAMERA_TO_TARGET_AT_SURFACE = 0.45;
+export const ORBIT_MIN_DISTANCE_FROM_CENTER =
+  EARTH_ICOSAHEDRON_RADIUS + ORBIT_SURFACE_CLEARANCE;
 export const ORBIT_MAX_DISTANCE = 96;
 export const ORBIT_DAMPING_FACTOR = 0.06;
-export const ORBIT_ZOOM_SPEED_NEAR = 0.42;
-export const ORBIT_ZOOM_SPEED_FAR = 1;
+export const ORBIT_TARGET: [number, number, number] = [0, 0, 0];
+export const ORBIT_ZOOM_SPEED_NEAR = 0.16;
+export const ORBIT_ZOOM_SPEED_FAR = 0.68;
+export const ORBIT_ZOOM_SPEED_CURVE_EXPONENT = 2.35;
 
 export const CAMERA_INITIAL_POSITION: [number, number, number] = [0, 0.1, 5];
 
