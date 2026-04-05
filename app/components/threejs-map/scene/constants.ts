@@ -14,9 +14,12 @@ export const ORBIT_MIN_DISTANCE_FROM_CENTER =
 export const ORBIT_MAX_DISTANCE = 160;
 export const ORBIT_DAMPING_FACTOR = 0.06;
 export const ORBIT_TARGET: CameraPosition = [0, 0, 0];
-export const ORBIT_ZOOM_SPEED_NEAR = 0.16;
-export const ORBIT_ZOOM_SPEED_FAR = 0.68;
-export const ORBIT_ZOOM_SPEED_CURVE_EXPONENT = 2.35;
+export const ZOOM_WHEEL_RATE = 1 / 450;
+export const ZOOM_TRACKPAD_RATE = 1 / 100;
+export const ZOOM_MAX_SCALE_PER_FRAME = 2;
+export const ZOOM_WHEEL_EASING_DURATION_MS = 200;
+export const ZOOM_WHEEL_DELTA_DIVISOR = 4.000244140625;
+
 export const ORBIT_ROTATE_SPEED_NEAR = 0.085;
 export const ORBIT_ROTATE_SPEED_FAR = 3;
 export const ORBIT_ROTATE_RESPONSE_SHARPNESS = 3.4;

@@ -14,10 +14,8 @@ import {
   ORBIT_ROTATE_SPEED_FAR,
   ORBIT_ROTATE_SPEED_NEAR,
   ORBIT_TARGET,
-  ORBIT_ZOOM_SPEED_CURVE_EXPONENT,
-  ORBIT_ZOOM_SPEED_FAR,
-  ORBIT_ZOOM_SPEED_NEAR,
 } from "./constants";
+import useMapboxStyleZoom from "./useMapboxStyleZoom";
 
 const CAMERA_SETTLED_THRESHOLD_SQ = 1e-8;
 
@@ -57,6 +55,8 @@ export default function EarthOrbitControls({
   const hasPendingChangeRef = useRef(false);
   const lastFramePositionRef = useRef(new THREE.Vector3());
 
+  useMapboxStyleZoom(ref);
+
   useFrame(() => {
     const controls = ref.current;
     if (!controls) {
@@ -64,19 +64,13 @@ export default function EarthOrbitControls({
     }
     controls.target.set(ORBIT_TARGET[0], ORBIT_TARGET[1], ORBIT_TARGET[2]);
     controls.minDistance = ORBIT_MIN_DISTANCE_FROM_CENTER;
+
     const distance = controls.getDistance();
     const zoomT = normalizedDistanceToTargetRange(
       distance,
       ORBIT_MIN_DISTANCE_FROM_CENTER,
       ORBIT_MAX_DISTANCE,
     );
-    const zoomResponsiveness = Math.pow(
-      zoomT,
-      ORBIT_ZOOM_SPEED_CURVE_EXPONENT,
-    );
-    controls.zoomSpeed =
-      ORBIT_ZOOM_SPEED_NEAR +
-      zoomResponsiveness * (ORBIT_ZOOM_SPEED_FAR - ORBIT_ZOOM_SPEED_NEAR);
     const rotateResponsiveness = exponentialSaturate01(
       zoomT,
       ORBIT_ROTATE_RESPONSE_SHARPNESS,
@@ -111,12 +105,12 @@ export default function EarthOrbitControls({
       }}
       enableDamping
       dampingFactor={ORBIT_DAMPING_FACTOR}
+      enableZoom={false}
       enablePan={false}
       maxDistance={ORBIT_MAX_DISTANCE}
       minDistance={ORBIT_MIN_DISTANCE_FROM_CENTER}
       target={ORBIT_TARGET}
       rotateSpeed={ORBIT_ROTATE_SPEED_NEAR}
-      zoomSpeed={ORBIT_ZOOM_SPEED_NEAR}
     />
   );
 }
