@@ -14,7 +14,7 @@ import {
   ORBIT_ROTATE_TRACKING_SCALE,
   ORBIT_TARGET,
 } from "../scene/constants";
-import useMapboxStyleZoom from "./useMapboxStyleZoom";
+import useEasedOrbitZoom from "./useEasedOrbitZoom";
 
 const CAMERA_SETTLED_THRESHOLD_SQ = 1e-8;
 
@@ -48,7 +48,7 @@ export default function EarthOrbitControls({
   const hasPendingChangeRef = useRef(false);
   const lastFramePositionRef = useRef(new THREE.Vector3());
 
-  useMapboxStyleZoom(ref);
+  useEasedOrbitZoom(ref);
 
   useFrame(() => {
     const controls = ref.current;

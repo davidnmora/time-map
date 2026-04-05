@@ -97,4 +97,4 @@ export function createCubicBezierEasing(x1: number, y1: number, x2: number, y2: 
   };
 }
 
-export const MAPBOX_EASE = createCubicBezierEasing(0.25, 0.1, 0.25, 1.0);
+export const STANDARD_SMOOTH_EASE = createCubicBezierEasing(0.25, 0.1, 0.25, 1.0);

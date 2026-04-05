@@ -1,7 +1,10 @@
 import { useThree, useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { MAPBOX_EASE, createCubicBezierEasing } from "@/lib/math/cubic-bezier";
+import {
+  STANDARD_SMOOTH_EASE,
+  createCubicBezierEasing,
+} from "@/lib/math/cubic-bezier";
 import {
   ORBIT_MIN_DISTANCE_FROM_CENTER,
   ORBIT_MAX_DISTANCE,
@@ -29,7 +32,7 @@ type ZoomAnimation = {
 function classifyInputType(
   deltaY: number,
   timeSinceLastEvent: number,
-  previousType: InputType | null,
+  previousType: InputType | null
 ): InputType {
   if (deltaY !== 0 && deltaY % ZOOM_WHEEL_DELTA_DIVISOR === 0) {
     return "wheel";
@@ -49,27 +52,28 @@ function classifyInputType(
 }
 
 function sigmoidScale(delta: number, rate: number): number {
-  return (
-    ZOOM_MAX_SCALE_PER_FRAME /
-    (1 + Math.exp(-Math.abs(delta * rate)))
-  );
+  return ZOOM_MAX_SCALE_PER_FRAME / (1 + Math.exp(-Math.abs(delta * rate)));
 }
 
-function buildChainedEasing(prevEasing: (t: number) => number, prevT: number): (t: number) => number {
+function buildChainedEasing(
+  prevEasing: (t: number) => number,
+  prevT: number
+): (t: number) => number {
   const SAMPLE_OFFSET = 0.01;
   const SPEED_SCALE_X = 0.27;
   const SPEED_SCALE_Y = 0.01;
   const MIN_DENOMINATOR = 0.0001;
 
-  const speed = prevEasing(Math.min(prevT + SAMPLE_OFFSET, 1)) - prevEasing(prevT);
-  const x = SPEED_SCALE_X * speed / Math.max(MIN_DENOMINATOR, speed);
-  const y = SPEED_SCALE_Y * speed / Math.max(MIN_DENOMINATOR, speed);
+  const speed =
+    prevEasing(Math.min(prevT + SAMPLE_OFFSET, 1)) - prevEasing(prevT);
+  const x = (SPEED_SCALE_X * speed) / Math.max(MIN_DENOMINATOR, speed);
+  const y = (SPEED_SCALE_Y * speed) / Math.max(MIN_DENOMINATOR, speed);
 
   return createCubicBezierEasing(x, y, 0.25, 1);
 }
 
-export default function useMapboxStyleZoom(
-  controlsRef: React.RefObject<OrbitControlsImpl | null>,
+export default function useEasedOrbitZoom(
+  controlsRef: React.RefObject<OrbitControlsImpl | null>
 ) {
   const gl = useThree((state) => state.gl);
 
@@ -99,7 +103,7 @@ export default function useMapboxStyleZoom(
       inputTypeRef.current = classifyInputType(
         value,
         timeSinceLastEvent,
-        inputTypeRef.current,
+        inputTypeRef.current
       );
 
       deltaRef.current -= value;
@@ -133,17 +137,16 @@ export default function useMapboxStyleZoom(
 
     if (delta !== 0) {
       const rate =
-        inputTypeRef.current === "wheel"
-          ? ZOOM_WHEEL_RATE
-          : ZOOM_TRACKPAD_RATE;
+        inputTypeRef.current === "wheel" ? ZOOM_WHEEL_RATE : ZOOM_TRACKPAD_RATE;
 
       const rawScale = sigmoidScale(delta, rate);
       const scale = delta < 0 ? 1 / rawScale : rawScale;
 
-      const currentTarget = animationRef.current?.targetDistance ?? currentDistance;
+      const currentTarget =
+        animationRef.current?.targetDistance ?? currentDistance;
       const newTarget = Math.max(
         ORBIT_MIN_DISTANCE_FROM_CENTER,
-        Math.min(ORBIT_MAX_DISTANCE, currentTarget / scale),
+        Math.min(ORBIT_MAX_DISTANCE, currentTarget / scale)
       );
 
       deltaRef.current = 0;
@@ -155,9 +158,12 @@ export default function useMapboxStyleZoom(
           prevAnimation !== null
             ? buildChainedEasing(
                 prevAnimation.easing,
-                Math.min((now - prevAnimation.startTime) / ZOOM_WHEEL_EASING_DURATION_MS, 1),
+                Math.min(
+                  (now - prevAnimation.startTime) / ZOOM_WHEEL_EASING_DURATION_MS,
+                  1
+                )
               )
-            : MAPBOX_EASE;
+            : STANDARD_SMOOTH_EASE;
 
         animationRef.current = {
           startDistance: currentDistance,
