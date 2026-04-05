@@ -13,10 +13,7 @@ import {
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 type AppState = {
-  zoom: number;
-  center: [number, number];
-  pitch: number;
-  bearing: number;
+  cameraPosition: [number, number, number];
   currentYear: number;
   minYear: number;
   maxYear: number;
@@ -24,10 +21,7 @@ type AppState = {
 };
 
 type PartialAppState = {
-  zoom?: number;
-  center?: [number, number];
-  pitch?: number;
-  bearing?: number;
+  cameraPosition?: [number, number, number];
   currentYear?: number;
   minYear?: number;
   maxYear?: number;
@@ -39,10 +33,7 @@ type UpdateOptions = {
 };
 
 type AppStateContextType = {
-  zoom: number;
-  center: [number, number];
-  pitch: number;
-  bearing: number;
+  cameraPosition: [number, number, number];
   currentYear: number;
   minYear: number;
   maxYear: number;
@@ -61,12 +52,7 @@ const AppStateContext = createContext<AppStateContextType | undefined>(
 
 const URL_DEBOUNCE_MS = 300;
 
-const DEFAULT_ZOOM = 2.175393325182904;
-const DEFAULT_CENTER: [number, number] = [
-  -85.53107857918121, 34.06934691684232,
-];
-const DEFAULT_PITCH = 3.4;
-const DEFAULT_BEARING = 11.9;
+const DEFAULT_CAMERA_POSITION: [number, number, number] = [0, 0.1, 5];
 const DEFAULT_TIMELINE_EXPANDED = true;
 const DEFAULT_MIN_YEAR = 1731;
 const DEFAULT_MAX_YEAR = 2050;
@@ -82,10 +68,7 @@ function calculateMidpointYear(minYear: number, maxYear: number): number {
 
 function getDefaultState(): AppState {
   return {
-    zoom: DEFAULT_ZOOM,
-    center: DEFAULT_CENTER,
-    pitch: DEFAULT_PITCH,
-    bearing: DEFAULT_BEARING,
+    cameraPosition: DEFAULT_CAMERA_POSITION,
     currentYear: DEFAULT_CURRENT_YEAR,
     minYear: DEFAULT_MIN_YEAR,
     maxYear: DEFAULT_MAX_YEAR,
@@ -93,21 +76,23 @@ function getDefaultState(): AppState {
   };
 }
 
-function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
-  const zoomParam = searchParams.get("zoom");
-  const zoom = zoomParam ? parseFloat(zoomParam) : undefined;
+function parseCameraPosition(
+  raw: string | null,
+): [number, number, number] | undefined {
+  if (!raw) return undefined;
+  try {
+    const parts = raw.split(",").map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return undefined;
+    return parts as [number, number, number];
+  } catch {
+    return undefined;
+  }
+}
 
-  const centerParam = searchParams.get("center");
-  const center = (() => {
-    if (!centerParam) return undefined;
-    try {
-      const [lng, lat] = centerParam.split(",").map(Number);
-      if (isNaN(lng) || isNaN(lat)) return undefined;
-      return [lng, lat] as [number, number];
-    } catch {
-      return undefined;
-    }
-  })();
+function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
+  const cameraPosition = parseCameraPosition(
+    searchParams.get("cameraPosition"),
+  );
 
   const currentYearParam = searchParams.get("currentYear");
   const currentYear = currentYearParam
@@ -120,12 +105,6 @@ function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
   const maxYearParam = searchParams.get("maxYear");
   const maxYear = maxYearParam ? parseFloat(maxYearParam) : undefined;
 
-  const pitchParam = searchParams.get("pitch");
-  const pitch = pitchParam ? parseFloat(pitchParam) : undefined;
-
-  const bearingParam = searchParams.get("bearing");
-  const bearing = bearingParam ? parseFloat(bearingParam) : undefined;
-
   const timelineExpandedParam = searchParams.get("timelineExpanded");
   const timelineExpanded =
     timelineExpandedParam === null
@@ -133,10 +112,7 @@ function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
       : timelineExpandedParam === "true";
 
   return {
-    zoom,
-    center,
-    pitch,
-    bearing,
+    cameraPosition,
     currentYear,
     minYear,
     maxYear,
@@ -145,10 +121,7 @@ function readStateFromURL(searchParams: URLSearchParams): PartialAppState {
 }
 
 const APP_STATE_KEYS: Array<keyof AppState> = [
-  "zoom",
-  "center",
-  "pitch",
-  "bearing",
+  "cameraPosition",
   "currentYear",
   "minYear",
   "maxYear",
@@ -181,16 +154,16 @@ function mergeAppState(partial: PartialAppState, complete: AppState): AppState {
 
 function writeStateToURL(
   state: PartialAppState,
-  currentParams: URLSearchParams
+  currentParams: URLSearchParams,
 ): string {
   const params = new URLSearchParams(currentParams.toString());
 
   APP_STATE_KEYS.forEach((key) => {
     const value = state[key];
     if (value !== undefined) {
-      if (key === "center") {
-        const center = value as [number, number];
-        params.set(key, `${center[0]},${center[1]}`);
+      if (key === "cameraPosition") {
+        const pos = value as [number, number, number];
+        params.set(key, `${pos[0]},${pos[1]},${pos[2]}`);
       } else if (key === "timelineExpanded") {
         params.set(key, (value as boolean).toString());
       } else {

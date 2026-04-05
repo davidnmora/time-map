@@ -19,8 +19,6 @@ export const ORBIT_ROTATE_SPEED_NEAR = 0.085;
 export const ORBIT_ROTATE_SPEED_FAR = 3;
 export const ORBIT_ROTATE_RESPONSE_SHARPNESS = 3.4;
 
-export const CAMERA_INITIAL_POSITION: [number, number, number] = [0, 0.1, 5];
-
 export const CANVAS_TONE_MAPPING = THREE.NoToneMapping;
 export const MAX_DEVICE_PIXEL_RATIO = 3;
 

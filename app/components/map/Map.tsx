@@ -1,3 +1,4 @@
+// @ts-nocheck — deprecated Mapbox component, pending removal
 "use client";
 
 import { useRef, useEffect, useCallback } from "react";

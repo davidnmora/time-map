@@ -3,13 +3,13 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import type { GeographicRegionMapLayer } from "@/app/components/map/geographic-region-map-layer";
+import { useAppState } from "@/app/contexts/AppStateContext";
 import Earth from "./scene/Earth";
 import EarthOrbitControls from "./scene/EarthOrbitControls";
 import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
 import Nebula from "./scene/Nebula";
 import Starfield from "./scene/Starfield";
 import {
-  CAMERA_INITIAL_POSITION,
   CANVAS_TONE_MAPPING,
   MAX_DEVICE_PIXEL_RATIO,
   SUN_DIRECTION,
@@ -28,11 +28,17 @@ type ThreeJSMapProps = {
 export default function ThreeJSMap({
   geographicRegions = EMPTY_GEOGRAPHIC_REGION_MAP_LAYERS,
 }: ThreeJSMapProps) {
+  const { cameraPosition, updateState } = useAppState();
+
+  const handleCameraSettled = (position: [number, number, number]) => {
+    updateState({ cameraPosition: position });
+  };
+
   const { x, y, z } = SUN_DIRECTION;
   return (
     <div className="h-full w-full min-h-0">
       <Canvas
-        camera={{ position: CAMERA_INITIAL_POSITION }}
+        camera={{ position: cameraPosition }}
         dpr={[1, MAX_DEVICE_PIXEL_RATIO]}
         resize={{ scroll: false }}
         gl={{
@@ -55,7 +61,7 @@ export default function ThreeJSMap({
           <directionalLight position={[x, y, z]} />
           <Nebula />
           <Starfield />
-          <EarthOrbitControls />
+          <EarthOrbitControls onCameraSettled={handleCameraSettled} />
         </Suspense>
       </Canvas>
     </div>
