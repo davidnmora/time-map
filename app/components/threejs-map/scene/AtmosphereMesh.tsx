@@ -9,6 +9,8 @@ const ICOSAHEDRON_RADIUS = 2.03;
 const ICOSAHEDRON_DETAIL = 32;
 
 const ATMOSPHERE_VERTEX_SHADER = `
+  #include <common>
+  #include <logdepthbuf_pars_vertex>
   uniform float fresnelBias;
   uniform float fresnelScale;
   uniform float fresnelPower;
@@ -26,16 +28,19 @@ const ATMOSPHERE_VERTEX_SHADER = `
     vReflectionFactor = fresnelBias + fresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), fresnelPower );
 
     gl_Position = projectionMatrix * mvPosition;
+    #include <logdepthbuf_vertex>
   }
   `;
 
 const ATMOSPHERE_FRAGMENT_SHADER = `
+  #include <logdepthbuf_pars_fragment>
   uniform vec3 color1;
   uniform vec3 color2;
 
   varying float vReflectionFactor;
 
   void main() {
+    #include <logdepthbuf_fragment>
     float f = clamp( vReflectionFactor, 0.0, 1.0 );
     gl_FragColor = vec4(mix(color2, color1, vec3(f)), f);
   }

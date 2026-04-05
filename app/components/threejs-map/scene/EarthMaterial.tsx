@@ -14,12 +14,15 @@ const TERMINATOR_SHADOW_EDGE = -0.52;
 const TERMINATOR_DAY_EDGE = 0.52;
 
 const EARTH_VERTEX_SHADER = `
+    #include <common>
+    #include <logdepthbuf_pars_vertex>
     varying vec2 vUv;
     varying vec3 vNormal;
 
     void main() {
       vec4 modelPosition = modelMatrix * vec4(position, 1.0);
       gl_Position = projectionMatrix * viewMatrix * modelPosition;
+      #include <logdepthbuf_vertex>
 
       vec3 modelNormal = (modelMatrix * vec4(normal, 0.0)).xyz;
 
@@ -29,6 +32,7 @@ const EARTH_VERTEX_SHADER = `
   `;
 
 const EARTH_FRAGMENT_SHADER = `
+    #include <logdepthbuf_pars_fragment>
     uniform sampler2D dayTexture;
     uniform sampler2D cloudsTexture;
     uniform vec3 sunDirection;
@@ -37,6 +41,7 @@ const EARTH_FRAGMENT_SHADER = `
     varying vec3 vNormal;
 
     void main() {
+      #include <logdepthbuf_fragment>
       vec3 normal = normalize(vNormal);
       vec3 color = vec3(0.0);
 

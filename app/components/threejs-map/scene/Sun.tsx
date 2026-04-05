@@ -21,6 +21,8 @@ const SUN_POSITION = SUN_DIRECTION
 const GLOW_SPHERE_SEGMENTS = 48;
 
 const GLOW_VERTEX_SHADER = `
+  #include <common>
+  #include <logdepthbuf_pars_vertex>
   varying vec3 vNormal;
   varying vec3 vViewDir;
 
@@ -29,10 +31,12 @@ const GLOW_VERTEX_SHADER = `
     vViewDir = normalize(cameraPosition - worldPos.xyz);
     vNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
     gl_Position = projectionMatrix * viewMatrix * worldPos;
+    #include <logdepthbuf_vertex>
   }
 `;
 
 const GLOW_FRAGMENT_SHADER = `
+  #include <logdepthbuf_pars_fragment>
   uniform vec3 glowColor;
   uniform float opacity;
   uniform float falloff;
@@ -41,6 +45,7 @@ const GLOW_FRAGMENT_SHADER = `
   varying vec3 vViewDir;
 
   void main() {
+    #include <logdepthbuf_fragment>
     float facing = dot(normalize(vNormal), normalize(vViewDir));
     float strength = pow(max(facing, 0.0), falloff);
     gl_FragColor = vec4(glowColor, strength * opacity);
