@@ -3,9 +3,11 @@ import type { GeoJSON } from "geojson";
 
 const DEGREES_TO_RADIANS = Math.PI / 180;
 
-export const FILL_SURFACE_OFFSET = 0.004;
-
-const MAX_EDGE_LENGTH = 0.25;
+// These two balance each other: keeping the edge offset higher improves performance by reducing the number of vertices, but increases risk
+// that a geometry will not properly "bend" around the earth's curvature, creating holes or other artifacts.
+// Lifting the geometries slightly off the earth's surface, we can keep the edge offset low, but still avoid artifacts.
+export const FILL_SURFACE_OFFSET = 0.001;
+const MAX_EDGE_LENGTH = 0.12;
 
 const DUPLICATE_VERTEX_EPSILON = 1e-10;
 
