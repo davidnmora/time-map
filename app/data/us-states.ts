@@ -54,18 +54,17 @@ export function generateUSStatesData(): PartialTimeBoundGeographicRegionGroup {
   const statesFounded = statesFoundedData as StateFounded[];
   const geojson = statesData as GeoJSON.FeatureCollection;
 
-  const timeBoundRegions: PartialTimeBoundGeographicRegion[] = statesFounded
-    .map((state) => {
+  const timeBoundRegions = statesFounded.reduce<PartialTimeBoundGeographicRegion[]>(
+    (acc, state) => {
       const feature = findStateFeature(state.name, geojson);
       if (!feature) {
-        console.warn(`Could not find GeoJSON feature for state: ${state.name}`);
-        return null;
+        // console.warn(`Could not find GeoJSON feature for state: ${state.name}`);
+        return acc;
       }
-      return createTimeBoundRegionForState(state.name, state.founded, feature);
-    })
-    .filter(
-      (region): region is PartialTimeBoundGeographicRegion => region !== null
-    );
+      return [...acc, createTimeBoundRegionForState(state.name, state.founded, feature)];
+    },
+    []
+  );
 
   return {
     children: timeBoundRegions,

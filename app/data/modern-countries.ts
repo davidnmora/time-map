@@ -90,25 +90,19 @@ export function generateModernCountriesData(): PartialTimeBoundGeographicRegionG
   const countriesIndependence = independenceData as CountryIndependence[];
   const geojson = modernCountriesGeoJson;
 
-  const timeBoundRegions: PartialTimeBoundGeographicRegion[] = countriesIndependence
+  const timeBoundRegions = countriesIndependence
     .filter((country) => country.independence !== null)
-    .map((country) => {
+    .reduce<PartialTimeBoundGeographicRegion[]>((acc, country) => {
       const feature = findCountryFeature(country.country, geojson);
       if (!feature) {
-        console.warn(
-          `Could not find GeoJSON feature for country: ${country.country}`
-        );
-        return null;
+        // console.warn(`Could not find GeoJSON feature for country: ${country.country}`);
+        return acc;
       }
-      return createTimeBoundRegionForCountry(
-        country.country,
-        country.independence as number,
-        feature
-      );
-    })
-    .filter(
-      (region): region is PartialTimeBoundGeographicRegion => region !== null
-    );
+      return [
+        ...acc,
+        createTimeBoundRegionForCountry(country.country, country.independence as number, feature),
+      ];
+    }, []);
 
   return {
     children: timeBoundRegions,
