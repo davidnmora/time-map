@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import type { CameraPosition } from "@/app/contexts/AppStateContext";
+
 export const SUN_DIRECTION = new THREE.Vector3(-2, 0.5, 1.5);
 
 export const EARTH_ICOSAHEDRON_RADIUS = 2;
@@ -11,7 +13,7 @@ export const ORBIT_MIN_DISTANCE_FROM_CENTER =
   EARTH_ICOSAHEDRON_RADIUS + ORBIT_SURFACE_CLEARANCE;
 export const ORBIT_MAX_DISTANCE = 96;
 export const ORBIT_DAMPING_FACTOR = 0.06;
-export const ORBIT_TARGET: [number, number, number] = [0, 0, 0];
+export const ORBIT_TARGET: CameraPosition = [0, 0, 0];
 export const ORBIT_ZOOM_SPEED_NEAR = 0.16;
 export const ORBIT_ZOOM_SPEED_FAR = 0.68;
 export const ORBIT_ZOOM_SPEED_CURVE_EXPONENT = 2.35;

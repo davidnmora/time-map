@@ -4,6 +4,7 @@ import { OrbitControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
+import type { CameraPosition } from "@/app/contexts/AppStateContext";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   ORBIT_DAMPING_FACTOR,
@@ -46,7 +47,7 @@ function exponentialSaturate01(normalizedDistance: number, sharpness: number) {
 }
 
 type EarthOrbitControlsProps = {
-  onCameraSettled: (position: [number, number, number]) => void;
+  onCameraSettled: (position: CameraPosition) => void;
 };
 
 export default function EarthOrbitControls({

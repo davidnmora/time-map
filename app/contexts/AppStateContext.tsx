@@ -12,8 +12,10 @@ import {
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
+export type CameraPosition = [number, number, number];
+
 type AppState = {
-  cameraPosition: [number, number, number];
+  cameraPosition: CameraPosition;
   currentYear: number;
   minYear: number;
   maxYear: number;
@@ -21,7 +23,7 @@ type AppState = {
 };
 
 type PartialAppState = {
-  cameraPosition?: [number, number, number];
+  cameraPosition?: CameraPosition;
   currentYear?: number;
   minYear?: number;
   maxYear?: number;
@@ -33,7 +35,7 @@ type UpdateOptions = {
 };
 
 type AppStateContextType = {
-  cameraPosition: [number, number, number];
+  cameraPosition: CameraPosition;
   currentYear: number;
   minYear: number;
   maxYear: number;
@@ -52,7 +54,7 @@ const AppStateContext = createContext<AppStateContextType | undefined>(
 
 const URL_DEBOUNCE_MS = 300;
 
-const DEFAULT_CAMERA_POSITION: [number, number, number] = [0, 0.1, 5];
+const DEFAULT_CAMERA_POSITION: CameraPosition = [0, 0.1, 5];
 const DEFAULT_TIMELINE_EXPANDED = true;
 const DEFAULT_MIN_YEAR = 1731;
 const DEFAULT_MAX_YEAR = 2050;
@@ -78,12 +80,12 @@ function getDefaultState(): AppState {
 
 function parseCameraPosition(
   raw: string | null,
-): [number, number, number] | undefined {
+): CameraPosition | undefined {
   if (!raw) return undefined;
   try {
     const parts = raw.split(",").map(Number);
     if (parts.length !== 3 || parts.some(isNaN)) return undefined;
-    return parts as [number, number, number];
+    return parts as CameraPosition;
   } catch {
     return undefined;
   }
@@ -162,7 +164,7 @@ function writeStateToURL(
     const value = state[key];
     if (value !== undefined) {
       if (key === "cameraPosition") {
-        const pos = value as [number, number, number];
+        const pos = value as CameraPosition;
         params.set(key, `${pos[0]},${pos[1]},${pos[2]}`);
       } else if (key === "timelineExpanded") {
         params.set(key, (value as boolean).toString());

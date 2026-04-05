@@ -3,7 +3,10 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import type { GeographicRegionMapLayer } from "@/app/components/map/geographic-region-map-layer";
-import { useAppState } from "@/app/contexts/AppStateContext";
+import {
+  useAppState,
+  type CameraPosition,
+} from "@/app/contexts/AppStateContext";
 import Earth from "./scene/Earth";
 import EarthOrbitControls from "./scene/EarthOrbitControls";
 import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
@@ -30,7 +33,7 @@ export default function ThreeJSMap({
 }: ThreeJSMapProps) {
   const { cameraPosition, updateState } = useAppState();
 
-  const handleCameraSettled = (position: [number, number, number]) => {
+  const handleCameraSettled = (position: CameraPosition) => {
     updateState({ cameraPosition: position });
   };
 
