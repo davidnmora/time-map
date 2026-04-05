@@ -3,15 +3,14 @@
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { useMemo, useRef } from "react";
-import {
-  STARFIELD_CIRCLE_TEXTURE_URL,
-  STARFIELD_HSL_HUE,
-  STARFIELD_HSL_SATURATION,
-  STARFIELD_MIN_RADIUS,
-  STARFIELD_POINT_SIZE,
-  STARFIELD_RADIUS_SPREAD,
-  STARFIELD_STAR_COUNT,
-} from "./constants";
+
+const CIRCLE_TEXTURE_URL = "/threejs-map/circle.png";
+const POINT_SIZE = 0.2;
+const STAR_COUNT = 3000;
+const HSL_HUE = 0.6;
+const HSL_SATURATION = 0.2;
+const MIN_RADIUS = 25;
+const RADIUS_SPREAD = 25;
 
 type StarSample = {
   pos: THREE.Vector3;
@@ -20,7 +19,7 @@ type StarSample = {
 };
 
 function randomSpherePoint(): StarSample {
-  const radius = Math.random() * STARFIELD_RADIUS_SPREAD + STARFIELD_MIN_RADIUS;
+  const radius = Math.random() * RADIUS_SPREAD + MIN_RADIUS;
   const u = Math.random();
   const v = Math.random();
   const theta = 2 * Math.PI * u;
@@ -55,8 +54,8 @@ function buildPoints(
     const { pos } = sample;
     verts.push(pos.x, pos.y, pos.z);
     const col = new THREE.Color().setHSL(
-      STARFIELD_HSL_HUE,
-      STARFIELD_HSL_SATURATION,
+      HSL_HUE,
+      HSL_SATURATION,
       Math.random(),
     );
     initialColors.push(col.r, col.g, col.b);
@@ -68,7 +67,7 @@ function buildPoints(
     new THREE.Float32BufferAttribute(initialColors, 3),
   );
   const mat = new THREE.PointsMaterial({
-    size: STARFIELD_POINT_SIZE,
+    size: POINT_SIZE,
     vertexColors: true,
     map: starTexture,
   });
@@ -79,8 +78,8 @@ function buildPoints(
       const sample = positions[i];
       const bright = sample.update(t);
       const col = new THREE.Color().setHSL(
-        STARFIELD_HSL_HUE,
-        STARFIELD_HSL_SATURATION,
+        HSL_HUE,
+        HSL_SATURATION,
         bright,
       );
       nextColors.push(col.r, col.g, col.b);
@@ -93,12 +92,9 @@ function buildPoints(
 }
 
 export default function Starfield() {
-  const starTexture = useLoader(
-    THREE.TextureLoader,
-    STARFIELD_CIRCLE_TEXTURE_URL,
-  );
+  const starTexture = useLoader(THREE.TextureLoader, CIRCLE_TEXTURE_URL);
   const points = useMemo(
-    () => buildPoints(starTexture, STARFIELD_STAR_COUNT),
+    () => buildPoints(starTexture, STAR_COUNT),
     [starTexture],
   );
   const ref = useRef<THREE.Points>(null);

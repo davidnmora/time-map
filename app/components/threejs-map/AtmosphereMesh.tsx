@@ -1,13 +1,12 @@
 import * as THREE from "three";
-import {
-  ATMOSPHERE_FACING_COLOR,
-  ATMOSPHERE_FRESNEL_BIAS,
-  ATMOSPHERE_FRESNEL_POWER,
-  ATMOSPHERE_FRESNEL_SCALE,
-  ATMOSPHERE_ICOSAHEDRON_DETAIL,
-  ATMOSPHERE_ICOSAHEDRON_RADIUS,
-  ATMOSPHERE_RIM_COLOR,
-} from "./constants";
+
+const RIM_COLOR = 0x0088ff;
+const FACING_COLOR = 0x000000;
+const FRESNEL_BIAS = 0.1;
+const FRESNEL_SCALE = 1.0;
+const FRESNEL_POWER = 4.0;
+const ICOSAHEDRON_RADIUS = 2.03;
+const ICOSAHEDRON_DETAIL = 32;
 
 const ATMOSPHERE_VERTEX_SHADER = `
   uniform float fresnelBias;
@@ -48,22 +47,20 @@ type AtmosphereMeshProps = {
 };
 
 export default function AtmosphereMesh({
-  rimHex = ATMOSPHERE_RIM_COLOR,
-  facingHex = ATMOSPHERE_FACING_COLOR,
+  rimHex = RIM_COLOR,
+  facingHex = FACING_COLOR,
 }: AtmosphereMeshProps) {
   const uniforms = {
     color1: { value: new THREE.Color(rimHex) },
     color2: { value: new THREE.Color(facingHex) },
-    fresnelBias: { value: ATMOSPHERE_FRESNEL_BIAS },
-    fresnelScale: { value: ATMOSPHERE_FRESNEL_SCALE },
-    fresnelPower: { value: ATMOSPHERE_FRESNEL_POWER },
+    fresnelBias: { value: FRESNEL_BIAS },
+    fresnelScale: { value: FRESNEL_SCALE },
+    fresnelPower: { value: FRESNEL_POWER },
   };
 
   return (
     <mesh>
-      <icosahedronGeometry
-        args={[ATMOSPHERE_ICOSAHEDRON_RADIUS, ATMOSPHERE_ICOSAHEDRON_DETAIL]}
-      />
+      <icosahedronGeometry args={[ICOSAHEDRON_RADIUS, ICOSAHEDRON_DETAIL]} />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={ATMOSPHERE_VERTEX_SHADER}

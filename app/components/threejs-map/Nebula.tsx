@@ -2,17 +2,16 @@
 
 import * as THREE from "three";
 import { useMemo } from "react";
-import {
-  NEBULA_HUE,
-  NEBULA_LIGHTNESS_JITTER,
-  NEBULA_SATURATION,
-  NEBULA_SPRITE_BASE_SIZE,
-  NEBULA_SPRITE_COUNT,
-  NEBULA_SPRITE_OPACITY,
-  NEBULA_SPRITE_RADIUS,
-  NEBULA_SPRITE_Z,
-  RADIAL_GRADIENT_TEXTURE_SIZE,
-} from "./constants";
+
+const SPRITE_COUNT = 8;
+const SPRITE_RADIUS = 10;
+const SPRITE_Z = -10.5;
+const SPRITE_BASE_SIZE = 24;
+const SPRITE_OPACITY = 0.2;
+const HUE = 0.65;
+const SATURATION = 0.5;
+const LIGHTNESS_JITTER = 0.1;
+const RADIAL_GRADIENT_SIZE = 256;
 
 function buildRadialGradientTexture(size: number) {
   const canvas = document.createElement("canvas");
@@ -47,7 +46,11 @@ function buildSprite(
     transparent: true,
     opacity,
   });
-  spriteMat.color.offsetHSL(0, 0, Math.random() * NEBULA_LIGHTNESS_JITTER * 2 - NEBULA_LIGHTNESS_JITTER);
+  spriteMat.color.offsetHSL(
+    0,
+    0,
+    Math.random() * LIGHTNESS_JITTER * 2 - LIGHTNESS_JITTER,
+  );
   const sprite = new THREE.Sprite(spriteMat);
   sprite.position.set(pos.x, -pos.y, pos.z);
   const jitteredSize = size + Math.random() - 0.5;
@@ -58,20 +61,20 @@ function buildSprite(
 
 function buildNebulaGroup(texture: THREE.Texture) {
   const layerGroup = new THREE.Group();
-  for (let i = 0; i < NEBULA_SPRITE_COUNT; i += 1) {
-    const angle = (i / NEBULA_SPRITE_COUNT) * Math.PI * 2;
+  for (let i = 0; i < SPRITE_COUNT; i += 1) {
+    const angle = (i / SPRITE_COUNT) * Math.PI * 2;
     const pos = new THREE.Vector3(
-      Math.cos(angle) * Math.random() * NEBULA_SPRITE_RADIUS,
-      Math.sin(angle) * Math.random() * NEBULA_SPRITE_RADIUS,
-      NEBULA_SPRITE_Z + Math.random(),
+      Math.cos(angle) * Math.random() * SPRITE_RADIUS,
+      Math.sin(angle) * Math.random() * SPRITE_RADIUS,
+      SPRITE_Z + Math.random(),
     );
-    const color = new THREE.Color().setHSL(NEBULA_HUE, 1, NEBULA_SATURATION);
+    const color = new THREE.Color().setHSL(HUE, 1, SATURATION);
     const sprite = buildSprite(
       texture,
       color,
-      NEBULA_SPRITE_OPACITY,
+      SPRITE_OPACITY,
       pos,
-      NEBULA_SPRITE_BASE_SIZE,
+      SPRITE_BASE_SIZE,
     );
     layerGroup.add(sprite);
   }
@@ -80,7 +83,7 @@ function buildNebulaGroup(texture: THREE.Texture) {
 
 export default function Nebula() {
   const sprites = useMemo(() => {
-    const texture = buildRadialGradientTexture(RADIAL_GRADIENT_TEXTURE_SIZE);
+    const texture = buildRadialGradientTexture(RADIAL_GRADIENT_SIZE);
     return buildNebulaGroup(texture);
   }, []);
   return <primitive object={sprites} />;

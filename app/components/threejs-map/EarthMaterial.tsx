@@ -3,7 +3,12 @@
 import * as THREE from "three";
 import { useLoader, useThree } from "@react-three/fiber";
 import { useLayoutEffect, useMemo } from "react";
-import { EARTH_TEXTURE_URLS } from "./constants";
+
+const TEXTURE_URLS = [
+  "/threejs-map/textures/earth-daymap-4k.jpg",
+  "/threejs-map/textures/earth-nightmap-4k.jpg",
+  "/threejs-map/textures/earth-clouds-4k.jpg",
+] as const;
 
 const EARTH_VERTEX_SHADER = `
     varying vec2 vUv;
@@ -61,7 +66,7 @@ type EarthMaterialProps = {
 export default function EarthMaterial({ sunDirection }: EarthMaterialProps) {
   const [dayTexture, nightTexture, cloudsTexture] = useLoader(
     THREE.TextureLoader,
-    [...EARTH_TEXTURE_URLS],
+    [...TEXTURE_URLS],
   );
   const gl = useThree((state) => state.gl);
 
