@@ -3,9 +3,9 @@ import type { GeoJSON } from "geojson";
 
 const DEGREES_TO_RADIANS = Math.PI / 180;
 
-export const FILL_SURFACE_OFFSET = 0.035;
+export const FILL_SURFACE_OFFSET = 0.004;
 
-const MAX_EDGE_LENGTH = 0.45;
+const MAX_EDGE_LENGTH = 0.22;
 
 function lonLatToSphere(
   lon: number,
