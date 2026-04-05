@@ -10,38 +10,31 @@ import {
   ORBIT_DAMPING_FACTOR,
   ORBIT_MAX_DISTANCE,
   ORBIT_MIN_DISTANCE_FROM_CENTER,
-  ORBIT_ROTATE_RESPONSE_SHARPNESS,
-  ORBIT_ROTATE_SPEED_FAR,
-  ORBIT_ROTATE_SPEED_NEAR,
+  ORBIT_ROTATE_PROXIMITY_DAMPENING,
+  ORBIT_ROTATE_TRACKING_SCALE,
   ORBIT_TARGET,
 } from "./constants";
 import useMapboxStyleZoom from "./useMapboxStyleZoom";
 
 const CAMERA_SETTLED_THRESHOLD_SQ = 1e-8;
 
-function normalizedDistanceToTargetRange(
+function computeSurfaceTrackingRotateSpeed(
+  camera: THREE.Camera,
   distance: number,
-  minDistance: number,
-  maxDistance: number,
-) {
-  const span = maxDistance - minDistance;
-  if (span <= 0) {
-    return 0;
+): number {
+  if (!(camera instanceof THREE.PerspectiveCamera)) {
+    return 1;
   }
-  return Math.max(0, Math.min(1, (distance - minDistance) / span));
-}
-
-function exponentialSaturate01(normalizedDistance: number, sharpness: number) {
-  const t = Math.max(0, Math.min(1, normalizedDistance));
-  if (sharpness <= 0) {
-    return t;
-  }
-  const expSharpness = Math.exp(sharpness);
-  const denominator = expSharpness - 1;
-  if (denominator === 0) {
-    return t;
-  }
-  return (Math.exp(sharpness * t) - 1) / denominator;
+  const halfFovTan = Math.tan(
+    THREE.MathUtils.degToRad(camera.fov / 2),
+  );
+  const geometricSpeed =
+    (distance * halfFovTan) / ORBIT_ROTATE_TRACKING_SCALE;
+  const proximityFactor =
+    1 -
+    ORBIT_ROTATE_PROXIMITY_DAMPENING *
+      Math.sqrt(ORBIT_MIN_DISTANCE_FROM_CENTER / distance);
+  return geometricSpeed * proximityFactor;
 }
 
 type EarthOrbitControlsProps = {
@@ -66,19 +59,10 @@ export default function EarthOrbitControls({
     controls.minDistance = ORBIT_MIN_DISTANCE_FROM_CENTER;
 
     const distance = controls.getDistance();
-    const zoomT = normalizedDistanceToTargetRange(
+    controls.rotateSpeed = computeSurfaceTrackingRotateSpeed(
+      controls.object,
       distance,
-      ORBIT_MIN_DISTANCE_FROM_CENTER,
-      ORBIT_MAX_DISTANCE,
     );
-    const rotateResponsiveness = exponentialSaturate01(
-      zoomT,
-      ORBIT_ROTATE_RESPONSE_SHARPNESS,
-    );
-    controls.rotateSpeed =
-      ORBIT_ROTATE_SPEED_NEAR +
-      rotateResponsiveness *
-        (ORBIT_ROTATE_SPEED_FAR - ORBIT_ROTATE_SPEED_NEAR);
 
     const currentPosition = controls.object.position;
     if (hasPendingChangeRef.current) {
@@ -110,7 +94,6 @@ export default function EarthOrbitControls({
       maxDistance={ORBIT_MAX_DISTANCE}
       minDistance={ORBIT_MIN_DISTANCE_FROM_CENTER}
       target={ORBIT_TARGET}
-      rotateSpeed={ORBIT_ROTATE_SPEED_NEAR}
     />
   );
 }
