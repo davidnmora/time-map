@@ -3,8 +3,8 @@
 import { useRef } from "react";
 import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
-import type { GeographicRegionMapLayer } from "@/app/components/map/geographic-region-map-layer";
-import { doesRegionIdMatch } from "@/app/components/map/map-utils";
+import type { GeographicRegionMapLayer } from "@/lib/regions/types";
+import { doesRegionIdMatch } from "@/lib/regions/region-utils";
 import { isTimeRangeActive } from "@/app/data/data-utils";
 import { createRegionGeometry, FILL_SURFACE_OFFSET } from "@/lib/geo/globe-region-utils";
 import { EARTH_ICOSAHEDRON_RADIUS } from "./constants";

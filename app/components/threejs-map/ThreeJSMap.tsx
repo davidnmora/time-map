@@ -2,8 +2,8 @@
 
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useState } from "react";
-import type { GeographicRegionMapLayer } from "@/app/components/map/geographic-region-map-layer";
-import type { TooltipData } from "@/app/components/map/map-utils";
+import type { GeographicRegionMapLayer } from "@/lib/regions/types";
+import type { TooltipData } from "@/lib/regions/region-utils";
 import {
   useAppState,
   type CameraPosition,

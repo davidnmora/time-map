@@ -11,5 +11,4 @@ We want to rely on react-three/fiber and @react-three/drei for controls. Install
 
 After that, to clean up:
 - We want page.tsx to be minimal/clean, and not be importing/executing a bunch of map specific details. That said, it SHOULD be passing in the minimum information needed to render geometries (eventually which geometry is selected may live in global state)
-- Once we've fully reproduced Map.tsx functionality, delete it, uninstall mapbox, remove references in docs.
-- 
+- ~~Once we've fully reproduced Map.tsx functionality, delete it, uninstall mapbox, remove references in docs.~~ Done — Map.tsx deleted, mapbox-gl uninstalled, shared code moved to lib/regions/.

@@ -4,8 +4,8 @@ import dynamic from "next/dynamic";
 import type { GeoJSON } from "geojson";
 import { Suspense, startTransition, useEffect, useState } from "react";
 
-import type { GeographicRegionMapLayer } from "./components/map/geographic-region-map-layer";
-import { convertAllToMapRegions } from "./components/map/map-utils";
+import type { GeographicRegionMapLayer } from "@/lib/regions/types";
+import { convertAllToMapRegions } from "@/lib/regions/region-utils";
 import { Timeline } from "./components/timeline/Timeline";
 import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/threejs-map/scene/constants";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";

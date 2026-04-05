@@ -33,7 +33,6 @@ See `app/data/types.ts` for the precise definitions of the data structures.
 - Digitizing a map image:
   - Open Source QGIS can [help](https://docs.qgis.org/3.40/en/docs/training_manual/forestry/map_georeferencing.html) you "georeference" a map image onto a digital map, so you can export it, say, as a [GeoJSON file](https://stackoverflow.com/questions/70455885/how-to-create-a-geojson-file-from-an-image-overlay)
   - [map-digitizer](https://github.com/mapstertech/map-digitizer?tab=readme-ov-file) is an open source tool, but the only partially works. If it's easy to get working again, it looks like exactly the tool I was hoping for.
-  - [mapbox-gl-draw](https://docs.mapbox.com/mapbox-gl-js/example/mapbox-gl-draw/)
   - [allmaps.org](https://allmaps.org/) is a tool for projecting map images over digital maps, and it's open source. They also have a big repository of map images (often historic) digitized.
 
 ### data sources

@@ -8,7 +8,7 @@ import type {
   TimeBoundGeographicRegion,
   TimeRange,
 } from "../../../data/types";
-import type { TooltipData } from "../../map/map-utils";
+import type { TooltipData } from "@/lib/regions/region-utils";
 import { isTimeRangeActive } from "@/app/data/data-utils";
 
 const DEFAULT_OPACITY = 0.7;

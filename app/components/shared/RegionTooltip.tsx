@@ -6,7 +6,7 @@ import {
   formatTimeRange,
   TOOLTIP_WIDTH,
   type TooltipData,
-} from "../map/map-utils";
+} from "@/lib/regions/region-utils";
 
 type RegionTooltipProps = {
   data: TooltipData;
