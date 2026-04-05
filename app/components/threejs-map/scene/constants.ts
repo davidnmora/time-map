@@ -15,6 +15,9 @@ export const ORBIT_TARGET: [number, number, number] = [0, 0, 0];
 export const ORBIT_ZOOM_SPEED_NEAR = 0.16;
 export const ORBIT_ZOOM_SPEED_FAR = 0.68;
 export const ORBIT_ZOOM_SPEED_CURVE_EXPONENT = 2.35;
+export const ORBIT_ROTATE_SPEED_NEAR = 0.085;
+export const ORBIT_ROTATE_SPEED_FAR = 3;
+export const ORBIT_ROTATE_RESPONSE_SHARPNESS = 3.4;
 
 export const CAMERA_INITIAL_POSITION: [number, number, number] = [0, 0.1, 5];
 
