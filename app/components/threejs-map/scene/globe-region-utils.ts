@@ -5,7 +5,9 @@ const DEGREES_TO_RADIANS = Math.PI / 180;
 
 export const FILL_SURFACE_OFFSET = 0.004;
 
-const MAX_EDGE_LENGTH = 0.22;
+const MAX_EDGE_LENGTH = 0.25;
+
+const DUPLICATE_VERTEX_EPSILON = 1e-10;
 
 function lonLatToSphere(
   lon: number,
@@ -71,8 +73,7 @@ function subdivideForSphere(
 
   const MAX_PASSES = 6;
   for (let pass = 0; pass < MAX_PASSES; pass++) {
-    let needsSubdivision = false;
-    const newIndices: number[] = [];
+    const splitEdges = new Set<string>();
     const midpointCache = new Map<string, number>();
 
     for (let i = 0; i < currentIndices.length; i += 3) {
@@ -80,52 +81,90 @@ function subdivideForSphere(
       const i1 = currentIndices[i + 1];
       const i2 = currentIndices[i + 2];
 
-      const d01 = edgeLength3D(currentPositions, i0, i1);
-      const d12 = edgeLength3D(currentPositions, i1, i2);
-      const d20 = edgeLength3D(currentPositions, i2, i0);
+      if (edgeLength3D(currentPositions, i0, i1) > MAX_EDGE_LENGTH)
+        splitEdges.add(edgeKey(i0, i1));
+      if (edgeLength3D(currentPositions, i1, i2) > MAX_EDGE_LENGTH)
+        splitEdges.add(edgeKey(i1, i2));
+      if (edgeLength3D(currentPositions, i2, i0) > MAX_EDGE_LENGTH)
+        splitEdges.add(edgeKey(i2, i0));
+    }
 
-      if (
-        d01 > MAX_EDGE_LENGTH ||
-        d12 > MAX_EDGE_LENGTH ||
-        d20 > MAX_EDGE_LENGTH
-      ) {
-        needsSubdivision = true;
-        const m01 = getOrCreateMidpoint(
-          currentPositions,
-          midpointCache,
-          i0,
-          i1,
-          radius,
-        );
-        const m12 = getOrCreateMidpoint(
-          currentPositions,
-          midpointCache,
-          i1,
-          i2,
-          radius,
-        );
-        const m20 = getOrCreateMidpoint(
-          currentPositions,
-          midpointCache,
-          i2,
-          i0,
-          radius,
-        );
+    if (splitEdges.size === 0) break;
 
-        newIndices.push(i0, m01, m20);
-        newIndices.push(i1, m12, m01);
-        newIndices.push(i2, m20, m12);
-        newIndices.push(m01, m12, m20);
-      } else {
+    const getMid = (a: number, b: number): number | null => {
+      if (!splitEdges.has(edgeKey(a, b))) return null;
+      return getOrCreateMidpoint(currentPositions, midpointCache, a, b, radius);
+    };
+
+    const newIndices: number[] = [];
+
+    for (let i = 0; i < currentIndices.length; i += 3) {
+      const i0 = currentIndices[i];
+      const i1 = currentIndices[i + 1];
+      const i2 = currentIndices[i + 2];
+
+      const m01 = getMid(i0, i1);
+      const m12 = getMid(i1, i2);
+      const m20 = getMid(i2, i0);
+
+      const has01 = m01 !== null;
+      const has12 = m12 !== null;
+      const has20 = m20 !== null;
+      const splitCount = +has01 + +has12 + +has20;
+
+      if (splitCount === 0) {
         newIndices.push(i0, i1, i2);
+      } else if (splitCount === 3) {
+        newIndices.push(i0, m01!, m20!);
+        newIndices.push(i1, m12!, m01!);
+        newIndices.push(i2, m20!, m12!);
+        newIndices.push(m01!, m12!, m20!);
+      } else if (splitCount === 1) {
+        if (has01) {
+          newIndices.push(i0, m01!, i2);
+          newIndices.push(m01!, i1, i2);
+        } else if (has12) {
+          newIndices.push(i1, m12!, i0);
+          newIndices.push(m12!, i2, i0);
+        } else {
+          newIndices.push(i2, m20!, i1);
+          newIndices.push(m20!, i0, i1);
+        }
+      } else {
+        if (!has01) {
+          newIndices.push(i0, i1, m12!);
+          newIndices.push(i0, m12!, m20!);
+          newIndices.push(m20!, m12!, i2);
+        } else if (!has12) {
+          newIndices.push(i1, i2, m20!);
+          newIndices.push(i1, m20!, m01!);
+          newIndices.push(m01!, m20!, i0);
+        } else {
+          newIndices.push(i2, i0, m01!);
+          newIndices.push(i2, m01!, m12!);
+          newIndices.push(m12!, m01!, i1);
+        }
       }
     }
 
     currentIndices = newIndices;
-    if (!needsSubdivision) break;
   }
 
   return { positions: currentPositions, indices: currentIndices };
+}
+
+function openRing(ring: number[][]): THREE.Vector2[] {
+  const points = ring.map((c) => new THREE.Vector2(c[0], c[1]));
+
+  const last = points[points.length - 1];
+  const first = points[0];
+  if (
+    Math.abs(last.x - first.x) < DUPLICATE_VERTEX_EPSILON &&
+    Math.abs(last.y - first.y) < DUPLICATE_VERTEX_EPSILON
+  ) {
+    return points.slice(0, -1);
+  }
+  return points;
 }
 
 function triangulatePolygonRings(
@@ -135,12 +174,10 @@ function triangulatePolygonRings(
   const outerRing = rings[0];
   if (!outerRing || outerRing.length < 4) return null;
 
-  const holes = rings.slice(1);
+  const contour = openRing(outerRing);
+  if (contour.length < 3) return null;
 
-  const contour = outerRing.map((c) => new THREE.Vector2(c[0], c[1]));
-  const holeArrays = holes.map((h) =>
-    h.map((c) => new THREE.Vector2(c[0], c[1])),
-  );
+  const holeArrays = rings.slice(1).map(openRing);
 
   let faces: number[][];
   try {

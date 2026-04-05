@@ -74,6 +74,9 @@ function RegionMesh({
         opacity={opacity}
         side={THREE.FrontSide}
         depthWrite={false}
+        polygonOffset
+        polygonOffsetFactor={-1}
+        polygonOffsetUnits={-1}
       />
     </mesh>
   );
