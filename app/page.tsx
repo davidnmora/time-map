@@ -1,26 +1,42 @@
 "use client";
 
-import Map from "./components/map/Map";
+import dynamic from "next/dynamic";
+import type { GeoJSON } from "geojson";
+import { Suspense, startTransition, useEffect, useState } from "react";
+
+import type { GeographicRegionMapLayer } from "@/lib/regions/types";
+import { convertAllToMapRegions } from "@/lib/regions/region-utils";
+import { Timeline } from "./components/timeline/Timeline";
+import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/threejs-map/scene/constants";
+import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
+import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { completeDataset } from "./data/complete-dataset";
 import { getAFlagListOfAllRegions } from "./data/data-utils";
-import {
-  renderTooltip,
-  convertAllToMapRegions,
-} from "./components/map/map-utils";
-import { Timeline } from "./components/timeline/Timeline";
-import { HoveredElementProvider } from "./contexts/HoveredElementContext";
-import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
-import { calculateTimelineWidth } from "./components/timeline/timeline-utils";
-import "mapbox-gl/dist/mapbox-gl.css";
+import modernCountries from "./data/modern-countries.json";
 import "./globals.css";
-import { Suspense, useState, useEffect, startTransition } from "react";
+
+const ThreeJSMap = dynamic(
+  () => import("./components/threejs-map/ThreeJSMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="absolute inset-0 bg-black" aria-hidden />
+    ),
+  },
+);
+
+const THREE_JS_MAP_GEOGRAPHIC_REGIONS: GeographicRegionMapLayer[] = [
+  {
+    id: "modern-countries",
+    data: modernCountries as GeoJSON.FeatureCollection,
+    lineWidth: GEOJSON_OVERLAY_LINE_WIDTH_PX,
+  },
+];
+
+const INTERACTIVE_MAP_REGIONS = convertAllToMapRegions(completeDataset);
 
 function MapContent() {
   const {
-    zoom,
-    center,
-    pitch,
-    bearing,
     currentYear,
     minYear,
     maxYear,
@@ -43,23 +59,14 @@ function MapContent() {
   }, []);
 
   const timelineRegions = getAFlagListOfAllRegions(completeDataset);
-  const timelineWidth = calculateTimelineWidth(timelineRegions, "area");
-
-  const geographicRegions = convertAllToMapRegions(completeDataset);
 
   return (
     <HoveredElementProvider>
       <div className="h-screen w-screen relative">
         <div className="absolute inset-0">
-          <Map
-            center={center}
-            zoom={zoom}
-            pitch={pitch}
-            bearing={bearing}
-            geographicRegions={geographicRegions}
-            renderTooltip={renderTooltip}
-            timelineExpanded={timelineExpanded}
-            timelineWidth={timelineWidth}
+          <ThreeJSMap
+            geographicRegions={THREE_JS_MAP_GEOGRAPHIC_REGIONS}
+            interactiveRegions={INTERACTIVE_MAP_REGIONS}
           />
         </div>
         {isMounted &&

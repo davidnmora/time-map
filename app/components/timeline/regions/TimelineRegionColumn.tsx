@@ -2,10 +2,13 @@
 
 import * as d3 from "d3";
 import { useState } from "react";
-import { createPortal } from "react-dom";
 import { useHoveredElement } from "../../../contexts/HoveredElementContext";
-import { renderTooltip, TOOLTIP_WIDTH } from "../../map/map-utils";
-import type { TimeBoundGeographicRegion, TimeRange } from "../../../data/types";
+import { RegionTooltip } from "../../shared/RegionTooltip";
+import type {
+  TimeBoundGeographicRegion,
+  TimeRange,
+} from "../../../data/types";
+import type { TooltipData } from "@/lib/regions/region-utils";
 import { isTimeRangeActive } from "@/app/data/data-utils";
 
 const DEFAULT_OPACITY = 0.7;
@@ -15,14 +18,14 @@ const HOVERED_OPACITY = 1;
 function getRegionOpacity(
   isHovered: boolean,
   timeRange: TimeRange,
-  currentYear: number
+  currentYear: number,
 ): number {
   if (isHovered) {
     return HOVERED_OPACITY;
   }
   const isOverlappingWithCurrentYear = isTimeRangeActive(
     timeRange,
-    currentYear
+    currentYear,
   );
   return isOverlappingWithCurrentYear
     ? DEFAULT_OPACITY
@@ -37,6 +40,12 @@ type TimelineRegionColumnProps = {
   scaleYearToPageY: d3.ScaleLinear<number, number>;
 };
 
+type TooltipState = {
+  data: TooltipData;
+  x: number;
+  y: number;
+};
+
 export const TimelineRegionColumn = ({
   height,
   currentYear,
@@ -45,11 +54,7 @@ export const TimelineRegionColumn = ({
   scaleYearToPageY,
 }: TimelineRegionColumnProps) => {
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
-  const [tooltipData, setTooltipData] = useState<{
-    x: number;
-    y: number;
-    html: string;
-  } | null>(null);
+  const [tooltipState, setTooltipState] = useState<TooltipState | null>(null);
 
   const strips = regions.map((region) => {
     const [startYear, endYear] = region.timeRange;
@@ -70,43 +75,32 @@ export const TimelineRegionColumn = ({
 
   const handleMouseEnter = (
     e: React.MouseEvent<HTMLDivElement>,
-    strip: (typeof strips)[0]
+    strip: (typeof strips)[0],
   ) => {
     setHoveredRegionId(strip.metadata.id);
     if (strip.metadata) {
-      const hierarchy = strip.hierarchy;
-      const title = strip.metadata.title || "";
-      const description = strip.metadata.description;
-      const timeRange = strip.timeRange;
-
-      const tooltipHtml = renderTooltip({
-        hierarchy,
-        title,
-        description,
-        timeRange,
-      });
-
-      setTooltipData({
+      setTooltipState({
         x: e.clientX,
         y: e.clientY,
-        html: tooltipHtml,
+        data: {
+          hierarchy: strip.hierarchy,
+          title: strip.metadata.title || "",
+          description: strip.metadata.description,
+          timeRange: strip.timeRange,
+        },
       });
     }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (tooltipData) {
-      setTooltipData({
-        ...tooltipData,
-        x: e.clientX,
-        y: e.clientY,
-      });
-    }
+    setTooltipState((prev) =>
+      prev ? { ...prev, x: e.clientX, y: e.clientY } : null,
+    );
   };
 
   const handleMouseLeave = () => {
     setHoveredRegionId(null);
-    setTooltipData(null);
+    setTooltipState(null);
   };
 
   return (
@@ -130,7 +124,7 @@ export const TimelineRegionColumn = ({
                 opacity: getRegionOpacity(
                   isHovered,
                   strip.timeRange,
-                  currentYear
+                  currentYear,
                 ),
                 cursor: "pointer",
               }}
@@ -141,29 +135,13 @@ export const TimelineRegionColumn = ({
           );
         })}
       </div>
-      {tooltipData &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <div
-            style={{
-              position: "fixed",
-              left: tooltipData.x,
-              top: tooltipData.y - 10,
-              transform: "translateX(calc(-100% - 10px))",
-              pointerEvents: "none",
-              zIndex: 10000,
-              backgroundColor: "white",
-              padding: "8px",
-              borderRadius: "4px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-              fontSize: "12px",
-              width: `${TOOLTIP_WIDTH}px`,
-            }}
-            dangerouslySetInnerHTML={{ __html: tooltipData.html }}
-          />,
-          document.body
-        )}
+      {tooltipState && (
+        <RegionTooltip
+          data={tooltipState.data}
+          x={tooltipState.x}
+          y={tooltipState.y}
+        />
+      )}
     </>
   );
 };
-
