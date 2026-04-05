@@ -1,11 +1,11 @@
 import * as THREE from "three";
 
-const RIM_COLOR = 0x0088ff;
+const RIM_COLOR = 0x4da6cc;
 const FACING_COLOR = 0x000000;
-const FRESNEL_BIAS = 0.1;
-const FRESNEL_SCALE = 1.0;
-const FRESNEL_POWER = 4.0;
-const ICOSAHEDRON_RADIUS = 2.03;
+const FRESNEL_BIAS = 0.05;
+const FRESNEL_SCALE = 0.6;
+const FRESNEL_POWER = 3.0;
+const ICOSAHEDRON_RADIUS = 2.02;
 const ICOSAHEDRON_DETAIL = 32;
 
 const ATMOSPHERE_VERTEX_SHADER = `
