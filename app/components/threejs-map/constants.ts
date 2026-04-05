@@ -18,14 +18,14 @@ export const HEMISPHERE_LIGHT_INTENSITY = 3.0;
 export const CANVAS_TONE_MAPPING = THREE.NoToneMapping;
 
 export const CANVAS_DPR_MIN = 1;
-export const CANVAS_DPR_MAX = 2;
+export const CANVAS_DPR_MAX = 3;
 
 export const EARTH_AXIAL_TILT_DEGREES = 23.4;
 
 export const EARTH_TEXTURE_URLS = [
   `${THREEJS_MAP_ASSET_BASE}/textures/earth-daymap-4k.jpg`,
-  `${THREEJS_MAP_ASSET_BASE}/textures/earth-nightmap-4k.png`,
-  `${THREEJS_MAP_ASSET_BASE}/textures/earth-clouds-4k.png`,
+  `${THREEJS_MAP_ASSET_BASE}/textures/earth-nightmap-4k.jpg`,
+  `${THREEJS_MAP_ASSET_BASE}/textures/earth-clouds-4k.jpg`,
 ] as const;
 
 export const STARFIELD_CIRCLE_TEXTURE_URL = `${THREEJS_MAP_ASSET_BASE}/circle.png`;

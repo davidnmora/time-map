@@ -43,6 +43,7 @@ export default function ThreeJSMap() {
       <Canvas
         camera={{ position: CAMERA_INITIAL_POSITION }}
         dpr={[CANVAS_DPR_MIN, CANVAS_DPR_MAX]}
+        resize={{ scroll: false }}
         gl={{
           toneMapping: CANVAS_TONE_MAPPING,
           antialias: true,

@@ -1,8 +1,8 @@
 "use client";
 
 import * as THREE from "three";
-import { useLoader } from "@react-three/fiber";
-import { useMemo } from "react";
+import { useLoader, useThree } from "@react-three/fiber";
+import { useLayoutEffect, useMemo } from "react";
 import { EARTH_TEXTURE_URLS } from "./constants";
 
 const EARTH_VERTEX_SHADER = `
@@ -44,9 +44,9 @@ const EARTH_FRAGMENT_SHADER = `
       vec3 nightColor = texture(nightTexture, vUv).rgb;
       color = mix(nightColor, dayColor, dayMix);
 
-      vec2 specularCloudsColor = texture(cloudsTexture, vUv).rg;
+      vec3 cloudsPacked = texture(cloudsTexture, vUv).rgb;
 
-      float cloudsMix = smoothstep(0.0, 1.0, specularCloudsColor.g);
+      float cloudsMix = smoothstep(0.0, 1.0, cloudsPacked.b);
       cloudsMix *= dayMix;
       color = mix(color, vec3(1.0), cloudsMix);
 
@@ -63,6 +63,19 @@ export default function EarthMaterial({ sunDirection }: EarthMaterialProps) {
     THREE.TextureLoader,
     [...EARTH_TEXTURE_URLS],
   );
+  const gl = useThree((state) => state.gl);
+
+  useLayoutEffect(() => {
+    const maxAnisotropy = gl.capabilities.getMaxAnisotropy();
+    const textures = [dayTexture, nightTexture, cloudsTexture];
+    for (const texture of textures) {
+      texture.anisotropy = maxAnisotropy;
+      texture.minFilter = THREE.LinearMipmapLinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.generateMipmaps = true;
+      texture.needsUpdate = true;
+    }
+  }, [gl, dayTexture, nightTexture, cloudsTexture]);
 
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
