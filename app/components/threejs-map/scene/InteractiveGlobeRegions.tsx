@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useState } from "react";
 import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import type { GeographicRegionMapLayer } from "@/lib/regions/types";
@@ -43,20 +43,17 @@ function RegionMesh({
   onPointerOver,
   onPointerOut,
 }: RegionMeshProps) {
-  const geometryRef = useRef<THREE.BufferGeometry | null>(null);
-
-  if (!geometryRef.current) {
-    geometryRef.current = createRegionGeometry(region.data, FILL_RADIUS);
-  }
-
-  if (!geometryRef.current) return null;
+  const [geometry] = useState<THREE.BufferGeometry | null>(() =>
+    createRegionGeometry(region.data, FILL_RADIUS)
+  );
+  if (!geometry) return null;
 
   const opacity = getRegionFillOpacity(isHovered, isActive);
   const isVisible = opacity > 0;
 
   return (
     <mesh
-      geometry={geometryRef.current}
+      geometry={geometry}
       visible={isVisible}
       renderOrder={FILL_RENDER_ORDER}
       onPointerOver={(e) => {

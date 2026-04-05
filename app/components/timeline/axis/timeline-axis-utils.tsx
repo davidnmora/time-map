@@ -5,8 +5,6 @@ export const TIMELINE_AXIS_WIDTH = 60;
 export const TICK_LENGTH = 6;
 export const TICK_OFFSET = 10;
 
-export const TRANSITION_DURATION_MS = 1000;
-
 export const DECADE_FONT_SIZE = 12;
 export const CENTURY_FONT_SIZE = 16;
 

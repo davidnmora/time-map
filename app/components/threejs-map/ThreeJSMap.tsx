@@ -11,6 +11,7 @@ import {
 import { useHoveredElement } from "@/app/contexts/HoveredElementContext";
 import { RegionTooltip } from "@/app/components/shared/RegionTooltip";
 import Earth from "./scene/Earth";
+import CameraViewOffsetController from "./controls/CameraViewOffsetController";
 import EarthOrbitControls from "./controls/EarthOrbitControls";
 import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
 import InteractiveGlobeRegions from "./scene/InteractiveGlobeRegions";
@@ -29,6 +30,7 @@ const HEMISPHERE_GROUND = 0x000000;
 const HEMISPHERE_INTENSITY = 3.0;
 
 const EMPTY_REGIONS: GeographicRegionMapLayer[] = [];
+const CAMERA_OFFSET_HALF_SHIFT_MULTIPLIER = 0.5;
 
 type TooltipState = {
   data: TooltipData;
@@ -48,15 +50,22 @@ function buildTooltipData(region: GeographicRegionMapLayer): TooltipData {
 type ThreeJSMapProps = {
   geographicRegions?: GeographicRegionMapLayer[];
   interactiveRegions?: GeographicRegionMapLayer[];
+  timelineWidth: number;
+  timelineExpanded: boolean;
 };
 
 export default function ThreeJSMap({
   geographicRegions = EMPTY_REGIONS,
   interactiveRegions = EMPTY_REGIONS,
+  timelineWidth,
+  timelineExpanded,
 }: ThreeJSMapProps) {
   const { cameraPosition, currentYear, updateState } = useAppState();
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
   const [tooltipState, setTooltipState] = useState<TooltipState | null>(null);
+  const cameraTargetOffsetPx = timelineExpanded
+    ? timelineWidth * CAMERA_OFFSET_HALF_SHIFT_MULTIPLIER
+    : 0;
 
   const handleCameraSettled = (position: CameraPosition) => {
     updateState({ cameraPosition: position });
@@ -100,6 +109,7 @@ export default function ThreeJSMap({
         }}
       >
         <Suspense fallback={null}>
+          <CameraViewOffsetController targetOffsetPx={cameraTargetOffsetPx} />
           <Earth>
             {geographicRegions.length > 0 && (
               <GeoJsonGlobeOverlay regions={geographicRegions} />

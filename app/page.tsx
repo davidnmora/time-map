@@ -7,6 +7,7 @@ import { Suspense, startTransition, useEffect, useState } from "react";
 import type { GeographicRegionMapLayer } from "@/lib/regions/types";
 import { convertAllToMapRegions } from "@/lib/regions/region-utils";
 import { Timeline } from "./components/timeline/Timeline";
+import { calculateTimelineWidth } from "./components/timeline/timeline-utils";
 import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/threejs-map/scene/constants";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
@@ -34,6 +35,7 @@ const THREE_JS_MAP_GEOGRAPHIC_REGIONS: GeographicRegionMapLayer[] = [
 ];
 
 const INTERACTIVE_MAP_REGIONS = convertAllToMapRegions(completeDataset);
+const TIMELINE_WIDTH_ENCODING_KEY = "area";
 
 function MapContent() {
   const {
@@ -59,6 +61,10 @@ function MapContent() {
   }, []);
 
   const timelineRegions = getAFlagListOfAllRegions(completeDataset);
+  const timelineWidth = calculateTimelineWidth(
+    timelineRegions,
+    TIMELINE_WIDTH_ENCODING_KEY
+  );
 
   return (
     <HoveredElementProvider>
@@ -67,6 +73,8 @@ function MapContent() {
           <ThreeJSMap
             geographicRegions={THREE_JS_MAP_GEOGRAPHIC_REGIONS}
             interactiveRegions={INTERACTIVE_MAP_REGIONS}
+            timelineWidth={timelineWidth}
+            timelineExpanded={timelineExpanded}
           />
         </div>
         {isMounted &&
@@ -77,7 +85,7 @@ function MapContent() {
               height={windowHeight}
               currentYear={currentYear}
               regions={timelineRegions}
-              widthEncodingKey="area"
+              widthEncodingKey={TIMELINE_WIDTH_ENCODING_KEY}
               expanded={timelineExpanded}
               onToggle={() =>
                 updateState({ timelineExpanded: !timelineExpanded })

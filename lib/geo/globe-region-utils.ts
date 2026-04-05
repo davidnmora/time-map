@@ -70,7 +70,7 @@ function subdivideForSphere(
   inputIndices: number[],
   radius: number,
 ): { positions: number[]; indices: number[] } {
-  let currentPositions = [...inputPositions];
+  const currentPositions = [...inputPositions];
   let currentIndices = [...inputIndices];
 
   const MAX_PASSES = 6;

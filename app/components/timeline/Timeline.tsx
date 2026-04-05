@@ -2,6 +2,10 @@
 
 import { useRef, useEffect } from "react";
 import * as d3 from "d3";
+import {
+  SHARED_UI_TRANSITION_DURATION_MS,
+  SHARED_UI_TRANSITION_TIMING_FUNCTION,
+} from "@/lib/ui/animation/transitions";
 import { TimelineAxis } from "./axis/TimelineAxis";
 import { TimelineRegions } from "./regions/TimelineRegions";
 import { TimelineToggleButton } from "./TimelineToggleButton";
@@ -15,10 +19,7 @@ import {
   DROP_SHADOW,
   TIMELINE_BACKDROP_OPACITY,
 } from "./timeline-utils";
-import {
-  TIMELINE_AXIS_WIDTH,
-  TRANSITION_DURATION_MS,
-} from "./axis/timeline-axis-utils";
+import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
 
 const TIMELINE_GRADIENT_FADE_PERCENT = 10;
 const TIMELINE_GRADIENT_COLOR = "255, 255, 255";
@@ -192,7 +193,8 @@ export const Timeline = ({
       className={`absolute top-0 right-0 h-full z-10 transition-transform`}
       style={{
         transform: expanded ? "translateX(0)" : "translateX(100%)",
-        transitionDuration: `${TRANSITION_DURATION_MS}ms`,
+        transitionDuration: `${SHARED_UI_TRANSITION_DURATION_MS}ms`,
+        transitionTimingFunction: SHARED_UI_TRANSITION_TIMING_FUNCTION,
         width: `${timelineTotalWidth}px`,
       }}
     >
