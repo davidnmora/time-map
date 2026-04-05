@@ -13,6 +13,7 @@ import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
 import Starfield from "./scene/Starfield";
 import Sun from "./scene/Sun";
 import {
+  CAMERA_FAR,
   CANVAS_TONE_MAPPING,
   MAX_DEVICE_PIXEL_RATIO,
   SUN_DIRECTION,
@@ -41,12 +42,13 @@ export default function ThreeJSMap({
   return (
     <div className="h-full w-full min-h-0">
       <Canvas
-        camera={{ position: cameraPosition }}
+        camera={{ position: cameraPosition, far: CAMERA_FAR }}
         dpr={[1, MAX_DEVICE_PIXEL_RATIO]}
         resize={{ scroll: false }}
         gl={{
           toneMapping: CANVAS_TONE_MAPPING,
           antialias: true,
+          logarithmicDepthBuffer: true,
           alpha: false,
           stencil: false,
           powerPreference: "high-performance",
