@@ -29,6 +29,7 @@ See `app/data/types.ts` for the precise definitions of the data structures.
 - For map style, rather than an image of geometries, you can represent the earth surface with a series of dots, raised based on (exsadurated) elavation. Here's [a tutorial with source code](https://www.youtube.com/watch?v=XaDQI1HmoOQ), and here's a [visually stunning](https://www.youtube.com/watch?v=3hgt_GrkAm0) example of it being done in a very performant manner (they downsampled a massive dataset on the earth's elevation using Python).
 
 ### tools
+- For ways of visulaization information on maps, take inspiration (technically and visually) from [this react-three-fiber globe library](https://github.com/vasturiano/r3f-globe?tab=readme-ov-file), especially this [gallery of globes](https://vasturiano.github.io/r3f-globe/example/multiple-globes/).
 - Digitizing a map image:
   - Open Source QGIS can [help](https://docs.qgis.org/3.40/en/docs/training_manual/forestry/map_georeferencing.html) you "georeference" a map image onto a digital map, so you can export it, say, as a [GeoJSON file](https://stackoverflow.com/questions/70455885/how-to-create-a-geojson-file-from-an-image-overlay)
   - [map-digitizer](https://github.com/mapstertech/map-digitizer?tab=readme-ov-file) is an open source tool, but the only partially works. If it's easy to get working again, it looks like exactly the tool I was hoping for.
@@ -46,6 +47,8 @@ See `app/data/types.ts` for the precise definitions of the data structures.
 ##### Deep time (geology & climate)
 - [EarthViewer](https://www.biointeractive.org/classroom-resources/earthviewer) is a globe that lets you explore where modern locations/countries existed on the earth's surface as far back as 540 Mya. It's the best tool I've found for seeing (the latest slice) of tectonic shifts. It's got this nice vertical timeline with the major geological eras and epochs labeled. It also lets you pull up line charts of specific properties over time, such as CO2 or temperature.
 
+#### Space (ie beyond just the Earth globe)
+- Amazing, raw threejs [3D solar system](https://github.com/SoumyaEXE/3d-Solar-System-ThreeJS), topped only by the much more detailed and scale-correct [NASA solar system (with satellites)](https://eyes.nasa.gov/apps/solar-system/)
 
 ##### Misc maps
 - [Native Land](https://native-land.ca/maps/native-land) shows indigenous lands, globally. Amazing resource.
