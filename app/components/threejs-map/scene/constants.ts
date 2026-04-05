@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 import type { CameraPosition } from "@/app/contexts/AppStateContext";
 
-export const SUN_DIRECTION = new THREE.Vector3(-2, 0.5, 1.5);
+export const SUN_DIRECTION = new THREE.Vector3(-4.374707487564229, -1.3527590872421713, 2.2099736314819878);
 
 export const EARTH_ICOSAHEDRON_RADIUS = 2;
 export const EARTH_ICOSAHEDRON_DETAIL = 64;
