@@ -1,10 +1,11 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import { Suspense } from "react";
+import EarthOrbitControls from "./EarthOrbitControls";
 import AtmosphereMesh from "./AtmosphereMesh";
 import EarthMaterial from "./EarthMaterial";
+import ModernCountriesGeo from "./ModernCountriesGeo";
 import Nebula from "./Nebula";
 import Starfield from "./Starfield";
 import {
@@ -32,6 +33,7 @@ function Earth() {
         <EarthMaterial sunDirection={SUN_DIRECTION} />
         <AtmosphereMesh />
       </mesh>
+      <ModernCountriesGeo />
     </group>
   );
 }
@@ -60,7 +62,7 @@ export default function ThreeJSMap() {
           <directionalLight position={[x, y, z]} />
           <Nebula />
           <Starfield />
-          <OrbitControls />
+          <EarthOrbitControls />
         </Suspense>
       </Canvas>
     </div>

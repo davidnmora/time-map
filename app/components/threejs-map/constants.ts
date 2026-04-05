@@ -6,7 +6,17 @@ export const EARTH_ICOSAHEDRON_RADIUS = 2;
 export const EARTH_ICOSAHEDRON_DETAIL = 64;
 export const EARTH_AXIAL_TILT_DEGREES = 23.4;
 
+export const ORBIT_SURFACE_CLEARANCE = 0.22;
+export const ORBIT_MIN_CAMERA_TO_TARGET_AT_SURFACE = 0.45;
+export const ORBIT_MAX_DISTANCE = 96;
+export const ORBIT_DAMPING_FACTOR = 0.06;
+export const ORBIT_ZOOM_SPEED_NEAR = 0.42;
+export const ORBIT_ZOOM_SPEED_FAR = 1;
+
 export const CAMERA_INITIAL_POSITION: [number, number, number] = [0, 0.1, 5];
 
 export const CANVAS_TONE_MAPPING = THREE.NoToneMapping;
 export const MAX_DEVICE_PIXEL_RATIO = 3;
+
+export const GEOJSON_OVERLAY_LINE_COLOR = 0x000000;
+export const GEOJSON_OVERLAY_LINE_WIDTH_PX = 2.5;
