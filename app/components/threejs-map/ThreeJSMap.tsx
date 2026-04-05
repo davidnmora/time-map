@@ -2,43 +2,32 @@
 
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
-import EarthOrbitControls from "./EarthOrbitControls";
-import AtmosphereMesh from "./AtmosphereMesh";
-import EarthMaterial from "./EarthMaterial";
-import ModernCountriesGeo from "./ModernCountriesGeo";
-import Nebula from "./Nebula";
-import Starfield from "./Starfield";
+import type { GeographicRegionMapLayer } from "@/app/components/map/geographic-region-map-layer";
+import Earth from "./scene/Earth";
+import EarthOrbitControls from "./scene/EarthOrbitControls";
+import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
+import Nebula from "./scene/Nebula";
+import Starfield from "./scene/Starfield";
 import {
   CAMERA_INITIAL_POSITION,
   CANVAS_TONE_MAPPING,
-  EARTH_AXIAL_TILT_DEGREES,
-  EARTH_ICOSAHEDRON_DETAIL,
-  EARTH_ICOSAHEDRON_RADIUS,
   MAX_DEVICE_PIXEL_RATIO,
   SUN_DIRECTION,
-} from "./constants";
+} from "./scene/constants";
 
 const HEMISPHERE_SKY = 0xffffff;
 const HEMISPHERE_GROUND = 0x000000;
 const HEMISPHERE_INTENSITY = 3.0;
 
-function Earth() {
-  const axialTiltRadians = (EARTH_AXIAL_TILT_DEGREES * Math.PI) / 180;
-  return (
-    <group rotation={[0, 0, axialTiltRadians]}>
-      <mesh>
-        <icosahedronGeometry
-          args={[EARTH_ICOSAHEDRON_RADIUS, EARTH_ICOSAHEDRON_DETAIL]}
-        />
-        <EarthMaterial sunDirection={SUN_DIRECTION} />
-        <AtmosphereMesh />
-      </mesh>
-      <ModernCountriesGeo />
-    </group>
-  );
-}
+const EMPTY_GEOGRAPHIC_REGION_MAP_LAYERS: GeographicRegionMapLayer[] = [];
 
-export default function ThreeJSMap() {
+type ThreeJSMapProps = {
+  geographicRegions?: GeographicRegionMapLayer[];
+};
+
+export default function ThreeJSMap({
+  geographicRegions = EMPTY_GEOGRAPHIC_REGION_MAP_LAYERS,
+}: ThreeJSMapProps) {
   const { x, y, z } = SUN_DIRECTION;
   return (
     <div className="h-full w-full min-h-0">
@@ -55,7 +44,11 @@ export default function ThreeJSMap() {
         }}
       >
         <Suspense fallback={null}>
-          <Earth />
+          <Earth>
+            {geographicRegions.length > 0 ? (
+              <GeoJsonGlobeOverlay regions={geographicRegions} />
+            ) : null}
+          </Earth>
           <hemisphereLight
             args={[HEMISPHERE_SKY, HEMISPHERE_GROUND, HEMISPHERE_INTENSITY]}
           />

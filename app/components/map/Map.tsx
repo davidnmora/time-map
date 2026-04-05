@@ -2,7 +2,6 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
-import type { GeoJSON } from "geojson";
 import {
   initializeMapRegions,
   updateRegionVisibility,
@@ -12,31 +11,21 @@ import {
   type TooltipData,
   type HoverHandlers,
 } from "./map-utils";
-import type { Metadata, TimeRange } from "../../data/types";
+import type { GeographicRegionMapLayer } from "./geographic-region-map-layer";
 import { useHoveredElement } from "../../contexts/HoveredElementContext";
 import { useAppState } from "../../contexts/AppStateContext";
 import { isTimeRangeActive } from "../../data/data-utils";
 import { TRANSITION_DURATION_MS } from "../timeline/axis/timeline-axis-utils";
 import { MAP_STYLE, MAPBOX_ACCESS_TOKEN } from "./map-config";
 
-export type GeographicRegion = {
-  id: string;
-  data: GeoJSON.Feature | GeoJSON.FeatureCollection;
-  fillColor?: string;
-  fillOpacity?: number;
-  lineColor?: string;
-  lineWidth?: number;
-  metadata?: Metadata;
-  timeRange?: TimeRange;
-  hierarchy?: string[];
-};
+export type { GeographicRegionMapLayer } from "./geographic-region-map-layer";
 
 type MapProps = {
   center: [number, number];
   zoom: number;
   pitch: number;
   bearing: number;
-  geographicRegions?: GeographicRegion[];
+  geographicRegions?: GeographicRegionMapLayer[];
   renderTooltip?: (data: TooltipData) => string;
   timelineExpanded?: boolean;
   timelineWidth?: number;
@@ -85,7 +74,7 @@ export default function Map(props: MapProps) {
   }, [timelineExpanded, timelineWidth]);
 
   const isRegionVisible = useCallback(
-    (region: GeographicRegion): boolean => {
+    (region: GeographicRegionMapLayer): boolean => {
       return isTimeRangeActive(region.timeRange, currentYear);
     },
     [currentYear]

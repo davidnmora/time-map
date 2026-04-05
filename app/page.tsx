@@ -1,13 +1,18 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { GeoJSON } from "geojson";
+import { Suspense, startTransition, useEffect, useState } from "react";
+
+import type { GeographicRegionMapLayer } from "./components/map/geographic-region-map-layer";
+import { Timeline } from "./components/timeline/Timeline";
+import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/threejs-map/scene/constants";
+import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
+import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { completeDataset } from "./data/complete-dataset";
 import { getAFlagListOfAllRegions } from "./data/data-utils";
-import { Timeline } from "./components/timeline/Timeline";
-import { HoveredElementProvider } from "./contexts/HoveredElementContext";
-import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
+import modernCountries from "./data/modern-countries.json";
 import "./globals.css";
-import { Suspense, useState, useEffect, startTransition } from "react";
 
 const ThreeJSMap = dynamic(
   () => import("./components/threejs-map/ThreeJSMap"),
@@ -18,6 +23,14 @@ const ThreeJSMap = dynamic(
     ),
   },
 );
+
+const THREE_JS_MAP_GEOGRAPHIC_REGIONS: GeographicRegionMapLayer[] = [
+  {
+    id: "modern-countries",
+    data: modernCountries as GeoJSON.FeatureCollection,
+    lineWidth: GEOJSON_OVERLAY_LINE_WIDTH_PX,
+  },
+];
 
 function MapContent() {
   const {
@@ -48,7 +61,9 @@ function MapContent() {
     <HoveredElementProvider>
       <div className="h-screen w-screen relative">
         <div className="absolute inset-0">
-          <ThreeJSMap />
+          <ThreeJSMap
+            geographicRegions={THREE_JS_MAP_GEOGRAPHIC_REGIONS}
+          />
         </div>
         {isMounted &&
           windowHeight !== null &&

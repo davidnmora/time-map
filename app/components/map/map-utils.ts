@@ -1,6 +1,6 @@
 import type React from "react";
 import mapboxgl from "mapbox-gl";
-import type { GeographicRegion } from "./Map";
+import type { GeographicRegionMapLayer } from "./geographic-region-map-layer";
 import type {
   TimeRange,
   TimeBoundGeographicRegionGroup,
@@ -85,7 +85,7 @@ export const renderTooltip = (data: TooltipData): string => {
 
 export function convertAllToMapRegions(
   group: TimeBoundGeographicRegionGroup
-): GeographicRegion[] {
+): GeographicRegionMapLayer[] {
   const regions = getAFlagListOfAllRegions(group);
   return regions.flatMap((region) =>
     region.geographicRegions.map((geoRegion, index) => ({
@@ -105,7 +105,7 @@ export function convertAllToMapRegions(
 export function initializeGeographicRegions(
   map: mapboxgl.Map,
   sourcesRef: React.MutableRefObject<Set<string>>,
-  geographicRegions: GeographicRegion[]
+  geographicRegions: GeographicRegionMapLayer[]
 ) {
   if (!map) return;
 
@@ -184,8 +184,8 @@ export function initializeGeographicRegions(
 
 export function updateRegionVisibility(
   map: mapboxgl.Map,
-  geographicRegions: GeographicRegion[],
-  isRegionVisible: (region: GeographicRegion) => boolean
+  geographicRegions: GeographicRegionMapLayer[],
+  isRegionVisible: (region: GeographicRegionMapLayer) => boolean
 ) {
   if (!map) return;
 
@@ -220,12 +220,12 @@ export function updateRegionVisibility(
 export function initializeMapRegions(
   map: mapboxgl.Map,
   sourcesRef: React.MutableRefObject<Set<string>>,
-  geographicRegions: GeographicRegion[],
+  geographicRegions: GeographicRegionMapLayer[],
   setupHoverHandlersFn: (
     map: mapboxgl.Map,
-    regions: GeographicRegion[]
+    regions: GeographicRegionMapLayer[]
   ) => void,
-  isRegionVisible: (region: GeographicRegion) => boolean
+  isRegionVisible: (region: GeographicRegionMapLayer) => boolean
 ) {
   if (!map) return;
 
@@ -242,7 +242,7 @@ export function initializeMapRegions(
 
 export function updateHoverStateFromContext(
   map: mapboxgl.Map,
-  geographicRegions: GeographicRegion[],
+  geographicRegions: GeographicRegionMapLayer[],
   contextHoveredRegionId: string | null
 ) {
   if (!map) return;
@@ -299,7 +299,7 @@ export type HoverHandlers = {
 
 export function setupHoverHandlers(
   map: mapboxgl.Map,
-  regions: GeographicRegion[],
+  regions: GeographicRegionMapLayer[],
   handlers: HoverHandlers
 ) {
   const {
