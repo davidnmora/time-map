@@ -7,6 +7,12 @@ import {
   TIMELINE_TOGGLE_BUTTON_Z_INDEX,
 } from "./timeline-utils";
 
+const BUTTON_HOVER_FILL_RGB_CHANNELS = "255, 255, 255";
+const CURRENT_YEAR_TEXT_SHADOW_ALPHA = 0.8;
+const CURRENT_YEAR_TEXT_SHADOW_OFFSET_Y_PX = 0.5;
+const CURRENT_YEAR_TEXT_SHADOW_BLUR_PX = 0;
+const CURRENT_YEAR_TEXT_SHADOW = `0 ${CURRENT_YEAR_TEXT_SHADOW_OFFSET_Y_PX}px ${CURRENT_YEAR_TEXT_SHADOW_BLUR_PX}px rgba(${BUTTON_HOVER_FILL_RGB_CHANNELS}, ${CURRENT_YEAR_TEXT_SHADOW_ALPHA})`;
+
 const CURRENT_YEAR_FONT_SIZE = 64;
 const CURRENT_YEAR_LABEL_FONT_SIZE = 10;
 const ARROW_FONT_SIZE = 18;
@@ -70,7 +76,10 @@ export const TimelineToggleButton = ({
       </span>
       <span
         className="text-gray-700 font-mono font-bold leading-none"
-        style={{ fontSize: CURRENT_YEAR_FONT_SIZE }}
+        style={{
+          fontSize: CURRENT_YEAR_FONT_SIZE,
+          textShadow: CURRENT_YEAR_TEXT_SHADOW,
+        }}
       >
         {Math.round(currentYear)}
       </span>
