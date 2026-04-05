@@ -39,16 +39,43 @@ function computeSurfaceTrackingRotateSpeed(
 
 type EarthOrbitControlsProps = {
   onCameraSettled: (position: CameraPosition) => void;
+  onInteractionStart: () => void;
+  onInteractionEnd: () => void;
 };
 
 export default function EarthOrbitControls({
   onCameraSettled,
+  onInteractionStart,
+  onInteractionEnd,
 }: EarthOrbitControlsProps) {
   const ref = useRef<OrbitControlsImpl>(null);
   const hasPendingChangeRef = useRef(false);
   const lastFramePositionRef = useRef(new THREE.Vector3());
+  const activeInteractionCountRef = useRef(0);
 
-  useEasedOrbitZoom(ref);
+  const beginInteraction = () => {
+    const nextCount = activeInteractionCountRef.current + 1;
+    activeInteractionCountRef.current = nextCount;
+    if (nextCount === 1) {
+      onInteractionStart();
+    }
+  };
+
+  const endInteraction = () => {
+    const nextCount = Math.max(0, activeInteractionCountRef.current - 1);
+    if (nextCount === activeInteractionCountRef.current) {
+      return;
+    }
+    activeInteractionCountRef.current = nextCount;
+    if (nextCount === 0) {
+      onInteractionEnd();
+    }
+  };
+
+  useEasedOrbitZoom(ref, {
+    onZoomInteractionStart: beginInteraction,
+    onZoomInteractionEnd: endInteraction,
+  });
 
   useFrame(() => {
     const controls = ref.current;
@@ -86,6 +113,10 @@ export default function EarthOrbitControls({
       ref={ref}
       onStart={() => {
         hasPendingChangeRef.current = true;
+        beginInteraction();
+      }}
+      onEnd={() => {
+        endInteraction();
       }}
       enableDamping
       dampingFactor={ORBIT_DAMPING_FACTOR}

@@ -63,6 +63,10 @@ export default function World({
   const { cameraPosition, currentYear, updateState } = useAppState();
   const { hoveredRegionId, setHoveredRegionId } = useHoveredElement();
   const [tooltipState, setTooltipState] = useState<TooltipState | null>(null);
+  const [
+    canvasInteractionIsCurrentlyHappening,
+    setCanvasInteractionIsCurrentlyHappening,
+  ] = useState(false);
   const cameraTargetOffsetPx = timelineExpanded
     ? timelineWidth * CAMERA_OFFSET_HALF_SHIFT_MULTIPLIER
     : 0;
@@ -76,6 +80,9 @@ export default function World({
     clientX: number,
     clientY: number,
   ) => {
+    if (canvasInteractionIsCurrentlyHappening) {
+      return;
+    }
     setHoveredRegionId(region.metadata?.id || region.id);
     setTooltipState({ data: buildTooltipData(region), x: clientX, y: clientY });
   };
@@ -85,13 +92,25 @@ export default function World({
     setTooltipState(null);
   };
 
+  const handleCanvasInteractionStart = () => {
+    setCanvasInteractionIsCurrentlyHappening(true);
+    setHoveredRegionId(null);
+    setTooltipState(null);
+  };
+
+  const handleCanvasInteractionEnd = () => {
+    setCanvasInteractionIsCurrentlyHappening(false);
+  };
+
   const { x, y, z } = SUN_DIRECTION;
   return (
     <div
       className="h-full w-full min-h-0"
       onPointerMove={(e) => {
         setTooltipState((prev) =>
-          prev ? { ...prev, x: e.clientX, y: e.clientY } : null,
+          prev && !canvasInteractionIsCurrentlyHappening
+            ? { ...prev, x: e.clientX, y: e.clientY }
+            : null,
         );
       }}
     >
@@ -131,10 +150,14 @@ export default function World({
           <Sun />
           <Moon />
           <Starfield />
-          <EarthOrbitControls onCameraSettled={handleCameraSettled} />
+          <EarthOrbitControls
+            onCameraSettled={handleCameraSettled}
+            onInteractionStart={handleCanvasInteractionStart}
+            onInteractionEnd={handleCanvasInteractionEnd}
+          />
         </Suspense>
       </Canvas>
-      {tooltipState && (
+      {tooltipState && !canvasInteractionIsCurrentlyHappening && (
         <RegionTooltip
           data={tooltipState.data}
           x={tooltipState.x}

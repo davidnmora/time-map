@@ -1,5 +1,5 @@
 import { useThree, useFrame } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import {
   STANDARD_SMOOTH_EASE,
@@ -27,6 +27,11 @@ type ZoomAnimation = {
   targetDistance: number;
   startTime: number;
   easing: (t: number) => number;
+};
+
+type UseEasedOrbitZoomOptions = {
+  onZoomInteractionStart?: () => void;
+  onZoomInteractionEnd?: () => void;
 };
 
 function classifyInputType(
@@ -73,21 +78,41 @@ function buildChainedEasing(
 }
 
 export default function useEasedOrbitZoom(
-  controlsRef: React.RefObject<OrbitControlsImpl | null>
+  controlsRef: React.RefObject<OrbitControlsImpl | null>,
+  options: UseEasedOrbitZoomOptions = {}
 ) {
   const gl = useThree((state) => state.gl);
+  const { onZoomInteractionStart, onZoomInteractionEnd } = options;
 
   const deltaRef = useRef(0);
   const inputTypeRef = useRef<InputType | null>(null);
   const lastWheelTimeRef = useRef(0);
   const animationRef = useRef<ZoomAnimation | null>(null);
   const typeResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const zoomInteractionActiveRef = useRef(false);
+
+  const notifyZoomInteractionStart = useCallback(() => {
+    if (zoomInteractionActiveRef.current) {
+      return;
+    }
+    zoomInteractionActiveRef.current = true;
+    onZoomInteractionStart?.();
+  }, [onZoomInteractionStart]);
+
+  const notifyZoomInteractionEnd = useCallback(() => {
+    if (!zoomInteractionActiveRef.current) {
+      return;
+    }
+    zoomInteractionActiveRef.current = false;
+    onZoomInteractionEnd?.();
+  }, [onZoomInteractionEnd]);
 
   useEffect(() => {
     const canvas = gl.domElement;
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
+      notifyZoomInteractionStart();
 
       const now = performance.now();
       const timeSinceLastEvent = now - lastWheelTimeRef.current;
@@ -123,14 +148,17 @@ export default function useEasedOrbitZoom(
         clearTimeout(typeResetTimerRef.current);
       }
     };
-  }, [gl]);
+  }, [gl, notifyZoomInteractionStart]);
 
   useFrame(() => {
     const controls = controlsRef.current;
     if (!controls) return;
 
     const delta = deltaRef.current;
-    if (delta === 0 && animationRef.current === null) return;
+    if (delta === 0 && animationRef.current === null) {
+      notifyZoomInteractionEnd();
+      return;
+    }
 
     const camera = controls.object;
     const currentDistance = camera.position.length();
