@@ -12,6 +12,7 @@ import EarthOrbitControls from "./scene/EarthOrbitControls";
 import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
 import Nebula from "./scene/Nebula";
 import Starfield from "./scene/Starfield";
+import Sun from "./scene/Sun";
 import {
   CANVAS_TONE_MAPPING,
   MAX_DEVICE_PIXEL_RATIO,
@@ -62,6 +63,7 @@ export default function ThreeJSMap({
             args={[HEMISPHERE_SKY, HEMISPHERE_GROUND, HEMISPHERE_INTENSITY]}
           />
           <directionalLight position={[x, y, z]} />
+          <Sun />
           <Nebula />
           <Starfield />
           <EarthOrbitControls onCameraSettled={handleCameraSettled} />

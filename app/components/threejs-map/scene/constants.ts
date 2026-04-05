@@ -24,5 +24,13 @@ export const ORBIT_ROTATE_RESPONSE_SHARPNESS = 3.4;
 export const CANVAS_TONE_MAPPING = THREE.NoToneMapping;
 export const MAX_DEVICE_PIXEL_RATIO = 3;
 
+export const SUN_DISTANCE = 60;
+export const SUN_RADIUS = 3;
+export const SUN_COLOR = 0xfff5e6;
+export const SUN_EMISSIVE_INTENSITY = 2.5;
+export const SUN_GLOW_SCALE = 2.2;
+export const SUN_GLOW_OPACITY = 1;
+export const SUN_GLOW_FALLOFF = 7.0;
+
 export const GEOJSON_OVERLAY_LINE_COLOR = 0x000000;
 export const GEOJSON_OVERLAY_LINE_WIDTH_PX = 2.5;
