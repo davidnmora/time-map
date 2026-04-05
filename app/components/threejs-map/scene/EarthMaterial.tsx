@@ -12,6 +12,8 @@ const TEXTURE_URLS = [
 const AMBIENT_SURFACE_SCALE = 0.68;
 const TERMINATOR_SHADOW_EDGE = -0.52;
 const TERMINATOR_DAY_EDGE = 0.52;
+const NIGHT_SIDE_CLOUD_STRENGTH = 0.1;
+const DAY_SIDE_CLOUD_STRENGTH = 0.4;
 
 const EARTH_VERTEX_SHADER = `
     #include <common>
@@ -53,8 +55,9 @@ const EARTH_FRAGMENT_SHADER = `
 
       vec3 cloudsPacked = texture(cloudsTexture, vUv).rgb;
 
-      float cloudsMix = smoothstep(0.0, 1.0, cloudsPacked.b);
-      cloudsMix *= dayMix;
+      float cloudShape = smoothstep(0.0, 1.0, cloudsPacked.b);
+      float cloudDayFactor = mix(float(${NIGHT_SIDE_CLOUD_STRENGTH}), float(${DAY_SIDE_CLOUD_STRENGTH}), dayMix);
+      float cloudsMix = cloudShape * cloudDayFactor;
       color = mix(color, vec3(1.0), cloudsMix);
 
       gl_FragColor = vec4(color, 1.0);
