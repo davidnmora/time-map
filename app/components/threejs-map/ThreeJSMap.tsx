@@ -10,7 +10,6 @@ import {
 import Earth from "./scene/Earth";
 import EarthOrbitControls from "./scene/EarthOrbitControls";
 import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
-import Nebula from "./scene/Nebula";
 import Starfield from "./scene/Starfield";
 import Sun from "./scene/Sun";
 import {
@@ -64,7 +63,6 @@ export default function ThreeJSMap({
           />
           <directionalLight position={[x, y, z]} />
           <Sun />
-          <Nebula />
           <Starfield />
           <EarthOrbitControls onCameraSettled={handleCameraSettled} />
         </Suspense>

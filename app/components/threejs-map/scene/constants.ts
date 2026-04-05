@@ -26,7 +26,7 @@ export const MAX_DEVICE_PIXEL_RATIO = 3;
 
 export const SUN_DISTANCE = 60;
 export const SUN_RADIUS = 3;
-export const SUN_COLOR = 0xfff5e6;
+export const SUN_COLOR = 0xffe599;
 export const SUN_EMISSIVE_INTENSITY = 2.5;
 export const SUN_GLOW_SCALE = 2.2;
 export const SUN_GLOW_OPACITY = 1;
