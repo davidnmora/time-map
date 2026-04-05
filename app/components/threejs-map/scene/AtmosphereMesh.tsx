@@ -71,6 +71,7 @@ export default function AtmosphereMesh({
         vertexShader={ATMOSPHERE_VERTEX_SHADER}
         fragmentShader={ATMOSPHERE_FRAGMENT_SHADER}
         transparent
+        depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
     </mesh>

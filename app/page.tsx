@@ -5,6 +5,7 @@ import type { GeoJSON } from "geojson";
 import { Suspense, startTransition, useEffect, useState } from "react";
 
 import type { GeographicRegionMapLayer } from "./components/map/geographic-region-map-layer";
+import { convertAllToMapRegions } from "./components/map/map-utils";
 import { Timeline } from "./components/timeline/Timeline";
 import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/threejs-map/scene/constants";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
@@ -31,6 +32,8 @@ const THREE_JS_MAP_GEOGRAPHIC_REGIONS: GeographicRegionMapLayer[] = [
     lineWidth: GEOJSON_OVERLAY_LINE_WIDTH_PX,
   },
 ];
+
+const INTERACTIVE_MAP_REGIONS = convertAllToMapRegions(completeDataset);
 
 function MapContent() {
   const {
@@ -63,6 +66,7 @@ function MapContent() {
         <div className="absolute inset-0">
           <ThreeJSMap
             geographicRegions={THREE_JS_MAP_GEOGRAPHIC_REGIONS}
+            interactiveRegions={INTERACTIVE_MAP_REGIONS}
           />
         </div>
         {isMounted &&
