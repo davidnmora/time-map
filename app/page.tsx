@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { GeoJSON } from "geojson";
 import { Suspense, startTransition, useEffect, useState } from "react";
 
 import type { GeographicRegionMapLayer } from "@/lib/regions/types";
@@ -13,7 +12,7 @@ import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
 import { completeDataset } from "./data/complete-dataset";
 import { getAFlagListOfAllRegions } from "./data/data-utils";
-import modernCountries from "./data/modern-countries.json";
+import { modernCountriesGeoJson } from "./data/modern-countries";
 import "./globals.css";
 
 const World = dynamic(
@@ -29,7 +28,7 @@ const World = dynamic(
 const WORLD_GEOGRAPHIC_REGIONS: GeographicRegionMapLayer[] = [
   {
     id: "modern-countries",
-    data: modernCountries as GeoJSON.FeatureCollection,
+    data: modernCountriesGeoJson,
     lineWidth: GEOJSON_OVERLAY_LINE_WIDTH_PX,
   },
 ];

@@ -12,6 +12,8 @@ type CountryIndependence = {
   independence: number | null;
 };
 
+const EXCLUDED_COUNTRY_IDS = new Set(["ATA"]);
+
 const COUNTRY_NAME_MAPPING: Record<string, string> = {
   "North Macedonia": "Macedonia",
   "Eswatini": "Swaziland",
@@ -26,6 +28,23 @@ const COUNTRY_NAME_MAPPING: Record<string, string> = {
 function normalizeCountryName(countryName: string): string {
   return COUNTRY_NAME_MAPPING[countryName] || countryName;
 }
+
+function shouldIncludeCountryFeature(feature: GeoJSON.Feature): boolean {
+  const featureId = feature.id;
+  if (typeof featureId !== "string") {
+    return true;
+  }
+  return !EXCLUDED_COUNTRY_IDS.has(featureId);
+}
+
+const RAW_MODERN_COUNTRIES_GEOJSON = countriesData as GeoJSON.FeatureCollection;
+
+export const modernCountriesGeoJson: GeoJSON.FeatureCollection = {
+  type: "FeatureCollection",
+  features: RAW_MODERN_COUNTRIES_GEOJSON.features.filter(
+    shouldIncludeCountryFeature
+  ),
+};
 
 function findCountryFeature(
   countryName: string,
@@ -66,7 +85,7 @@ function createTimeBoundRegionForCountry(
 
 export function generateModernCountriesData(): PartialTimeBoundGeographicRegionGroup {
   const countriesIndependence = independenceData as CountryIndependence[];
-  const geojson = countriesData as GeoJSON.FeatureCollection;
+  const geojson = modernCountriesGeoJson;
 
   const timeBoundRegions: PartialTimeBoundGeographicRegion[] = countriesIndependence
     .filter((country) => country.independence !== null)
