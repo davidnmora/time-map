@@ -13,13 +13,16 @@ import { useAppState } from "../../contexts/AppStateContext";
 import type { TimeBoundGeographicRegion } from "../../data/types";
 import {
   BACKDROP_BLUR,
-  computeRegionColumns,
+  computeRegionColumnsByContinent,
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
   DROP_SHADOW,
+  CONTINENT_GROUP_GAP,
+  TIMELINE_EXTRA_WIDTH,
   TIMELINE_BACKDROP_OPACITY,
 } from "./timeline-utils";
 import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
+import { CONTINENT_GROUP_NAMES } from "../../data/continent-mapping";
 
 const TIMELINE_GRADIENT_FADE_PERCENT = 10;
 const TIMELINE_GRADIENT_COLOR = "255, 255, 255";
@@ -33,6 +36,8 @@ const TIMELINE_BACKGROUND_GRADIENT = `
     rgba(${TIMELINE_GRADIENT_COLOR}, 0) 100%
   )
 `;
+
+const NUM_CONTINENT_GAPS = CONTINENT_GROUP_NAMES.length - 1;
 
 type TimelineProps = {
   height: number;
@@ -160,27 +165,27 @@ export const Timeline = ({
   }, [height, minYear, maxYear, currentYear, updateTimelineRange]);
 
   const widthEncodingKeyValue = widthEncodingKey || "area";
-  const columns = computeRegionColumns(regions);
+  const continentGroups = computeRegionColumnsByContinent(regions);
   const domain = regions.map((region) => Number(region[widthEncodingKeyValue]));
   const getWidthEncodingValue = createGetWidthEncodingValue(
     domain,
     widthEncodingKeyValue
   );
 
-  const columnsWithWidths = columns.map((columnRegions) => {
-    const stripWidths = columnRegions.map((region) =>
-      getWidthEncodingValue(region)
-    );
-    const columnWidth =
-      Math.round(Math.max(...stripWidths, DEFAULT_STRIP_WIDTH) * 100) / 100;
-    return { columnRegions, columnWidth };
-  });
+  const totalColumnsWidth = continentGroups.reduce((groupSum, group) => {
+    const groupWidth = group.columns.reduce((colSum, columnRegions) => {
+      const stripWidths = columnRegions.map((region) =>
+        getWidthEncodingValue(region)
+      );
+      const columnWidth =
+        Math.round(Math.max(...stripWidths, DEFAULT_STRIP_WIDTH) * 100) / 100;
+      return colSum + columnWidth;
+    }, 0);
+    return groupSum + groupWidth;
+  }, 0);
 
-  const totalWidth = columnsWithWidths.reduce(
-    (sum, { columnWidth }) => sum + columnWidth,
-    0
-  );
-
+  const gapsWidth = NUM_CONTINENT_GAPS * CONTINENT_GROUP_GAP;
+  const totalWidth = totalColumnsWidth + gapsWidth + TIMELINE_EXTRA_WIDTH;
   const timelineTotalWidth = TIMELINE_AXIS_WIDTH + totalWidth;
 
   const scaleYearToPageY = d3
