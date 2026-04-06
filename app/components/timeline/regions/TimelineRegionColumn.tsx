@@ -14,6 +14,9 @@ import { isTimeRangeActive } from "@/app/data/data-utils";
 const DEFAULT_OPACITY = 0.7;
 const DEFAULT_OPACITY_IF_NOT_OVERLAPPING_WITH_CURRENT_YEAR = 0.4;
 const HOVERED_OPACITY = 1;
+const COUNTRY_LABEL_FONT_SIZE = 8;
+const COUNTRY_LABEL_PADDING = 4;
+const COUNTRY_LABEL_MIN_VISIBLE_HEIGHT = COUNTRY_LABEL_FONT_SIZE * 2;
 
 function getRegionOpacity(
   isHovered: boolean,
@@ -30,6 +33,47 @@ function getRegionOpacity(
   return isOverlappingWithCurrentYear
     ? DEFAULT_OPACITY
     : DEFAULT_OPACITY_IF_NOT_OVERLAPPING_WITH_CURRENT_YEAR;
+}
+
+type LabelPlacement = {
+  top: number;
+  height: number;
+  anchorAtBottom: boolean;
+};
+
+function computeLabelPlacement(
+  stripY: number,
+  stripHeight: number,
+  timeRange: TimeRange,
+  currentYear: number,
+  scaleYearToPageY: d3.ScaleLinear<number, number>,
+): LabelPlacement {
+  const overlapping = isTimeRangeActive(timeRange, currentYear);
+
+  if (overlapping) {
+    const currentYearRelY = scaleYearToPageY(currentYear) - stripY;
+    const clampedHeight = Math.max(0, Math.min(currentYearRelY, stripHeight));
+    return {
+      top: COUNTRY_LABEL_PADDING,
+      height: clampedHeight - COUNTRY_LABEL_PADDING * 2,
+      anchorAtBottom: true,
+    };
+  }
+
+  const [startYear] = timeRange;
+  if (startYear > currentYear) {
+    return {
+      top: COUNTRY_LABEL_PADDING,
+      height: stripHeight - COUNTRY_LABEL_PADDING * 2,
+      anchorAtBottom: true,
+    };
+  }
+
+  return {
+    top: COUNTRY_LABEL_PADDING,
+    height: stripHeight - COUNTRY_LABEL_PADDING * 2,
+    anchorAtBottom: false,
+  };
 }
 
 type TimelineRegionColumnProps = {
@@ -58,8 +102,8 @@ export const TimelineRegionColumn = ({
 
   const strips = regions.map((region) => {
     const [startYear, endYear] = region.timeRange;
-    const currentYear = new Date().getFullYear();
-    const effectiveEndYear = endYear !== null ? endYear : currentYear;
+    const nowYear = new Date().getFullYear();
+    const effectiveEndYear = endYear !== null ? endYear : nowYear;
 
     const startY = scaleYearToPageY(effectiveEndYear);
     const endY = scaleYearToPageY(startYear);
@@ -103,6 +147,8 @@ export const TimelineRegionColumn = ({
     setTooltipState(null);
   };
 
+  const showLabels = columnWidth >= COUNTRY_LABEL_FONT_SIZE;
+
   return (
     <>
       <div
@@ -111,6 +157,19 @@ export const TimelineRegionColumn = ({
       >
         {strips.map((strip) => {
           const isHovered = hoveredRegionId === strip.metadata.id;
+          const labelPlacement = showLabels
+            ? computeLabelPlacement(
+                strip.y,
+                strip.height,
+                strip.timeRange,
+                currentYear,
+                scaleYearToPageY,
+              )
+            : null;
+          const labelVisible =
+            labelPlacement !== null &&
+            labelPlacement.height >= COUNTRY_LABEL_MIN_VISIBLE_HEIGHT;
+
           return (
             <div
               key={strip.metadata.id}
@@ -131,7 +190,37 @@ export const TimelineRegionColumn = ({
               onMouseEnter={(e) => handleMouseEnter(e, strip)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-            />
+            >
+              {labelVisible && labelPlacement && (
+                <div
+                  className="absolute left-0 overflow-hidden pointer-events-none flex justify-center"
+                  style={{
+                    top: labelPlacement.top,
+                    width: strip.width,
+                    height: labelPlacement.height,
+                    alignItems: labelPlacement.anchorAtBottom
+                      ? "flex-end"
+                      : "flex-start",
+                  }}
+                >
+                  <span
+                    className="whitespace-nowrap overflow-hidden text-white/80"
+                    style={{
+                      writingMode: "vertical-rl",
+                      transform: labelPlacement.anchorAtBottom
+                        ? "rotate(180deg)"
+                        : undefined,
+                      direction: labelPlacement.anchorAtBottom
+                        ? undefined
+                        : "rtl",
+                      fontSize: COUNTRY_LABEL_FONT_SIZE,
+                    }}
+                  >
+                    {strip.metadata.title}
+                  </span>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

@@ -9,12 +9,12 @@ import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
 
 export type Column = TimeBoundGeographicRegion[];
 
-export const MIN_STRIP_WIDTH = 2;
-export const MAX_STRIP_WIDTH = 30;
+export const MIN_STRIP_WIDTH = 3;
+export const MAX_STRIP_WIDTH = 40;
 export const DEFAULT_STRIP_WIDTH = 0.001;
 
 export const CONTINENT_GROUP_GAP = 4;
-export const TIMELINE_EXTRA_WIDTH = 50;
+export const TIMELINE_RIGHT_PADDING = 24;
 const NUM_CONTINENT_GAPS = CONTINENT_GROUP_NAMES.length - 1;
 
 export const TIMELINE_BACKDROP_OPACITY = 0.8;
@@ -116,6 +116,6 @@ export const calculateTimelineWidth = (
 
   const gapsWidth = NUM_CONTINENT_GAPS * CONTINENT_GROUP_GAP;
   return (
-    TIMELINE_AXIS_WIDTH + totalColumnsWidth + gapsWidth + TIMELINE_EXTRA_WIDTH
+    TIMELINE_AXIS_WIDTH + totalColumnsWidth + gapsWidth + TIMELINE_RIGHT_PADDING
   );
 };

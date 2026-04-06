@@ -18,7 +18,7 @@ import {
   DEFAULT_STRIP_WIDTH,
   DROP_SHADOW,
   CONTINENT_GROUP_GAP,
-  TIMELINE_EXTRA_WIDTH,
+  TIMELINE_RIGHT_PADDING,
   TIMELINE_BACKDROP_OPACITY,
 } from "./timeline-utils";
 import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
@@ -185,7 +185,7 @@ export const Timeline = ({
   }, 0);
 
   const gapsWidth = NUM_CONTINENT_GAPS * CONTINENT_GROUP_GAP;
-  const totalWidth = totalColumnsWidth + gapsWidth + TIMELINE_EXTRA_WIDTH;
+  const totalWidth = totalColumnsWidth + gapsWidth + TIMELINE_RIGHT_PADDING;
   const timelineTotalWidth = TIMELINE_AXIS_WIDTH + totalWidth;
 
   const scaleYearToPageY = d3
