@@ -11,6 +11,10 @@ import type {
 import type { TooltipData } from "@/lib/regions/region-utils";
 import { isTimeRangeActive } from "@/app/data/data-utils";
 import { TimelineRegionStripLabel } from "./TimelineRegionStripLabel";
+import {
+  TIMELINE_REGION_RESIZE_WIDTH_OPACITY_TRANSITION,
+  TIMELINE_REGION_RESIZE_WIDTH_TRANSITION,
+} from "../timeline-utils";
 
 const DEFAULT_OPACITY = 0.7;
 const DEFAULT_OPACITY_IF_NOT_OVERLAPPING_WITH_CURRENT_YEAR = 0.4;
@@ -70,7 +74,6 @@ export const TimelineRegionColumn = ({
       ...region,
       y: Math.min(startY, endY),
       height: Math.max(stripHeight, 1),
-      width: columnWidth,
     };
   });
 
@@ -108,7 +111,11 @@ export const TimelineRegionColumn = ({
     <>
       <div
         className="relative block"
-        style={{ width: columnWidth, height: height }}
+        style={{
+          width: columnWidth,
+          height: height,
+          transition: TIMELINE_REGION_RESIZE_WIDTH_TRANSITION,
+        }}
       >
         {strips.map((strip) => {
           const isHovered = hoveredRegionId === strip.metadata.id;
@@ -120,7 +127,7 @@ export const TimelineRegionColumn = ({
               style={{
                 left: 0,
                 top: strip.y,
-                width: strip.width,
+                width: "100%",
                 height: strip.height,
                 backgroundColor: strip.metadata.color || "#0080ff",
                 opacity: getRegionOpacity(
@@ -129,6 +136,7 @@ export const TimelineRegionColumn = ({
                   currentYear,
                 ),
                 cursor: "pointer",
+                transition: TIMELINE_REGION_RESIZE_WIDTH_OPACITY_TRANSITION,
               }}
               onMouseEnter={(e) => handleMouseEnter(e, strip)}
               onMouseMove={handleMouseMove}
@@ -138,7 +146,7 @@ export const TimelineRegionColumn = ({
                 columnWidth={columnWidth}
                 stripY={strip.y}
                 stripHeight={strip.height}
-                stripWidth={strip.width}
+                stripWidth={columnWidth}
                 timeRange={strip.timeRange}
                 currentYear={currentYear}
                 scaleYearToPageY={scaleYearToPageY}

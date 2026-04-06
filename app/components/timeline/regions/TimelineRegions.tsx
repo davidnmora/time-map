@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import * as d3 from "d3";
 import { TimelineRegionColumn } from "./TimelineRegionColumn";
 import {
@@ -8,11 +8,21 @@ import {
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
   CONTINENT_GROUP_GAP,
+  BACKDROP_COLOR,
+  DROP_SHADOW,
+  TIMELINE_REGION_RESIZE_WIDTH_TRANSITION,
 } from "../timeline-utils";
 import { TimeBoundGeographicRegion } from "@/app/data/types";
 
 const CONTINENT_HEADER_HEIGHT = 28;
-const CONTINENT_HEADER_FONT_SIZE = 8;
+const CONTINENT_HEADER_FONT_SIZE = 12;
+const CONTINENT_FOCUSED_OTHER_WIDTH_RATIO = 0.2;
+const WIDTH_ROUNDING_FACTOR = 100;
+const CONTINENT_HEADER_Z_INDEX = "z-40";
+
+function roundWidth(width: number): number {
+  return Math.round(width * WIDTH_ROUNDING_FACTOR) / WIDTH_ROUNDING_FACTOR;
+}
 
 type TimelineRegionsProps = {
   height: number;
@@ -29,6 +39,7 @@ export const TimelineRegions = ({
   widthEncodingKey = "area",
   scaleYearToPageY,
 }: TimelineRegionsProps) => {
+  const [focusedContinent, setFocusedContinent] = useState<string | null>(null);
   const continentGroups = computeRegionColumnsByContinent(regions);
   const domain = regions.map((region) => Number(region[widthEncodingKey]));
   const getWidthEncodingValue = createGetWidthEncodingValue(
@@ -36,7 +47,7 @@ export const TimelineRegions = ({
     widthEncodingKey
   );
 
-  const groupsWithWidths = continentGroups.map((group) => {
+  const groupsWithBaseWidths = continentGroups.map((group) => {
     const columnsWithWidths = group.columns.map((columnRegions) => {
       const stripWidths = columnRegions.map((region) =>
         getWidthEncodingValue(region)
@@ -51,23 +62,67 @@ export const TimelineRegions = ({
     return { ...group, columnsWithWidths, groupWidth };
   });
 
+  const totalGroupWidth = groupsWithBaseWidths.reduce(
+    (sum, group) => sum + group.groupWidth,
+    0
+  );
+  const collapsedWidthTotal = groupsWithBaseWidths.reduce((sum, group) => {
+    if (group.continentName === focusedContinent) {
+      return sum;
+    }
+    return sum + group.groupWidth * CONTINENT_FOCUSED_OTHER_WIDTH_RATIO;
+  }, 0);
+
+  const groupsWithWidths = groupsWithBaseWidths.map((group) => {
+    const targetGroupWidth =
+      focusedContinent === null
+        ? group.groupWidth
+        : focusedContinent === group.continentName
+          ? Math.max(totalGroupWidth - collapsedWidthTotal, 0)
+          : group.groupWidth * CONTINENT_FOCUSED_OTHER_WIDTH_RATIO;
+    const widthScale =
+      group.groupWidth > 0 ? targetGroupWidth / group.groupWidth : 1;
+    const columnsWithWidths = group.columnsWithWidths.map(
+      ({ columnRegions, columnWidth }) => ({
+        columnRegions,
+        columnWidth: roundWidth(columnWidth * widthScale),
+      })
+    );
+    return {
+      ...group,
+      columnsWithWidths,
+      groupWidth: roundWidth(targetGroupWidth),
+    };
+  });
+
+  const toggleFocusedContinent = (continentName: string) =>
+    setFocusedContinent((currentFocusedContinent) =>
+      currentFocusedContinent === continentName ? null : continentName
+    );
+
   return (
     <div className="relative" style={{ height }}>
-      <div className="absolute top-0 left-0 flex pointer-events-none z-10">
+      <div className={`absolute top-0 left-0 flex ${CONTINENT_HEADER_Z_INDEX}`}>
         {groupsWithWidths.map((group, i) => (
           <Fragment key={group.continentName}>
             <div
-              className="flex items-start justify-center bg-white/90"
+              className="flex items-start justify-center"
               style={{
                 width: group.groupWidth,
                 height: CONTINENT_HEADER_HEIGHT,
                 fontSize: CONTINENT_HEADER_FONT_SIZE,
                 lineHeight: 1.2,
+                transition: TIMELINE_REGION_RESIZE_WIDTH_TRANSITION,
               }}
             >
-              <span className="text-center text-gray-600 font-medium px-0.5 pt-1 break-words overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleFocusedContinent(group.continentName)}
+                aria-pressed={focusedContinent === group.continentName}
+                className={`h-full w-full cursor-pointer text-center text-gray-700 font-bold px-1 pt-1 break-words overflow-hidden pointer-events-auto rounded-lg border border-gray-300/70 bg-gray-100/90 hover:bg-white/100 transition-colors ${BACKDROP_COLOR} ${DROP_SHADOW}`}
+              >
                 {group.continentName}
-              </span>
+              </button>
             </div>
             {i < groupsWithWidths.length - 1 && (
               <div style={{ width: CONTINENT_GROUP_GAP }} />
