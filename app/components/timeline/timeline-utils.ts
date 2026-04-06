@@ -16,6 +16,8 @@ export const DEFAULT_STRIP_WIDTH = 0.001;
 
 export const CONTINENT_GROUP_GAP = 4;
 export const TIMELINE_RIGHT_PADDING = 24;
+export const TIMELINE_EXPANDED_WIDTH_RATIO = 0.8;
+export const TIMELINE_TOGGLE_BUTTON_REQUIRED_WIDTH = 220;
 const NUM_CONTINENT_GAPS = CONTINENT_GROUP_NAMES.length - 1;
 
 export const TIMELINE_BACKDROP_OPACITY = 0.8;
@@ -122,4 +124,27 @@ export const calculateTimelineWidth = (
   return (
     TIMELINE_AXIS_WIDTH + totalColumnsWidth + gapsWidth + TIMELINE_RIGHT_PADDING
   );
+};
+
+export const calculateExpandedTimelineWidth = (viewportWidth: number): number => {
+  if (!Number.isFinite(viewportWidth) || viewportWidth <= 0) {
+    return 0;
+  }
+
+  const targetWidth = viewportWidth * TIMELINE_EXPANDED_WIDTH_RATIO;
+  const remainingWidth = viewportWidth - targetWidth;
+  const maxWidthWithButtonRoom = Math.max(
+    0,
+    viewportWidth - TIMELINE_TOGGLE_BUTTON_REQUIRED_WIDTH,
+  );
+  const timelineMinimumVisibleWidth = TIMELINE_AXIS_WIDTH + TIMELINE_RIGHT_PADDING;
+
+  if (remainingWidth < TIMELINE_TOGGLE_BUTTON_REQUIRED_WIDTH) {
+    return Math.min(
+      viewportWidth,
+      Math.max(timelineMinimumVisibleWidth, maxWidthWithButtonRoom),
+    );
+  }
+
+  return targetWidth;
 };

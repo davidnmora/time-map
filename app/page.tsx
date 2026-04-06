@@ -6,7 +6,7 @@ import { Suspense, startTransition, useEffect, useState } from "react";
 import type { GeographicRegionMapLayer } from "@/lib/regions/types";
 import { convertAllToMapRegions } from "@/lib/regions/region-utils";
 import { Timeline } from "./components/timeline/Timeline";
-import { calculateTimelineWidth } from "./components/timeline/timeline-utils";
+import { calculateExpandedTimelineWidth } from "./components/timeline/timeline-utils";
 import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/world/scene/constants";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
@@ -44,25 +44,30 @@ function MapContent() {
     timelineExpanded,
     updateState,
   } = useAppState();
-  const [windowHeight, setWindowHeight] = useState<number | null>(null);
+  const [windowDimensions, setWindowDimensions] = useState<{
+    height: number;
+    width: number;
+  } | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     startTransition(() => {
       setIsMounted(true);
     });
-    const updateHeight = () => {
-      setWindowHeight(window.innerHeight);
+    const updateDimensions = () => {
+      setWindowDimensions({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      });
     };
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
   const timelineRegions = getAFlagListOfAllRegions(completeDataset);
-  const timelineWidth = calculateTimelineWidth(
-    timelineRegions,
-    TIMELINE_WIDTH_ENCODING_KEY
+  const timelineWidth = calculateExpandedTimelineWidth(
+    windowDimensions?.width ?? 0,
   );
 
   return (
@@ -77,14 +82,15 @@ function MapContent() {
           />
         </div>
         {isMounted &&
-          windowHeight !== null &&
+          windowDimensions !== null &&
           isFinite(minYear) &&
           isFinite(maxYear) && (
             <Timeline
-              height={windowHeight}
+              height={windowDimensions.height}
               currentYear={currentYear}
               regions={timelineRegions}
               widthEncodingKey={TIMELINE_WIDTH_ENCODING_KEY}
+              expandedWidth={timelineWidth}
               expanded={timelineExpanded}
               onToggle={() =>
                 updateState({ timelineExpanded: !timelineExpanded })

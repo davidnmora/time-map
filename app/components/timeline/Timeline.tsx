@@ -13,16 +13,10 @@ import { useAppState } from "../../contexts/AppStateContext";
 import type { TimeBoundGeographicRegion } from "../../data/types";
 import {
   BACKDROP_BLUR,
-  computeRegionColumnsByContinent,
-  createGetWidthEncodingValue,
-  DEFAULT_STRIP_WIDTH,
   DROP_SHADOW,
-  CONTINENT_GROUP_GAP,
-  TIMELINE_RIGHT_PADDING,
   TIMELINE_BACKDROP_OPACITY,
 } from "./timeline-utils";
 import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
-import { CONTINENT_GROUP_NAMES } from "../../data/continent-mapping";
 
 const TIMELINE_GRADIENT_FADE_PERCENT = 10;
 const TIMELINE_GRADIENT_COLOR = "255, 255, 255";
@@ -37,13 +31,12 @@ const TIMELINE_BACKGROUND_GRADIENT = `
   )
 `;
 
-const NUM_CONTINENT_GAPS = CONTINENT_GROUP_NAMES.length - 1;
-
 type TimelineProps = {
   height: number;
   currentYear: number;
   regions: TimeBoundGeographicRegion[];
   widthEncodingKey?: keyof TimeBoundGeographicRegion;
+  expandedWidth: number;
   expanded: boolean;
   onToggle: () => void;
 };
@@ -53,6 +46,7 @@ export const Timeline = ({
   currentYear,
   regions,
   widthEncodingKey,
+  expandedWidth,
   expanded,
   onToggle,
 }: TimelineProps) => {
@@ -164,29 +158,7 @@ export const Timeline = ({
     };
   }, [height, minYear, maxYear, currentYear, updateTimelineRange]);
 
-  const widthEncodingKeyValue = widthEncodingKey || "area";
-  const continentGroups = computeRegionColumnsByContinent(regions);
-  const domain = regions.map((region) => Number(region[widthEncodingKeyValue]));
-  const getWidthEncodingValue = createGetWidthEncodingValue(
-    domain,
-    widthEncodingKeyValue
-  );
-
-  const totalColumnsWidth = continentGroups.reduce((groupSum, group) => {
-    const groupWidth = group.columns.reduce((colSum, columnRegions) => {
-      const stripWidths = columnRegions.map((region) =>
-        getWidthEncodingValue(region)
-      );
-      const columnWidth =
-        Math.round(Math.max(...stripWidths, DEFAULT_STRIP_WIDTH) * 100) / 100;
-      return colSum + columnWidth;
-    }, 0);
-    return groupSum + groupWidth;
-  }, 0);
-
-  const gapsWidth = NUM_CONTINENT_GAPS * CONTINENT_GROUP_GAP;
-  const totalWidth = totalColumnsWidth + gapsWidth + TIMELINE_RIGHT_PADDING;
-  const timelineTotalWidth = TIMELINE_AXIS_WIDTH + totalWidth;
+  const totalWidth = Math.max(0, expandedWidth - TIMELINE_AXIS_WIDTH);
 
   const scaleYearToPageY = d3
     .scaleLinear()
@@ -200,7 +172,7 @@ export const Timeline = ({
         transform: expanded ? "translateX(0)" : "translateX(100%)",
         transitionDuration: `${SHARED_UI_TRANSITION_DURATION_MS}ms`,
         transitionTimingFunction: SHARED_UI_TRANSITION_TIMING_FUNCTION,
-        width: `${timelineTotalWidth}px`,
+        width: `${expandedWidth}px`,
       }}
     >
       <div
