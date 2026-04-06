@@ -4,9 +4,17 @@ import * as d3 from "d3";
 import type { TimeRange } from "../../../data/types";
 import { isTimeRangeActive } from "@/app/data/data-utils";
 
-const COUNTRY_LABEL_FONT_SIZE = 8;
+const COUNTRY_LABEL_MIN_FONT_SIZE = 8;
+const COUNTRY_LABEL_MAX_FONT_SIZE = 16;
 const COUNTRY_LABEL_PADDING = 4;
-const COUNTRY_LABEL_MIN_VISIBLE_HEIGHT = COUNTRY_LABEL_FONT_SIZE * 2;
+const COUNTRY_LABEL_MIN_VISIBLE_HEIGHT_FONT_MULTIPLIER = 2;
+
+function computeLabelFontSize(stripWidth: number): number {
+  return Math.min(
+    COUNTRY_LABEL_MAX_FONT_SIZE,
+    Math.max(COUNTRY_LABEL_MIN_FONT_SIZE, Math.floor(stripWidth)),
+  );
+}
 
 type LabelPlacement = {
   top: number;
@@ -70,7 +78,10 @@ export const TimelineRegionStripLabel = ({
   scaleYearToPageY,
   title,
 }: TimelineRegionStripLabelProps) => {
-  const showLabels = columnWidth >= COUNTRY_LABEL_FONT_SIZE;
+  const fontSize = computeLabelFontSize(stripWidth);
+  const minVisibleLabelHeight =
+    fontSize * COUNTRY_LABEL_MIN_VISIBLE_HEIGHT_FONT_MULTIPLIER;
+  const showLabels = columnWidth >= COUNTRY_LABEL_MIN_FONT_SIZE;
   const labelPlacement = showLabels
     ? computeLabelPlacement(
         stripY,
@@ -81,8 +92,7 @@ export const TimelineRegionStripLabel = ({
       )
     : null;
   const labelVisible =
-    labelPlacement !== null &&
-    labelPlacement.height >= COUNTRY_LABEL_MIN_VISIBLE_HEIGHT;
+    labelPlacement !== null && labelPlacement.height >= minVisibleLabelHeight;
 
   if (!labelVisible || !labelPlacement) {
     return null;
@@ -95,9 +105,7 @@ export const TimelineRegionStripLabel = ({
         top: labelPlacement.top,
         width: stripWidth,
         height: labelPlacement.height,
-        alignItems: labelPlacement.anchorAtBottom
-          ? "flex-end"
-          : "flex-start",
+        alignItems: labelPlacement.anchorAtBottom ? "flex-end" : "flex-start",
       }}
     >
       <span
@@ -108,7 +116,7 @@ export const TimelineRegionStripLabel = ({
             ? "rotate(180deg)"
             : undefined,
           direction: labelPlacement.anchorAtBottom ? undefined : "rtl",
-          fontSize: COUNTRY_LABEL_FONT_SIZE,
+          fontSize,
         }}
       >
         {title}
