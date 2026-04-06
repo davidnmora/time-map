@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import type { TimeRange } from "../../../data/types";
 import { isTimeRangeActive } from "@/app/data/data-utils";
 
-const COUNTRY_LABEL_MIN_FONT_SIZE = 8;
+const COUNTRY_LABEL_MIN_FONT_SIZE = 7;
 const COUNTRY_LABEL_MAX_FONT_SIZE = 16;
 const COUNTRY_LABEL_PADDING = 4;
 const COUNTRY_LABEL_MIN_VISIBLE_HEIGHT_FONT_MULTIPLIER = 2;
