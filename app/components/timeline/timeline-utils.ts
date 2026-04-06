@@ -9,8 +9,8 @@ import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
 
 export type Column = TimeBoundGeographicRegion[];
 
-export const MIN_STRIP_WIDTH = 3;
-export const MAX_STRIP_WIDTH = 40;
+export const MIN_STRIP_WIDTH = 4;
+export const MAX_STRIP_WIDTH = 55;
 export const DEFAULT_STRIP_WIDTH = 0.001;
 
 export const CONTINENT_GROUP_GAP = 4;
