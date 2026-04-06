@@ -3,6 +3,7 @@ import type { TimeBoundGeographicRegion } from "../../data/types";
 import {
   getContinentForCountry,
   CONTINENT_GROUP_NAMES,
+  sortRegionsForContinent,
   type ContinentGroup,
 } from "../../data/continent-mapping";
 import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
@@ -81,8 +82,11 @@ export function computeRegionColumnsByContinent(
 
   return CONTINENT_GROUP_NAMES.map((name) => {
     const regionList = grouped.get(name) ?? [];
-    const sorted = [...regionList].sort(
-      (a, b) => getCentroidLongitude(a) - getCentroidLongitude(b),
+    const sorted = sortRegionsForContinent(
+      name,
+      regionList,
+      getCentroidLongitude,
+      (r) => r.metadata.title,
     );
     return {
       continentName: name,

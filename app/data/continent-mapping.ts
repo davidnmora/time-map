@@ -3,10 +3,62 @@ export const CONTINENT_GROUP_NAMES = [
   "Africa",
   "Middle East",
   "Asia and the Pacific",
-  "Americas",
+  "North America",
+  "South America",
 ] as const;
 
 export type ContinentGroup = (typeof CONTINENT_GROUP_NAMES)[number];
+
+type ContinentSortOverride = {
+  priorityCountryTitles: readonly string[];
+};
+
+const CONTINENT_SORT_OVERRIDES: Partial<
+  Record<ContinentGroup, ContinentSortOverride>
+> = {
+  "North America": {
+    priorityCountryTitles: ["Canada", "United States", "Mexico"],
+  },
+};
+
+const PRIORITY_FALLBACK_RANK = Number.MAX_SAFE_INTEGER;
+
+function priorityRankForTitle(
+  title: string,
+  priorityTitles: readonly string[],
+): number {
+  const index = priorityTitles.indexOf(title);
+  return index === -1 ? PRIORITY_FALLBACK_RANK : index;
+}
+
+export function sortRegionsForContinent<T>(
+  continent: ContinentGroup,
+  regions: T[],
+  getLongitude: (region: T) => number,
+  getCountryTitle: (region: T) => string,
+): T[] {
+  const override = CONTINENT_SORT_OVERRIDES[continent];
+  const defaultCompare = (a: T, b: T) =>
+    getLongitude(a) - getLongitude(b);
+  if (!override) {
+    return [...regions].sort(defaultCompare);
+  }
+  const { priorityCountryTitles } = override;
+  return [...regions].sort((a, b) => {
+    const rankA = priorityRankForTitle(
+      getCountryTitle(a),
+      priorityCountryTitles,
+    );
+    const rankB = priorityRankForTitle(
+      getCountryTitle(b),
+      priorityCountryTitles,
+    );
+    if (rankA !== rankB) {
+      return rankA - rankB;
+    }
+    return defaultCompare(a, b);
+  });
+}
 
 const COUNTRY_TO_CONTINENT: Record<string, ContinentGroup> = {
   "Albania": "Europe",
@@ -171,41 +223,42 @@ const COUNTRY_TO_CONTINENT: Record<string, ContinentGroup> = {
   "Vanuatu": "Asia and the Pacific",
   "Vietnam": "Asia and the Pacific",
 
-  "Antigua and Barbuda": "Americas",
-  "Argentina": "Americas",
-  "Bahamas": "Americas",
-  "Barbados": "Americas",
-  "Belize": "Americas",
-  "Bolivia": "Americas",
-  "Brazil": "Americas",
-  "Canada": "Americas",
-  "Chile": "Americas",
-  "Colombia": "Americas",
-  "Costa Rica": "Americas",
-  "Cuba": "Americas",
-  "Dominica": "Americas",
-  "Dominican Republic": "Americas",
-  "Ecuador": "Americas",
-  "El Salvador": "Americas",
-  "Grenada": "Americas",
-  "Guatemala": "Americas",
-  "Guyana": "Americas",
-  "Haiti": "Americas",
-  "Honduras": "Americas",
-  "Jamaica": "Americas",
-  "Mexico": "Americas",
-  "Nicaragua": "Americas",
-  "Panama": "Americas",
-  "Paraguay": "Americas",
-  "Peru": "Americas",
-  "Saint Kitts and Nevis": "Americas",
-  "Saint Lucia": "Americas",
-  "Saint Vincent and the Grenadines": "Americas",
-  "Suriname": "Americas",
-  "Trinidad and Tobago": "Americas",
-  "United States": "Americas",
-  "Uruguay": "Americas",
-  "Venezuela": "Americas",
+  "Antigua and Barbuda": "North America",
+  "Bahamas": "North America",
+  "Barbados": "North America",
+  "Belize": "North America",
+  "Canada": "North America",
+  "Costa Rica": "North America",
+  "Cuba": "North America",
+  "Dominica": "North America",
+  "Dominican Republic": "North America",
+  "El Salvador": "North America",
+  "Grenada": "North America",
+  "Guatemala": "North America",
+  "Haiti": "North America",
+  "Honduras": "North America",
+  "Jamaica": "North America",
+  "Mexico": "North America",
+  "Nicaragua": "North America",
+  "Panama": "North America",
+  "Saint Kitts and Nevis": "North America",
+  "Saint Lucia": "North America",
+  "Saint Vincent and the Grenadines": "North America",
+  "Trinidad and Tobago": "North America",
+  "United States": "North America",
+
+  "Argentina": "South America",
+  "Bolivia": "South America",
+  "Brazil": "South America",
+  "Chile": "South America",
+  "Colombia": "South America",
+  "Ecuador": "South America",
+  "Guyana": "South America",
+  "Paraguay": "South America",
+  "Peru": "South America",
+  "Suriname": "South America",
+  "Uruguay": "South America",
+  "Venezuela": "South America",
 };
 
 export function getContinentForCountry(
