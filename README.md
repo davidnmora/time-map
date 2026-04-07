@@ -22,6 +22,66 @@ Given the nested nature of data (e.g. a region in Britain is part of the larger 
 See `app/data/types.ts` for the precise definitions of the data structures.
 
 
+# Core design (philosophical?) approaches for Time Map
+
+## *Story and experience over precision* - a potential guiding principle
+
+My sense is that we want to befriend impricision and embrace it mindfully in all our design and research choices.
+
+There are pragmatic reason for this:
+
+1. As you go back in history, things get fuzzier and we just *can't* be precise. The best information we have is hand-wavey or even just a blatant guess.
+2. Being super precise is its own rabit hole, or, less pajoritively, it's own *discipline*. But I don't think it's ours, necessarily. I see folks like [Ollie Bye](https://www.linkedin.com/in/ollie-bye-75a713272/) and friends being *miopic* (even judgey haha) about precision of maps and historical names. I'm not sure that's where I want to sink a bunch of energy. (There's also an argument to be made that we should work in stages, beginning with broad strokes and getting more precise once that scaffolding is in place.)
+3. Much of what we catalog is itself made up, semi-arbitrary human abstractions. *Does this tree in the middle of a forest suddenly become a Canadian tree if planted ten meters north?* These sorts of questions seem not terribly interesting, especially since things like the entirely undefended, unmarked border between the US and Canada lives mostly in our imagination.
+
+At least for me (David), I think what I'm most interested in *isn't* "accurately" or "precisely" capturing "all of human history", it's
+1. seeing the big picture story, the sweeps of history, the flow of major civilizations, cultures, and religions
+2. connecting with the *lived experiences* of beings in different moments of history
+3. on a meta-level, exploring together what we think matters enough to count as "history", and being forced to recon with our own assumptions and paradigms as we build our tool
+
+But precision has its place: these ideas can guide can also guide us to when more precise *is* warranted, eg 
+- Would it help us see the bigger picture picture more clearly to more precisely map the Mongol Empire in this region of China? 
+- Would adding X data help us understand lived experience of someone in the Mexica empire?
+
+(We could come up with a slogan like, "Story over precision" or "Experiencing story over sweating details.")
+
+## Working with imprecision and uncertainty
+
+We will have to make explicit choices around imprecision and uncertainty when we create and select:
+- data (time, geographic region, "ownership")
+- visuals
+  - aesthetics (eg hard borders vs feathered edges, hard lines vs "sketchy" lines, etc)
+  - visualization choices (simplification, showing uncertainty, interpolation, etc)
+- language and terminology
+
+### Where this shows up practically  
+
+- *Time*:
+  - Historians may dispute (or not know) exactly *when* a civilization existed
+  - The Roman empire doesn't exactly "start" or "end" clealy in one specific year (and even the historically recognized boundaries may themselves be more for easy reference than actually meaningful)
+- *Geography*: 
+  - Historians may dispute (or not know) exactly *where* a civilization was geographically
+  - Where exactly did Alexander's empire end at its peak? Was it a well defined border, or a general region that transitioned into less and less control?
+  - There were many people groups within and adjacent to the Mexica empire, so how do we designate these regions? 
+- *"Ownership"*
+  - China and Taiwan both claim each other. 
+  - North and South Vietnam both claimed each other during the Vietnam War.
+  - The UN recognized Palestine borders differ from the realities of Israeli occupation
+- *Interpolating (animating) between known points*:
+  - *Changes of geography over time within one empire*: According to [this series of maps](https://www.pinterest.com/pin/386817055516269369/), in 1237, the lower limit of the Mongol empire extended just to the Northern tip of modern day Iran; by 1259, they had extended south through all of Iran to the Persian Gulf. It's clear what to show on the map in the year 1237 or 1959, but, what about in the years between? Do we just show the empire suddenly expanding southward in 1259 (ie no interpolation, just a sudden jump)? Or do we animate their empire smoothly and evenly across every year from 1237 to 1259 (despite the fact this is almost certainly not exactly how it expanded)? Do we slowly fade-in (or out) the region between the two defined points in time, indicating that this is inference but also giving a sense of generally where the change was heading? This is important because, practically speaking, we can't always (or won't want to spend energy to) figure out exactly where there empire was every single year.
+  - *Geography changing hands (or in multiple hands) over time*: 
+    - The first British colony was Jamestown in 1607, and the European population (and colonial desire for Independence) grew steadily toward 1776. Needless to say, the only civilizations in North America prior to the European colonizers were indigenous, though they were steadily displaced and killed over time. How do we mark land as "colonist" vs "some specific indigenous group" vs "British", and how do we explore the shift in dominance/"ownership" over time? Especially when the spheres of influence (geography) of each were actively shifting over time, too (eg the geography dominated the colonists grew steadily).
+    - The US *declared* independence in 1776, but the British didn't surrender until 1981
+    - The US government "purchased land" from indigenous people on specific dates, though the level of dominance / control from settlers varied before and after that official "land sale"
+
+    
+
+
+
+
+
+
+
 # Resources
 
 ### inspiration
