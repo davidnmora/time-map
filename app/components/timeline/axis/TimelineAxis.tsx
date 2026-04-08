@@ -42,7 +42,7 @@ export const TimelineAxis = ({
   };
 
   const getAxisElementColor = (year: number) => {
-    return isInTheFuture(year) ? "rgba(0, 0, 0, 0.2)" : "rgb(0, 0, 0)";
+    return isInTheFuture(year) ? "rgba(0, 0, 0, 0.1)" : "rgba(40, 40, 40, 0.6)";
   };
 
   return (

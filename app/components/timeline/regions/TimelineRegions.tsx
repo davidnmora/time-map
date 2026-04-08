@@ -3,22 +3,17 @@
 import { Fragment, useState } from "react";
 import * as d3 from "d3";
 import { TimelineRegionColumn } from "./TimelineRegionColumn";
+import { TimelineContinentLabels } from "./TimelineContinentLabels";
 import {
   computeRegionColumnsByContinent,
   createGetWidthEncodingValue,
   DEFAULT_STRIP_WIDTH,
   CONTINENT_GROUP_GAP,
-  BACKDROP_COLOR,
-  DROP_SHADOW,
-  TIMELINE_REGION_RESIZE_WIDTH_TRANSITION,
 } from "../timeline-utils";
 import { TimeBoundGeographicRegion } from "@/app/data/types";
 
-const CONTINENT_HEADER_HEIGHT = 28;
-const CONTINENT_HEADER_FONT_SIZE = 12;
 const CONTINENT_FOCUSED_OTHER_WIDTH_RATIO = 0.2;
 const WIDTH_ROUNDING_FACTOR = 100;
-const CONTINENT_HEADER_Z_INDEX = "z-40";
 
 function roundWidth(width: number): number {
   return Math.round(width * WIDTH_ROUNDING_FACTOR) / WIDTH_ROUNDING_FACTOR;
@@ -102,34 +97,11 @@ export const TimelineRegions = ({
 
   return (
     <div className="relative" style={{ height }}>
-      <div className={`absolute top-0 left-0 flex ${CONTINENT_HEADER_Z_INDEX}`}>
-        {groupsWithWidths.map((group, i) => (
-          <Fragment key={group.continentName}>
-            <div
-              className="flex items-start justify-center"
-              style={{
-                width: group.groupWidth,
-                height: CONTINENT_HEADER_HEIGHT,
-                fontSize: CONTINENT_HEADER_FONT_SIZE,
-                lineHeight: 1.2,
-                transition: TIMELINE_REGION_RESIZE_WIDTH_TRANSITION,
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => toggleFocusedContinent(group.continentName)}
-                aria-pressed={focusedContinent === group.continentName}
-                className={`h-full w-full cursor-pointer text-center text-gray-700 font-bold px-1 pt-1 break-words overflow-hidden pointer-events-auto rounded-lg border border-gray-300/70 bg-gray-100/90 hover:bg-white/100 transition-colors ${BACKDROP_COLOR} ${DROP_SHADOW}`}
-              >
-                {group.continentName}
-              </button>
-            </div>
-            {i < groupsWithWidths.length - 1 && (
-              <div style={{ width: CONTINENT_GROUP_GAP }} />
-            )}
-          </Fragment>
-        ))}
-      </div>
+      <TimelineContinentLabels
+        groupsWithWidths={groupsWithWidths}
+        focusedContinent={focusedContinent}
+        onToggleFocusedContinent={toggleFocusedContinent}
+      />
       <div className="flex" style={{ height }}>
         {groupsWithWidths.map((group, groupIndex) => (
           <Fragment key={group.continentName}>

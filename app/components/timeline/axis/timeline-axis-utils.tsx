@@ -1,5 +1,5 @@
-export const CENTURY_TICK_THICKNESS = 2;
-export const REGULAR_TICK_THICKNESS = 1;
+export const CENTURY_TICK_THICKNESS = 1;
+export const REGULAR_TICK_THICKNESS = 0.1;
 
 export const TIMELINE_AXIS_WIDTH = 60;
 export const TICK_LENGTH = 6;
@@ -66,10 +66,7 @@ export const getTickThickness = (year: number): number => {
   return isCentury(year) ? CENTURY_TICK_THICKNESS : REGULAR_TICK_THICKNESS;
 };
 
-export const calculateMinTickSpacing = (
-  numTicks: number,
-  height: number
-): number => {
+export const calculateMinTickSpacing = (numTicks: number, height: number): number => {
   if (numTicks <= 1) return height;
   return height / (numTicks - 1);
 };
@@ -78,7 +75,7 @@ export const determineDensityLevel = (
   height: number,
   minYear: number,
   maxYear: number,
-  fontSize: number
+  fontSize: number,
 ): DensityLevel => {
   const minimumSpacing = fontSize * MIN_TICK_SPACING_MULTIPLIER;
 
@@ -102,20 +99,20 @@ export const determineDensityLevel = (
 
   const centuriesHalfCenturiesSpacing = calculateMinTickSpacing(
     centuriesHalfCenturiesCount,
-    height
+    height,
   );
   const centuries25Spacing = calculateMinTickSpacing(centuries25Count, height);
   const centuriesHalfDecadesSpacing = calculateMinTickSpacing(
     centuriesHalfDecadesCount,
-    height
+    height,
   );
   const centuriesDecadesSpacing = calculateMinTickSpacing(
     centuriesDecadesCount,
-    height
+    height,
   );
   const centuriesYearsSpacing = calculateMinTickSpacing(
     centuriesYearsCount,
-    height
+    height,
   );
 
   if (centuriesYearsSpacing >= minimumSpacing) {
@@ -144,7 +141,7 @@ export const determineDensityLevel = (
 export const generateTicksForDensityLevel = (
   densityLevel: DensityLevel,
   minYear: number,
-  maxYear: number
+  maxYear: number,
 ): number[] => {
   const centuryTicks = generateCenturyTicks(minYear, maxYear);
 
@@ -168,7 +165,7 @@ export const generateTicksForDensityLevel = (
       ].sort((a, b) => a - b);
     case "centuries-decades":
       return [...centuryTicks, ...generateDecadeTicks(minYear, maxYear)].sort(
-        (a, b) => a - b
+        (a, b) => a - b,
       );
     case "centuries-years":
       return [

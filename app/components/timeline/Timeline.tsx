@@ -14,22 +14,9 @@ import type { TimeBoundGeographicRegion } from "../../data/types";
 import {
   BACKDROP_BLUR,
   DROP_SHADOW,
-  TIMELINE_BACKDROP_OPACITY,
 } from "./timeline-utils";
 import { TIMELINE_AXIS_WIDTH } from "./axis/timeline-axis-utils";
-
-const TIMELINE_GRADIENT_FADE_PERCENT = 10;
-const TIMELINE_GRADIENT_COLOR = "255, 255, 255";
-
-const TIMELINE_BACKGROUND_GRADIENT = `
-  linear-gradient(
-    to bottom,
-    rgba(${TIMELINE_GRADIENT_COLOR}, 0) 0%,
-    rgba(${TIMELINE_GRADIENT_COLOR}, ${TIMELINE_BACKDROP_OPACITY}) ${TIMELINE_GRADIENT_FADE_PERCENT}%,
-    rgba(${TIMELINE_GRADIENT_COLOR}, ${TIMELINE_BACKDROP_OPACITY}) ${100 - TIMELINE_GRADIENT_FADE_PERCENT}%,
-    rgba(${TIMELINE_GRADIENT_COLOR}, 0) 100%
-  )
-`;
+import { TIMELINE_BACKGROUND_GRADIENT } from "./timeline-background-gradient";
 
 type TimelineProps = {
   height: number;

@@ -14,6 +14,7 @@ const TERMINATOR_SHADOW_EDGE = -0.52;
 const TERMINATOR_DAY_EDGE = 0.52;
 const NIGHT_SIDE_CLOUD_STRENGTH = 0.1;
 const DAY_SIDE_CLOUD_STRENGTH = 0.4;
+const BASE_EARTH_SATURATION = 0.6;
 
 const EARTH_VERTEX_SHADER = `
     #include <common>
@@ -51,7 +52,9 @@ const EARTH_FRAGMENT_SHADER = `
 
       float dayMix = smoothstep(float(${TERMINATOR_SHADOW_EDGE}), float(${TERMINATOR_DAY_EDGE}), sunOrientation);
       vec3 dayColor = texture(dayTexture, vUv).rgb;
-      color = dayColor * mix(float(${AMBIENT_SURFACE_SCALE}), 1.0, dayMix);
+      float dayLuma = dot(dayColor, vec3(0.2126, 0.7152, 0.0722));
+      vec3 desaturatedDayColor = mix(vec3(dayLuma), dayColor, float(${BASE_EARTH_SATURATION}));
+      color = desaturatedDayColor * mix(float(${AMBIENT_SURFACE_SCALE}), 1.0, dayMix);
 
       vec3 cloudsPacked = texture(cloudsTexture, vUv).rgb;
 
