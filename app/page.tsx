@@ -7,6 +7,7 @@ import type { GeographicRegionMapLayer } from "@/lib/regions/types";
 import { convertAllToMapRegions } from "@/lib/regions/region-utils";
 import { Timeline } from "./components/timeline/Timeline";
 import { calculateExpandedTimelineWidth } from "./components/timeline/timeline-utils";
+import { ModernCountryBordersToggle } from "./components/world/ModernCountryBordersToggle";
 import { GEOJSON_OVERLAY_LINE_WIDTH_PX } from "./components/world/scene/constants";
 import { AppStateProvider, useAppState } from "./contexts/AppStateContext";
 import { HoveredElementProvider } from "./contexts/HoveredElementContext";
@@ -25,7 +26,7 @@ const World = dynamic(
   },
 );
 
-const WORLD_GEOGRAPHIC_REGIONS: GeographicRegionMapLayer[] = [
+const MODERN_COUNTRY_BORDER_REGIONS: GeographicRegionMapLayer[] = [
   {
     id: "modern-countries",
     data: modernCountriesGeoJson,
@@ -49,6 +50,7 @@ function MapContent() {
     width: number;
   } | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [showModernCountryBorders, setShowModernCountryBorders] = useState(true);
 
   useEffect(() => {
     startTransition(() => {
@@ -75,12 +77,20 @@ function MapContent() {
       <div className="h-screen w-screen relative">
         <div className="absolute inset-0">
           <World
-            geographicRegions={WORLD_GEOGRAPHIC_REGIONS}
+            modernCountryBorders={
+              showModernCountryBorders ? MODERN_COUNTRY_BORDER_REGIONS : []
+            }
             interactiveRegions={INTERACTIVE_MAP_REGIONS}
             timelineWidth={timelineWidth}
             timelineExpanded={timelineExpanded}
           />
         </div>
+        <ModernCountryBordersToggle
+          checked={showModernCountryBorders}
+          onToggle={() =>
+            setShowModernCountryBorders((previousValue) => !previousValue)
+          }
+        />
         {isMounted &&
           windowDimensions !== null &&
           isFinite(minYear) &&

@@ -13,7 +13,7 @@ import {
   GEOJSON_OVERLAY_LINE_WIDTH_PX,
 } from "./constants";
 
-type GeoJsonGlobeOverlayProps = {
+type ModernCountryBordersProps = {
   regions: GeographicRegionMapLayer[];
 };
 
@@ -46,9 +46,9 @@ function resolveLineColor(
   return new THREE.Color(lineColor).getHex();
 }
 
-export default function GeoJsonGlobeOverlay({
+export default function ModernCountryBorders({
   regions,
-}: GeoJsonGlobeOverlayProps) {
+}: ModernCountryBordersProps) {
   const { width, height } = useThree((s) => s.size);
   const groupRef = useRef<THREE.Group>(null);
 

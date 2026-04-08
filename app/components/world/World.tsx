@@ -16,7 +16,7 @@ import { RegionTooltip } from "@/app/components/shared/RegionTooltip";
 import Earth from "./scene/Earth";
 import CameraViewOffsetController from "./controls/CameraViewOffsetController";
 import EarthOrbitControls from "./controls/EarthOrbitControls";
-import GeoJsonGlobeOverlay from "./scene/GeoJsonGlobeOverlay";
+import ModernCountryBorders from "./scene/ModernCountryBorders";
 import InteractiveGlobeRegions from "./scene/InteractiveGlobeRegions";
 import Moon from "./scene/Moon";
 import Starfield from "./scene/Starfield";
@@ -52,14 +52,14 @@ function buildTooltipData(region: GeographicRegionMapLayer): TooltipData {
 }
 
 type WorldProps = {
-  geographicRegions?: GeographicRegionMapLayer[];
+  modernCountryBorders?: GeographicRegionMapLayer[];
   interactiveRegions?: InteractiveGeographicRegionMapLayer[];
   timelineWidth: number;
   timelineExpanded: boolean;
 };
 
 export default function World({
-  geographicRegions = EMPTY_REGIONS,
+  modernCountryBorders = EMPTY_REGIONS,
   interactiveRegions = EMPTY_INTERACTIVE_REGIONS,
   timelineWidth,
   timelineExpanded,
@@ -134,8 +134,8 @@ export default function World({
         <Suspense fallback={null}>
           <CameraViewOffsetController targetOffsetPx={cameraTargetOffsetPx} />
           <Earth>
-            {geographicRegions.length > 0 && (
-              <GeoJsonGlobeOverlay regions={geographicRegions} />
+            {modernCountryBorders.length > 0 && (
+              <ModernCountryBorders regions={modernCountryBorders} />
             )}
             {interactiveRegions.length > 0 && (
               <InteractiveGlobeRegions
