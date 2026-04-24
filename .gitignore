@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# large local SVG sources for scripts (not committed)
+scripts/convert-cottereau-svgs/sample-svg-maps-from-cottereau/
