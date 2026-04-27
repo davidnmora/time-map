@@ -34588,7 +34588,7 @@
       "type": "Feature",
       "properties": {
         "fill": "#fdf7ec",
-        "label_hint": "Kish_and_Uruk",
+        "label_hint": "Uruk",
         "svg_layer_ids": [
           "Middle_east"
         ],
@@ -37954,7 +37954,7 @@
       "type": "Feature",
       "properties": {
         "fill": "#fdf7ec",
-        "label_hint": "Kish_and_Uruk",
+        "label_hint": "Kish",
         "svg_layer_ids": [
           "Middle_east"
         ],

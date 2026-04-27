@@ -35,6 +35,9 @@ BASEMAP_CLASSES = frozenset({"st6", "st9", "st26", "st38"})
 MIDDLE_EAST_LAYER_ID = "Middle_east"
 UNKNOWN_FILL_LABEL_PREFIX = "Cottereau_fill"
 MIN_SCOPED_LABEL_SVG_SHOELACE_AREA = 1.0
+KISH_AND_URUK_LABEL = "Kish_and_Uruk"
+KISH_LABEL = "Kish"
+URUK_LABEL = "Uruk"
 
 
 @dataclass(frozen=True)
@@ -60,7 +63,7 @@ KNOWN_CIVILIZATION_FILL_LABELS: dict[str, str] = {
 SCOPED_CIVILIZATION_FILL_LABELS = tuple(
     ScopedFillLabel(
         fill=fill,
-        label="Kish_and_Uruk",
+        label=KISH_AND_URUK_LABEL,
         geo_layer_id=MIDDLE_EAST_LAYER_ID,
         min_svg_shoelace_area=MIN_SCOPED_LABEL_SVG_SHOELACE_AREA,
     )
@@ -140,6 +143,40 @@ def civilization_label(fill: str, geo_layer_ids: list[str], svg_area: float) -> 
     if fill in KNOWN_CIVILIZATION_FILL_LABELS:
         return KNOWN_CIVILIZATION_FILL_LABELS[fill]
     return f"{UNKNOWN_FILL_LABEL_PREFIX}_{fill.lstrip('#')}"
+
+
+def label_kish_and_uruk(features: list[dict]) -> list[dict]:
+    def kish_uruk_candidate_mean_lat(indexed_feature: tuple[int, dict]) -> float:
+        coordinates = indexed_feature[1]["geometry"]["coordinates"][0]
+        return sum(point[1] for point in coordinates) / len(coordinates)
+
+    kish_and_uruk_candidates = sorted(
+        (
+            (index, feature)
+            for index, feature in enumerate(features)
+            if feature["properties"].get("label_hint") == KISH_AND_URUK_LABEL
+        ),
+        key=kish_uruk_candidate_mean_lat,
+        reverse=True,
+    )
+    if len(kish_and_uruk_candidates) != 2:
+        return features
+
+    kish_index = kish_and_uruk_candidates[0][0]
+    uruk_index = kish_and_uruk_candidates[1][0]
+    labels_by_index = {kish_index: KISH_LABEL, uruk_index: URUK_LABEL}
+    return [
+        {
+            **feature,
+            "properties": {
+                **feature["properties"],
+                "label_hint": labels_by_index[index],
+            },
+        }
+        if index in labels_by_index
+        else feature
+        for index, feature in enumerate(features)
+    ]
 
 
 def group_chain_ids(el: ET.Element, pmap: dict[ET.Element, ET.Element | None]) -> list[str]:
@@ -404,6 +441,7 @@ def main() -> None:
         }
         features.append(fe)
 
+    labeled_features = label_kish_and_uruk(features)
     fc = {
         "type": "FeatureCollection",
         "name": "2500 BC civilizations (from Cottereau SVG)",
@@ -422,17 +460,17 @@ def main() -> None:
             "lat_north": LAT_DEG_NORTH,
             "lat_south": LAT_DEG_SOUTH,
         },
-        "features": features,
+        "features": labeled_features,
     }
     OUTPUT_GJ.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_GJ, "w", encoding="utf-8") as f:
         json.dump(fc, f, indent=2)
 
     by_fill_label: dict[tuple[str, str], int] = {}
-    for fe in features:
+    for fe in labeled_features:
         key = (fe["properties"]["fill"], fe["properties"]["label_hint"])
         by_fill_label[key] = by_fill_label.get(key, 0) + 1
-    print(f"Wrote {len(features)} features to {OUTPUT_GJ}")
+    print(f"Wrote {len(labeled_features)} features to {OUTPUT_GJ}")
     for fill, label in sorted(by_fill_label, key=by_fill_label.get, reverse=True):
         print(f"  {fill} ({label}): {by_fill_label[(fill, label)]}")
 
