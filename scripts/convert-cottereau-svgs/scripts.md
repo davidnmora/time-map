@@ -32,8 +32,8 @@ The extractor uses `2500_BC_qgis_polynomial3.points`, exported from QGIS Georefe
 Internally, the script:
 
 1. Parses the SVG style block.
-2. Finds only the fill colors that correspond to Cottereau civilizations.
-3. Extracts `path`, `polygon`, and `rect` geometry from the relevant geographic layers.
+2. Finds filled `path`, `polygon`, and `rect` geometry in the relevant geographic layers.
+3. Excludes stable basemap fills/classes from the fixed Cottereau basemap.
 4. Samples SVG paths into point rings.
 5. Fits the Polynomial 3 SVG-to-WGS84 transform from all enabled QGIS GCPs.
 6. Converts every SVG `(x, y)` vertex to WGS84 `(longitude, latitude)`.

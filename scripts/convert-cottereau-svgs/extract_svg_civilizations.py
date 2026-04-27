@@ -30,7 +30,22 @@ LAT_DEG_SOUTH = -90.0
 GCP_POLYNOMIAL_DEGREE = 3
 QGIS_RASTER_TO_SVG_SCALE = 0.5
 
-CIVILIZATION_FILLS: dict[str, str] = {
+BASEMAP_FILLS = frozenset({"#fff", "#010101", "#231f20"})
+BASEMAP_CLASSES = frozenset({"st6", "st9", "st26", "st38"})
+MIDDLE_EAST_LAYER_ID = "Middle_east"
+UNKNOWN_FILL_LABEL_PREFIX = "Cottereau_fill"
+MIN_SCOPED_LABEL_SVG_SHOELACE_AREA = 1.0
+
+
+@dataclass(frozen=True)
+class ScopedFillLabel:
+    fill: str
+    label: str
+    geo_layer_id: str
+    min_svg_shoelace_area: float
+
+
+KNOWN_CIVILIZATION_FILL_LABELS: dict[str, str] = {
     "#f8d655": "Nile",
     "#fbd7ad": "Northern_Levant_Anatolia",
     "#e4a6a3": "Central_Mesopotamia",
@@ -41,6 +56,16 @@ CIVILIZATION_FILLS: dict[str, str] = {
     "#265c85": "Dark_blue_Aegean",
     "#d8d13e": "Andes_yellow_green",
 }
+
+SCOPED_CIVILIZATION_FILL_LABELS = tuple(
+    ScopedFillLabel(
+        fill=fill,
+        label="Kish_and_Uruk",
+        geo_layer_id=MIDDLE_EAST_LAYER_ID,
+        min_svg_shoelace_area=MIN_SCOPED_LABEL_SVG_SHOELACE_AREA,
+    )
+    for fill in ("#fdf7ec", "#fcf7ed")
+)
 
 GEO_CONTAINERS = frozenset(
     {
@@ -93,6 +118,28 @@ def resolve_fill(classes: list[str], class_to_fill: dict[str, str]) -> str | Non
         if c in class_to_fill:
             return class_to_fill[c]
     return None
+
+
+def is_basemap_element(fill: str, classes: list[str]) -> bool:
+    return fill in BASEMAP_FILLS or any(c in BASEMAP_CLASSES for c in classes)
+
+
+def civilization_label(fill: str, geo_layer_ids: list[str], svg_area: float) -> str:
+    scoped_label = next(
+        (
+            scoped.label
+            for scoped in SCOPED_CIVILIZATION_FILL_LABELS
+            if fill == scoped.fill
+            and scoped.geo_layer_id in geo_layer_ids
+            and svg_area >= scoped.min_svg_shoelace_area
+        ),
+        None,
+    )
+    if scoped_label:
+        return scoped_label
+    if fill in KNOWN_CIVILIZATION_FILL_LABELS:
+        return KNOWN_CIVILIZATION_FILL_LABELS[fill]
+    return f"{UNKNOWN_FILL_LABEL_PREFIX}_{fill.lstrip('#')}"
 
 
 def group_chain_ids(el: ET.Element, pmap: dict[ET.Element, ET.Element | None]) -> list[str]:
@@ -303,7 +350,6 @@ def main() -> None:
     if style_el is None or not style_el.text:
         raise SystemExit("No <style> block found")
     class_to_fill = parse_styles(style_el.text)
-    allowed_fills = set(CIVILIZATION_FILLS.keys())
     pmap = build_parent_map(r)
 
     features: list[dict] = []
@@ -313,10 +359,15 @@ def main() -> None:
             continue
         cls_list = (el.get("class") or "").split()
         fill = resolve_fill(cls_list, class_to_fill)
-        if not fill or fill not in allowed_fills:
+        if not fill:
+            continue
+        if is_basemap_element(fill, cls_list):
             continue
 
         chain = group_chain_ids(el, pmap)
+        geo_layer_ids = geo_subtree_ids(chain)
+        if not geo_layer_ids:
+            continue
         ring: list[tuple[float, float]] | None = None
         if t == "path":
             ring = path_d_to_ring(el.get("d", ""))
@@ -339,14 +390,14 @@ def main() -> None:
         if not ring:
             continue
 
-        label = CIVILIZATION_FILLS[fill]
+        label = civilization_label(fill, geo_layer_ids, shoelace_area(ring))
         gcoords = ring_to_geojson_coords(ring, geo_transform)
         fe = {
             "type": "Feature",
             "properties": {
                 "fill": fill,
                 "label_hint": label,
-                "svg_layer_ids": geo_subtree_ids(chain),
+                "svg_layer_ids": geo_layer_ids,
                 "svg_class": " ".join(cls_list),
             },
             "geometry": {"type": "Polygon", "coordinates": [gcoords]},
@@ -377,13 +428,13 @@ def main() -> None:
     with open(OUTPUT_GJ, "w", encoding="utf-8") as f:
         json.dump(fc, f, indent=2)
 
-    by_fill: dict[str, int] = {}
+    by_fill_label: dict[tuple[str, str], int] = {}
     for fe in features:
-        f = fe["properties"]["fill"]
-        by_fill[f] = by_fill.get(f, 0) + 1
+        key = (fe["properties"]["fill"], fe["properties"]["label_hint"])
+        by_fill_label[key] = by_fill_label.get(key, 0) + 1
     print(f"Wrote {len(features)} features to {OUTPUT_GJ}")
-    for fill in sorted(by_fill, key=by_fill.get, reverse=True):
-        print(f"  {fill} ({CIVILIZATION_FILLS[fill]}): {by_fill[fill]}")
+    for fill, label in sorted(by_fill_label, key=by_fill_label.get, reverse=True):
+        print(f"  {fill} ({label}): {by_fill_label[(fill, label)]}")
 
 
 if __name__ == "__main__":
