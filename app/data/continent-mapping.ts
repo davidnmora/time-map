@@ -261,8 +261,24 @@ const COUNTRY_TO_CONTINENT: Record<string, ContinentGroup> = {
   Venezuela: "South America",
 };
 
+const COTTEREAU_2500BCE_REGION_TO_CONTINENT: Record<string, ContinentGroup> = {
+  Nile: "Africa",
+  "Northern Levant Anatolia": "Mid East",
+  "Central Mesopotamia": "Mid East",
+  "Lower Mesopotamia": "Mid East",
+  Indus: "Asia and the Pacific",
+  "Eastern Persian Gulf": "Mid East",
+  "Mesopotamia pink tones": "Mid East",
+  "Dark blue Aegean": "Europe",
+  "Andes yellow green": "South America",
+};
+
 export function getContinentForCountry(
   countryName: string
 ): ContinentGroup | null {
-  return COUNTRY_TO_CONTINENT[countryName] ?? null;
+  return (
+    COTTEREAU_2500BCE_REGION_TO_CONTINENT[countryName] ??
+    COUNTRY_TO_CONTINENT[countryName] ??
+    null
+  );
 }

@@ -12,6 +12,9 @@ import {
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
+import { completeDataset } from "@/app/data/complete-dataset";
+import { getMinMaxYears } from "@/app/data/data-utils";
+
 export type CameraPosition = [number, number, number];
 
 type AppState = {
@@ -54,16 +57,13 @@ const AppStateContext = createContext<AppStateContextType | undefined>(
 
 const URL_DEBOUNCE_MS = 300;
 
+const DATASET_YEAR_EXTENT = getMinMaxYears(completeDataset);
 const DEFAULT_CAMERA_POSITION: CameraPosition = [0, 0.1, 5];
 const DEFAULT_TIMELINE_EXPANDED = true;
-const DEFAULT_MIN_YEAR = 1731;
-const DEFAULT_MAX_YEAR = 2050;
-const DEFAULT_CURRENT_YEAR = calculateMidpointYear(
-  DEFAULT_MIN_YEAR,
-  DEFAULT_MAX_YEAR
-);
+const DEFAULT_MIN_YEAR = DATASET_YEAR_EXTENT.min;
+const DEFAULT_MAX_YEAR = DATASET_YEAR_EXTENT.max;
+const DEFAULT_CURRENT_YEAR = new Date().getFullYear();
 
-// Note: due to our timeline choice, we always place the currentYear at the midpoint of the min and max years
 function calculateMidpointYear(minYear: number, maxYear: number): number {
   return maxYear - (maxYear - minYear) / 2;
 }
@@ -143,12 +143,6 @@ function mergeAppState(partial: PartialAppState, complete: AppState): AppState {
     } else {
       (result as Record<string, unknown>)[key] = complete[key];
     }
-  }
-
-  const finalMinYear = result.minYear;
-  const finalMaxYear = result.maxYear;
-  if (isFinite(finalMinYear) && isFinite(finalMaxYear)) {
-    result.currentYear = calculateMidpointYear(finalMinYear, finalMaxYear);
   }
 
   return result;

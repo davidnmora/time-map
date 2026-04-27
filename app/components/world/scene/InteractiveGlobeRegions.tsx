@@ -46,12 +46,14 @@ function RegionMesh({
   );
   if (!geometry) return null;
 
+  const fillColorThree = new THREE.Color(region.fillColor);
   const opacity = getRegionFillOpacity(isHovered, isActive);
   const isVisible = opacity > 0;
 
   return (
     <mesh
       geometry={geometry}
+      frustumCulled={false}
       visible={isVisible}
       renderOrder={FILL_RENDER_ORDER}
       onPointerOver={(e) => {
@@ -64,10 +66,10 @@ function RegionMesh({
       }}
     >
       <meshBasicMaterial
-        color={region.fillColor}
+        color={fillColorThree}
         transparent
         opacity={opacity}
-        side={THREE.FrontSide}
+        side={THREE.DoubleSide}
         depthWrite={false}
         polygonOffset
         polygonOffsetFactor={-1}

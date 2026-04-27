@@ -1,28 +1,34 @@
 from __future__ import annotations
 
+import csv
 import json
 import re
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 from svg.path import parse_path
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 SVG_PATH = Path(__file__).parent / "sample-svg-maps-from-cottereau" / "2500 BC.svg"
+GCP_POINTS_PATH = Path(__file__).parent / "2500_BC_qgis_polynomial3.points"
 OUTPUT_GJ = (
     _REPO_ROOT
     / "app"
     / "data"
     / "civilizations-from-cottereau"
-    / "2500_BC_civilizations.geojson"
+    / "2500_BC_civilizations.json"
 )
 
-VIEWBOX = {"width": 6189.31, "height": 3094.65}
 LON_DEG_EAST = 180.0
 LON_DEG_WEST = -180.0
 LAT_DEG_NORTH = 90.0
 LAT_DEG_SOUTH = -90.0
+
+GCP_POLYNOMIAL_DEGREE = 3
+QGIS_RASTER_TO_SVG_SCALE = 0.5
 
 CIVILIZATION_FILLS: dict[str, str] = {
     "#f8d655": "Nile",
@@ -100,12 +106,97 @@ def group_chain_ids(el: ET.Element, pmap: dict[ET.Element, ET.Element | None]) -
     return o
 
 
-def svg_to_lonlat(sx: float, sy: float) -> tuple[float, float]:
-    w = VIEWBOX["width"]
-    h = VIEWBOX["height"]
-    lon = LON_DEG_WEST + (sx / w) * (LON_DEG_EAST - LON_DEG_WEST)
-    lat = LAT_DEG_NORTH - (sy / h) * (LAT_DEG_NORTH - LAT_DEG_SOUTH)
-    return round(lon, 6), round(lat, 6)
+@dataclass(frozen=True)
+class GcpPoint:
+    svg_x: float
+    svg_y: float
+    lon: float
+    lat: float
+
+
+@dataclass(frozen=True)
+class PolynomialGeoTransform:
+    degree: int
+    view_w: float
+    view_h: float
+    lon_coefficients: np.ndarray
+    lat_coefficients: np.ndarray
+
+    def svg_to_lonlat(self, sx: float, sy: float) -> tuple[float, float]:
+        terms = polynomial_terms(
+            normalize_svg_x(sx, self.view_w),
+            normalize_svg_y(sy, self.view_h),
+            self.degree,
+        )
+        lon = float(terms @ self.lon_coefficients)
+        lat = float(terms @ self.lat_coefficients)
+        return round(lon, 6), round(max(LAT_DEG_SOUTH, min(LAT_DEG_NORTH, lat)), 6)
+
+
+def normalize_svg_x(sx: float, view_w: float) -> float:
+    return (sx - view_w / 2.0) / view_w
+
+
+def normalize_svg_y(sy: float, view_h: float) -> float:
+    return (sy - view_h / 2.0) / view_h
+
+
+def polynomial_terms(x: float, y: float, degree: int) -> np.ndarray:
+    return np.array(
+        [x**i * y**j for total in range(degree + 1) for i in range(total + 1) for j in [total - i]],
+        dtype=float,
+    )
+
+
+def qgis_source_to_svg(source_x: float, source_y: float) -> tuple[float, float]:
+    return source_x * QGIS_RASTER_TO_SVG_SCALE, -source_y * QGIS_RASTER_TO_SVG_SCALE
+
+
+def qgis_row_to_gcp_point(row: dict[str, str]) -> GcpPoint:
+    svg_x, svg_y = qgis_source_to_svg(float(row["sourceX"]), float(row["sourceY"]))
+    return GcpPoint(
+        svg_x=svg_x,
+        svg_y=svg_y,
+        lon=float(row["mapX"]),
+        lat=float(row["mapY"]),
+    )
+
+
+def parse_qgis_gcps(path: Path) -> list[GcpPoint]:
+    with open(path, newline="", encoding="utf-8") as f:
+        rows = csv.DictReader(line for line in f if not line.startswith("#"))
+        points = [qgis_row_to_gcp_point(row) for row in rows if row.get("enable") == "1"]
+    min_points = (GCP_POLYNOMIAL_DEGREE + 1) * (GCP_POLYNOMIAL_DEGREE + 2) // 2
+    if len(points) < min_points:
+        raise SystemExit(
+            f"Polynomial degree {GCP_POLYNOMIAL_DEGREE} needs at least {min_points} enabled GCPs; got {len(points)}"
+        )
+    return points
+
+
+def build_geo_transform(view_w: float, view_h: float) -> PolynomialGeoTransform:
+    points = parse_qgis_gcps(GCP_POINTS_PATH)
+    matrix = np.vstack(
+        [
+            polynomial_terms(
+                normalize_svg_x(point.svg_x, view_w),
+                normalize_svg_y(point.svg_y, view_h),
+                GCP_POLYNOMIAL_DEGREE,
+            )
+            for point in points
+        ]
+    )
+    lon_values = np.array([point.lon for point in points], dtype=float)
+    lat_values = np.array([point.lat for point in points], dtype=float)
+    lon_coefficients, *_ = np.linalg.lstsq(matrix, lon_values, rcond=None)
+    lat_coefficients, *_ = np.linalg.lstsq(matrix, lat_values, rcond=None)
+    return PolynomialGeoTransform(
+        degree=GCP_POLYNOMIAL_DEGREE,
+        view_w=view_w,
+        view_h=view_h,
+        lon_coefficients=lon_coefficients,
+        lat_coefficients=lat_coefficients,
+    )
 
 
 def shoelace_area(ring: list[tuple[float, float]]) -> float:
@@ -173,17 +264,37 @@ def rect_to_ring(x: float, y: float, w: float, h: float) -> list[tuple[float, fl
     return [(x, y), (x + w, y), (x + w, y + h), (x, y + h), (x, y)]
 
 
-def ring_to_geojson_coords(ring: list[tuple[float, float]]) -> list[list[float]]:
+def ring_to_geojson_coords(
+    ring: list[tuple[float, float]],
+    geo_transform: PolynomialGeoTransform,
+) -> list[list[float]]:
     if ring[0] == ring[-1]:
         r = ring
     else:
         r = [*ring, ring[0]]
-    return [[svg_to_lonlat(x, y)[0], svg_to_lonlat(x, y)[1]] for x, y in r]
+    return [
+        list(geo_transform.svg_to_lonlat(x, y)) for x, y in r
+    ]
+
+
+def parse_svg_viewbox(svg_root: ET.Element) -> tuple[float, float]:
+    raw = (svg_root.get("viewBox") or "").strip()
+    if not raw:
+        raise SystemExit("Root <svg> has no viewBox")
+    parts = raw.replace(",", " ").split()
+    if len(parts) < 4:
+        raise SystemExit("viewBox must have at least 4 values")
+    w, h = float(parts[2]), float(parts[3])
+    if w <= 0 or h <= 0:
+        raise SystemExit("viewBox width/height must be positive")
+    return w, h
 
 
 def main() -> None:
     tree = ET.parse(SVG_PATH)
     r = tree.getroot()
+    view_w, view_h = parse_svg_viewbox(r)
+    geo_transform = build_geo_transform(view_w, view_h)
     style_el = None
     for el in r.iter():
         if local_tag(el) == "style":
@@ -229,7 +340,7 @@ def main() -> None:
             continue
 
         label = CIVILIZATION_FILLS[fill]
-        gcoords = ring_to_geojson_coords(ring)
+        gcoords = ring_to_geojson_coords(ring, geo_transform)
         fe = {
             "type": "Feature",
             "properties": {
@@ -245,8 +356,15 @@ def main() -> None:
     fc = {
         "type": "FeatureCollection",
         "name": "2500 BC civilizations (from Cottereau SVG)",
-        "proj_note": "Assumes Plate Carrée (equirectangular) over viewBox: lon = -180 + (x/width)*360, lat = 90 - (y/height)*180. Illustrator exports may be slightly off true geography.",
-        "viewBox": VIEWBOX,
+        "proj_note": (
+            "Coordinates are fitted from QGIS WGS84 GCPs with a degree-3 polynomial transform. "
+            "QGIS raster source coordinates are converted back to SVG coordinates with "
+            "svg_x = sourceX * 0.5 and svg_y = -sourceY * 0.5 before fitting."
+        ),
+        "viewBox": {"width": view_w, "height": view_h},
+        "qgisGcpPoints": GCP_POINTS_PATH.name,
+        "qgisPolynomialDegree": GCP_POLYNOMIAL_DEGREE,
+        "qgisRasterToSvgScale": QGIS_RASTER_TO_SVG_SCALE,
         "extent": {
             "lon_west": LON_DEG_WEST,
             "lon_east": LON_DEG_EAST,

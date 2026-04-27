@@ -4,6 +4,7 @@ import type {
   PartialTimeBoundGeographicRegion,
   PartialTimeBoundGeographicRegionGroup,
 } from "./types";
+import { generateCottereau2500BceData } from "./cottereau-2500bce";
 import { generateModernCountriesData } from "./modern-countries";
 import { calculateTotalArea, addTitleToHierarchy } from "./data-utils";
 
@@ -39,7 +40,10 @@ function completeGroup(
 }
 
 const partialDataset: PartialTimeBoundGeographicRegionGroup = {
-  children: [generateModernCountriesData()],
+  children: [
+    generateCottereau2500BceData(),
+    generateModernCountriesData(),
+  ],
   metadata: {
     id: "complete-dataset",
     title: "",
